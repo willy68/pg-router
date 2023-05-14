@@ -17,14 +17,14 @@ class NamedParamsParser extends AbstractParser
         return $this->routes;
     }
 
-    protected function getSubpattern(?string $name = null, ?string $token = null): string
+    protected function getSubpattern(string $name, ?string $token = null): string
     {
         // is there a custom subpattern for the name?
         if ($token) {
-            return "(?P<{$name}>{$token})";
+            return '(?P<' . $name . '>' . $token . ')';
         }
 
         // use a default subpattern
-        return "(?P<{$name}>[^/]+)";
+        return '(?P<' . $name . '>[^/]+)';
     }
 }

@@ -61,12 +61,13 @@ class UrlGenerator implements GeneratorInterface
                     $this->route->getName()
                 ));
             }
+
             $name = $match[1];
             foreach ($this->data as $key => $val) {
                 if ($key === $name) {
                     $token = $match[2] ?? null;
                     if ($token) {
-                        if (!preg_match('~^' . $token . '$~', (string)$val)) {
+                        if (!preg_match('~^' . $token . '$~x', (string)$val)) {
                             throw new RuntimeException(sprintf(
                                 'Parameter value for [%s] did not match the regex `%s`',
                                 $name,
@@ -121,12 +122,14 @@ class UrlGenerator implements GeneratorInterface
     protected function buildOptionalReplacement(array $names): string
     {
         $repl = '';
+
         foreach ($names as $name) {
             $token = null;
             if (is_array($name)) {
                 $token = $name[1];
                 $name = $name[0];
             }
+
             // is there data for this optional attribute?
             if (!isset($this->data[$name])) {
                 // options are *sequentially* optional, so if one is
@@ -138,7 +141,7 @@ class UrlGenerator implements GeneratorInterface
 
             // Check val matching token
             if ($token) {
-                if (!preg_match('~^' . $token . '$~', (string)$val)) {
+                if (!preg_match('~^' . $token . '$~x', (string)$val)) {
                     throw new RuntimeException(sprintf(
                         'Parameter value for [%s] did not match the regex `%s`',
                         $name,
@@ -146,9 +149,11 @@ class UrlGenerator implements GeneratorInterface
                     ));
                 }
             }
+
             // encode the optional value
             $repl .= '/' . $val;
         }
+
         return $repl;
     }
 }

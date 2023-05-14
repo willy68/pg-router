@@ -63,7 +63,6 @@ class MarkDataMatcher implements MatcherInterface
     protected function matchPath(string $uri, array $regexToRouteVars): bool|array
     {
         foreach ($regexToRouteVars as $routeVars) {
-            //dd($routeVars);
             if (!preg_match($routeVars['regex'], $uri, $matches)) {
                 continue;
             }
@@ -77,6 +76,7 @@ class MarkDataMatcher implements MatcherInterface
 
             return $matches;
         }
+
         return false;
     }
 
@@ -89,10 +89,7 @@ class MarkDataMatcher implements MatcherInterface
     {
         $attributes = [];
 
-        for ($i = 1; '' === $matches[$i]; $i++) {
-            continue;
-        }
-
+        $i = 1;
         foreach ($varNames as $varName) {
             if (isset($matches[$i]) && '' !== $matches[$i]) {
                 $attributes[$varName] = rawurldecode($matches[$i++]);

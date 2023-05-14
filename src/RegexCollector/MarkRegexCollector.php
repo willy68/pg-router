@@ -89,7 +89,7 @@ class MarkRegexCollector implements RegexCollectorInterface
             $routeVars[$name] = ['vars' => $vars, 'methods' => $methods];
         }
 
-        $regex = '~^(?|' . implode('|', $regexes) . ')$~';
+        $regex = '~^(?|' . implode('|', $regexes) . ')$~x';
 
         return ['regex' => $regex, 'routeVars' => $routeVars];
     }

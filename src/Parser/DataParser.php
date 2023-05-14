@@ -17,11 +17,11 @@ class DataParser extends AbstractParser
         return $this->routes;
     }
 
-    protected function getSubpattern(?string $name = null, $token = null): string
+    protected function getSubpattern(string $name, ?string $token = null): string
     {
         // is there a custom subpattern for the name?
         if ($token) {
-            return "({$token})";
+            return '(' . $token . ')';
         }
 
         // use a default subpattern

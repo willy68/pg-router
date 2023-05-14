@@ -63,11 +63,12 @@ class RouteMatcher implements MatcherInterface
         $routeVars = $parser->parse($path);
         [$regexes, ] = $routeVars;
         foreach ($regexes as $regex) {
-            if (!preg_match('~^' . $regex . '$~', $uri, $matches)) {
+            if (!preg_match('~^' . $regex . '$~x', $uri, $matches)) {
                 continue;
             }
             return $matches;
         }
+
         return false;
     }
 
@@ -76,6 +77,7 @@ class RouteMatcher implements MatcherInterface
         if (null === $this->parser) {
             $this->parser = new NamedParamsParser();
         }
+
         return $this->parser;
     }
 
@@ -92,6 +94,7 @@ class RouteMatcher implements MatcherInterface
                 $attributes[$key] = rawurldecode($val);
             }
         }
+
         return $attributes;
     }
 

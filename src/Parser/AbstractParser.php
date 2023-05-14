@@ -41,7 +41,7 @@ abstract class AbstractParser implements ParserInterface
             $repl = '';
 
             foreach ($parts as $part) {
-                $repl .= '/' . "{{$part}}";
+                $repl .= '/' . '{' . $part . '}';
                 $routes[] = str_replace($matches[0], $repl, $this->regex);
             }
         }
@@ -65,6 +65,7 @@ abstract class AbstractParser implements ParserInterface
             foreach ($matches as $index => $match) {
                 $name = $match[1];
                 $token = $match[2] ?? null;
+
                 $subpattern = $this->getSubpattern($name, $token);
                 $route = str_replace($match[0], $subpattern, $route);
                 $vars[$index] = $name;
@@ -75,5 +76,5 @@ abstract class AbstractParser implements ParserInterface
         $this->routes = [$regex, $vars];
     }
 
-    abstract protected function getSubpattern(string $name = null, string $token = null): string;
+    abstract protected function getSubpattern(string $name, ?string $token = null): string;
 }
