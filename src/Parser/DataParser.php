@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Pg\Router\Parser;
+
+class DataParser extends AbstractParser
+{
+    public function parse(string $path): string|array
+    {
+        $this->regex = $path;
+        $this->routes = [];
+
+        $routes = $this->parseOptionalParts();
+        $this->parseVariableParts($routes);
+
+        return $this->routes;
+    }
+
+    protected function getSubpattern(?string $name = null, $token = null): string
+    {
+        // is there a custom subpattern for the name?
+        if ($token) {
+            return "({$token})";
+        }
+
+        // use a default subpattern
+        return "([^/]+)";
+    }
+}
