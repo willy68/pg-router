@@ -8,7 +8,6 @@ use Pg\Router\Route;
 use Pg\Router\RouteCollectionInterface;
 use Pg\Router\RouterInterface;
 use RuntimeException;
-
 use function is_array;
 use function preg_match;
 use function preg_match_all;
@@ -17,14 +16,16 @@ use function strtr;
 
 class UrlGenerator implements GeneratorInterface
 {
-    public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:*\s*([^/]*{*[^/]*}*[^/]*)\s*}~';
-    public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
+    public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*{*[^{}]*}*[^{}]*)\s*)?}~';
+    // Basic
+    //public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:*\s*([^/]*{*[^/]*}*[^/]*)\s*}~';
+    //public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
     // For new format
-    //public const OPT_REGEX = '~{\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)}~';
-    public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^;]*{*[^;]*,?}*))?~';
+    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)\]~';
+    //public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^;]*{*[^;]*,?}*))?~';
     //public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^,]*(?:\{(?-1)\}[^,]*)*))?~';
     // For new format
-    //public const EXPLODE_REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^{}]*{*[^{}]*,?}*))?}~';
+    public const EXPLODE_REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^{}]*{*[^{}]*,?}*))?}~';
 
     protected Route $route;
     protected string $url;
@@ -60,12 +61,13 @@ class UrlGenerator implements GeneratorInterface
     protected function buildTokenReplacements(): void
     {
         // For new format
-        //$regex = preg_split(self::OPT_REGEX, $this->regex);
-        //if (false === $regex || $regex[0] === '/') {
-        //    return;
-        //}
-        //preg_match_all(self::REGEX, $this->url, $matches, PREG_SET_ORDER);
-        preg_match_all(self::REGEX, $this->url, $matches, PREG_SET_ORDER);
+        $regex = preg_split(self::OPT_REGEX, $this->url);
+
+        if (false === $regex || $regex[0] === '/') {
+            return;
+        }
+
+        preg_match_all(self::REGEX, $regex[0], $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             if (empty($this->data)) {
                 throw new RuntimeException(sprintf(
@@ -75,21 +77,27 @@ class UrlGenerator implements GeneratorInterface
             }
 
             $name = $match[1];
-            foreach ($this->data as $key => $val) {
-                if ($key === $name) {
-                    $token = $match[2] ?? null;
-                    if ($token) {
-                        if (!preg_match('~^' . $token . '$~x', (string)$val)) {
-                            throw new RuntimeException(sprintf(
-                                'Parameter value for [%s] did not match the regex `%s`',
-                                $name,
-                                $token
-                            ));
-                        }
-                    }
-                    $this->repl[$match[0]] = $val;
-                }
+
+            // is there data for this variable attribute?
+            if (!isset($this->data[$name])) {
+                // Variables attributes are not optional
+                throw new RuntimeException(sprintf(
+                    'Parameter value for [%s] is missing',
+                    $name
+                ));
             }
+
+            $val = $this->data[$name];
+            $token = $match[2] ?? "([^/]+)";
+
+            if (!preg_match('~^' . $token . '$~x', (string)$val)) {
+                throw new RuntimeException(sprintf(
+                    'Parameter value for [%s] did not match the regex `%s`',
+                    $name,
+                    $token
+                ));
+            }
+            $this->repl[$match[0]] = $val;
         }
     }
 
@@ -136,7 +144,7 @@ class UrlGenerator implements GeneratorInterface
         $repl = '';
 
         foreach ($names as $name) {
-            $token = null;
+            $token = "([^/]+)";
             if (is_array($name)) {
                 $token = $name[1];
                 $name = $name[0];
@@ -152,14 +160,12 @@ class UrlGenerator implements GeneratorInterface
             $val = $this->data[$name];
 
             // Check val matching token
-            if ($token) {
-                if (!preg_match('~^' . $token . '$~x', (string)$val)) {
-                    throw new RuntimeException(sprintf(
-                        'Parameter value for [%s] did not match the regex `%s`',
-                        $name,
-                        $token
-                    ));
-                }
+            if (!preg_match('~^' . $token . '$~x', (string)$val)) {
+                throw new RuntimeException(sprintf(
+                    'Parameter value for [%s] did not match the regex `%s`',
+                    $name,
+                    $token
+                ));
             }
 
             // encode the optional value
