@@ -21,7 +21,7 @@ class NamedParamsParser extends AbstractParser
     {
         // is there a custom subpattern for the name?
         if ($token) {
-            return '(?P<' . $name . '>' . $token . ')';
+            return '(?P<' . $name . '>' . trim($token) . ')';
         }
 
         // use a default subpattern

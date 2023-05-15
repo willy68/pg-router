@@ -21,7 +21,7 @@ class DataParser extends AbstractParser
     {
         // is there a custom subpattern for the name?
         if ($token) {
-            return '(' . $token . ')';
+            return '(' . trim($token) . ')';
         }
 
         // use a default subpattern

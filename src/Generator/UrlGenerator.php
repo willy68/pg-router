@@ -19,8 +19,12 @@ class UrlGenerator implements GeneratorInterface
 {
     public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:*\s*([^/]*{*[^/]*}*[^/]*)\s*}~';
     public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
+    // For new format
+    //public const OPT_REGEX = '~{\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)}~';
     public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^;]*{*[^;]*,?}*))?~';
     //public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^,]*(?:\{(?-1)\}[^,]*)*))?~';
+    // For new format
+    //public const EXPLODE_REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^{}]*{*[^{}]*,?}*))?}~';
 
     protected Route $route;
     protected string $url;
@@ -39,9 +43,11 @@ class UrlGenerator implements GeneratorInterface
         $this->route = $this->router->getRouteName($name);
         $this->url = $this->route->getPath();
         $this->data = $attributes;
+
         $this->buildTokenReplacements();
         $this->buildOptionalReplacements();
         $this->url = strtr($this->url, $this->repl);
+
         return $this->url;
     }
 
@@ -53,6 +59,12 @@ class UrlGenerator implements GeneratorInterface
      */
     protected function buildTokenReplacements(): void
     {
+        // For new format
+        //$regex = preg_split(self::OPT_REGEX, $this->regex);
+        //if (false === $regex || $regex[0] === '/') {
+        //    return;
+        //}
+        //preg_match_all(self::REGEX, $this->url, $matches, PREG_SET_ORDER);
         preg_match_all(self::REGEX, $this->url, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             if (empty($this->data)) {

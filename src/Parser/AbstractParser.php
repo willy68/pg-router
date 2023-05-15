@@ -13,8 +13,11 @@ use function str_replace;
 
 abstract class AbstractParser implements ParserInterface
 {
-    public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:*\s*([^/]*{*[^/]*}*[^/]*)\s*}~';
+    public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*(?:\{(?-1)\}[^{}]*)*)\s*)?}~';
+    //public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*{*[^{}]*}*[^{}]*)\s*)?}~';
     public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
+    // For new format
+    //public const OPT_REGEX = '~{\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)}~';
     protected string $regex;
     protected array $routes;
 
@@ -42,6 +45,8 @@ abstract class AbstractParser implements ParserInterface
 
             foreach ($parts as $part) {
                 $repl .= '/' . '{' . $part . '}';
+                // For new format
+                //$repl .= '/' . $part;
                 $routes[] = str_replace($matches[0], $repl, $this->regex);
             }
         }
