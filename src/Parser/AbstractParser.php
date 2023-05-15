@@ -20,7 +20,7 @@ abstract class AbstractParser implements ParserInterface
     // Basic
     //public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
     // For new format
-    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)\]~';
+    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)]~';
     protected string $regex;
     protected array $routes;
 

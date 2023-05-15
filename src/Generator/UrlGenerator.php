@@ -8,6 +8,7 @@ use Pg\Router\Route;
 use Pg\Router\RouteCollectionInterface;
 use Pg\Router\RouterInterface;
 use RuntimeException;
+
 use function is_array;
 use function preg_match;
 use function preg_match_all;
@@ -19,13 +20,7 @@ class UrlGenerator implements GeneratorInterface
     public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*{*[^{}]*}*[^{}]*)\s*)?}~';
     // Basic
     //public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:*\s*([^/]*{*[^/]*}*[^/]*)\s*}~';
-    //public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
-    // For new format
-    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)\]~';
-    //public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^;]*{*[^;]*,?}*))?~';
-    //public const EXPLODE_REGEX = '~\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^,]*(?:\{(?-1)\}[^,]*)*))?~';
-    // For new format
-    public const EXPLODE_REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::*\s*([^{}]*{*[^{}]*,?}*))?}~';
+    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)]~';
 
     protected Route $route;
     protected string $url;
@@ -117,7 +112,7 @@ class UrlGenerator implements GeneratorInterface
 
         // the optional attribute names in the token
         $names = [];
-        preg_match_all(self::EXPLODE_REGEX, $matches[1], $exMatches, PREG_SET_ORDER);
+        preg_match_all(self::REGEX, $matches[1], $exMatches, PREG_SET_ORDER);
         foreach ($exMatches as $match) {
             $name = $match[1];
             $token = $match[2] ?? null;
