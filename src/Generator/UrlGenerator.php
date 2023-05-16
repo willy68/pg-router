@@ -54,7 +54,7 @@ class UrlGenerator implements GeneratorInterface
         // For new format
         $regex = preg_split(Regex::OPT_REGEX, $this->url);
 
-        if (false === $regex || $regex[0] === '/') {
+        if (false === $regex  || $regex[0] === '/' || $regex[0] === '') {
             return;
         }
 

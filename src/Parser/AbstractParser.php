@@ -31,7 +31,7 @@ abstract class AbstractParser implements ParserInterface
         $regex = preg_split(Regex::OPT_REGEX, $this->regex);
         if (is_array($regex)) {
             // Put variable part (or static) in first without optional part
-            $routes[] = $regex[0];
+            $routes[] = $regex[0] ?: '/';
         }
 
         preg_match(Regex::OPT_REGEX, $this->regex, $matches);
