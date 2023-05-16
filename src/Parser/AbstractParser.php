@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pg\Router\Parser;
 
+use Pg\Router\Regex\Regex;
+
 use function explode;
 use function is_array;
 use function preg_match;
@@ -13,14 +15,6 @@ use function str_replace;
 
 abstract class AbstractParser implements ParserInterface
 {
-    // From fastRoute
-    //public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*(?:\{(?-1)\}[^{}]*)*)\s*)?}~';
-    // Perso
-    public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*{*[^{}]*}*[^{}]*)\s*)?}~';
-    // Basic
-    //public const OPT_REGEX = '~{\s*/\s*([a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*)}~';
-    // For new format
-    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)]~';
     protected string $regex;
     protected array $routes;
 
@@ -34,13 +28,13 @@ abstract class AbstractParser implements ParserInterface
     protected function parseOptionalParts(): array
     {
         $routes = [];
-        $regex = preg_split(self::OPT_REGEX, $this->regex);
+        $regex = preg_split(Regex::OPT_REGEX, $this->regex);
         if (is_array($regex)) {
             // Put variable part (or static) in first without optional part
             $routes[] = $regex[0];
         }
 
-        preg_match(self::OPT_REGEX, $this->regex, $matches);
+        preg_match(Regex::OPT_REGEX, $this->regex, $matches);
         if ($matches) {
             $parts = explode(';', $matches[1]);
             $repl = '';
@@ -66,7 +60,7 @@ abstract class AbstractParser implements ParserInterface
         $regex = [];
 
         foreach ($routes as $route) {
-            preg_match_all(self::REGEX, $route, $matches, PREG_SET_ORDER);
+            preg_match_all(Regex::REGEX, $route, $matches, PREG_SET_ORDER);
             foreach ($matches as $index => $match) {
                 $name = $match[1];
                 $token = $match[2] ?? null;

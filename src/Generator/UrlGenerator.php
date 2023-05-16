@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pg\Router\Generator;
 
+use Pg\Router\Regex\Regex;
 use Pg\Router\Route;
 use Pg\Router\RouteCollectionInterface;
 use Pg\Router\RouterInterface;
@@ -17,11 +18,6 @@ use function strtr;
 
 class UrlGenerator implements GeneratorInterface
 {
-    public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*{*[^{}]*}*[^{}]*)\s*)?}~';
-    // Basic
-    //public const REGEX = '~{\s*([a-zA-Z_][a-zA-Z0-9_-]*)\s*:*\s*([^/]*{*[^/]*}*[^/]*)\s*}~';
-    public const OPT_REGEX = '~\[\s*/\s*({[a-z][a-zA-Z0-9_-]*\s*:*\s*[^/]*{*[^/]*}*[^/]*;*}*)]~';
-
     protected Route $route;
     protected string $url;
     protected array $data = [];
@@ -56,13 +52,13 @@ class UrlGenerator implements GeneratorInterface
     protected function buildTokenReplacements(): void
     {
         // For new format
-        $regex = preg_split(self::OPT_REGEX, $this->url);
+        $regex = preg_split(Regex::OPT_REGEX, $this->url);
 
         if (false === $regex || $regex[0] === '/') {
             return;
         }
 
-        preg_match_all(self::REGEX, $regex[0], $matches, PREG_SET_ORDER);
+        preg_match_all(Regex::REGEX, $regex[0], $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             if (empty($this->data)) {
                 throw new RuntimeException(sprintf(
@@ -105,14 +101,14 @@ class UrlGenerator implements GeneratorInterface
     protected function buildOptionalReplacements(): void
     {
         // replacements for optional attributes, if any
-        preg_match(self::OPT_REGEX, $this->url, $matches);
+        preg_match(Regex::OPT_REGEX, $this->url, $matches);
         if (!$matches) {
             return;
         }
 
         // the optional attribute names in the token
         $names = [];
-        preg_match_all(self::REGEX, $matches[1], $exMatches, PREG_SET_ORDER);
+        preg_match_all(Regex::REGEX, $matches[1], $exMatches, PREG_SET_ORDER);
         foreach ($exMatches as $match) {
             $name = $match[1];
             $token = $match[2] ?? null;
