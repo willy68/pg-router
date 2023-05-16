@@ -62,14 +62,13 @@ class MarkDataMatcher implements MatcherInterface
 
     protected function matchPath(string $uri, array $regexToRouteVars): bool|array
     {
-        foreach ($regexToRouteVars as $routeVars) {
-            if (!preg_match($routeVars['regex'], $uri, $matches)) {
+        foreach ($regexToRouteVars as $routes) {
+            if (!preg_match($routes['regex'], $uri, $matches)) {
                 continue;
             }
 
             $name = $matches['MARK'];
-            $routeVars = $routeVars['routeVars'][$name];
-            $varNames = $routeVars['vars'];
+            $varNames = $routes['routeVars'][$name]['vars'];
 
             $this->attributes = $this->foundAttributes($matches, $varNames);
             $this->matchedRoute = $name;
