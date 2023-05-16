@@ -58,10 +58,10 @@ abstract class AbstractParser implements ParserInterface
     protected function parseVariableParts(array $routes): void
     {
         $attributes = [];
-        $vars = [];
         $regex = [];
 
         foreach ($routes as $route) {
+            $vars = [];
             preg_match_all(Regex::REGEX, $route, $matches, PREG_SET_ORDER);
             foreach ($matches as $match) {
                 $name = $match[1];
@@ -75,13 +75,11 @@ abstract class AbstractParser implements ParserInterface
                         )
                     );
                 }
-                $vars[$name] = $name;
 
                 $subpattern = $this->getSubpattern($name, $token);
                 $route = str_replace($match[0], $subpattern, $route);
-                $attributes[$name] = $name;
+                $attributes[$name] = $vars[$name] = $name;
             }
-            $vars = [];
             $regex[] = $route;
         }
 

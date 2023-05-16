@@ -22,7 +22,7 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
     protected function detectDuplicateRoute(Route $route): void
     {
         if (isset($this->routes[$route->getName()])) {
-            throw new DuplicateRouteException(
+            $this->throwDuplicateRoute(
                 sprintf(
                     'Route with name `%s` already exists',
                     $route->getName()
@@ -33,7 +33,7 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
         $path = $route->getPath();
 
         if (isset($this->methodToPathMap['ANY'][$path])) {
-            throw new DuplicateRouteException(
+            $this->throwDuplicateRoute(
                 sprintf(
                     'Route with path `%s` already exists with method [%s]',
                     $path,
@@ -41,19 +41,20 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
                 )
             );
         }
+
+        $allowedMethods = $route->getAllowedMethods() ?? ['ANY'];
         foreach ($this->methodToPathMap as $method => $routePath) {
-            $allowedMethods = $route->getAllowedMethods() ?? ['ANY'];
             foreach ($allowedMethods as $allowedMethod) {
                 if (
                     isset($this->methodToPathMap[$allowedMethod][$path]) ||
-                    ($route->allowsAnyMethod() && isset($this->methodToPathMap[$method][$path]))
+                    ($allowedMethod === 'ANY' && isset($this->methodToPathMap[$method][$path]))
                 ) {
-                    throw new DuplicateRouteException(
+                    $this->throwDuplicateRoute(
                         sprintf(
                             'Route with path `%s` already exists with method [%s] and name [%s]',
                             $route->getPath(),
                             $method,
-                            $this->methodToPathMap[$method][$path]->getName()
+                            $this->methodToPathMap[$method][$path]
                         )
                     );
                 }
@@ -63,14 +64,16 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
 
     protected function memorizeRoute(Route $route): void
     {
-        $this->routes[$route->getName()] = $route;
+        $name = $route->getName();
+        $this->routes[$route->getName()] = $name;
+
         if ($route->allowsAnyMethod()) {
-            $this->methodToPathMap['ANY'][$route->getPath()] = $route;
+            $this->methodToPathMap['ANY'][$name] = $name;
             return;
         }
 
         foreach ($route->getAllowedMethods() as $method) {
-            $this->methodToPathMap[$method][$route->getPath()] = $route;
+            $this->methodToPathMap[$method][$route->getPath()] = $name;
         }
     }
 
