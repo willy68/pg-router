@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pg\Router\Parser;
 
+use Pg\Router\Exception\DuplicateAttributeException;
 use Pg\Router\Regex\Regex;
 
 use function explode;
@@ -56,23 +57,35 @@ abstract class AbstractParser implements ParserInterface
      */
     protected function parseVariableParts(array $routes): void
     {
+        $attributes = [];
         $vars = [];
         $regex = [];
 
         foreach ($routes as $route) {
             preg_match_all(Regex::REGEX, $route, $matches, PREG_SET_ORDER);
-            foreach ($matches as $index => $match) {
+            foreach ($matches as $match) {
                 $name = $match[1];
                 $token = $match[2] ?? null;
 
+                if (isset($vars[$name])) {
+                    throw new DuplicateAttributeException(
+                        sprintf(
+                            'Cannot use the same attribute twice [%s]',
+                            $name
+                        )
+                    );
+                }
+                $vars[$name] = $name;
+
                 $subpattern = $this->getSubpattern($name, $token);
                 $route = str_replace($match[0], $subpattern, $route);
-                $vars[$index] = $name;
+                $attributes[$name] = $name;
             }
+            $vars = [];
             $regex[] = $route;
         }
 
-        $this->routes = [$regex, $vars];
+        $this->routes = [$regex, $attributes];
     }
 
     abstract protected function getSubpattern(string $name, ?string $token = null): string;

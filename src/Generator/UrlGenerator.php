@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Pg\Router\Generator;
 
+use Pg\Router\Exception\MissingAttributeException;
+use Pg\Router\Exception\RuntimeException;
 use Pg\Router\Regex\Regex;
 use Pg\Router\Route;
 use Pg\Router\RouteCollectionInterface;
 use Pg\Router\RouterInterface;
-use RuntimeException;
 
 use function is_array;
 use function preg_match;
@@ -61,7 +62,7 @@ class UrlGenerator implements GeneratorInterface
         preg_match_all(Regex::REGEX, $regex[0], $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             if (empty($this->data)) {
-                throw new RuntimeException(sprintf(
+                throw new MissingAttributeException(sprintf(
                     'No replacement attributes found for this route [%s]',
                     $this->route->getName()
                 ));
@@ -72,7 +73,7 @@ class UrlGenerator implements GeneratorInterface
             // is there data for this variable attribute?
             if (!isset($this->data[$name])) {
                 // Variables attributes are not optional
-                throw new RuntimeException(sprintf(
+                throw new MissingAttributeException(sprintf(
                     'Parameter value for [%s] is missing',
                     $name
                 ));
