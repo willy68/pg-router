@@ -1,6 +1,6 @@
 <?php
 
-namespace Parser;
+namespace PgTest\Router\Parser;
 
 use Pg\Router\Exception\DuplicateAttributeException;
 use Pg\Router\Parser\NamedParamsParser;

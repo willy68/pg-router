@@ -1,6 +1,6 @@
 <?php
 
-namespace Generator;
+namespace PgTest\Router\Generator;
 
 use Pg\Router\Exception\RouteNotFoundException;
 use Pg\Router\Generator\UrlGenerator;
@@ -108,5 +108,4 @@ class UrlGeneratorTest extends TestCase
         $url = $generator->generate('test', ['id' => 42, 'host' => 'bar']);
         $this->assertEquals('//bar.example.com/blog/42/edit', $url);
     }
-
 }

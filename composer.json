@@ -9,7 +9,7 @@
         }
     },
     "autoload-dev": {
-        "PgTest\\Router\\": "tests"
+        "PgTest\\Router\\": "tests/"
     },
     "authors": [
         {
@@ -17,7 +17,6 @@
             "email": "william.lety@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
     "require": {
         "php": "~8.0.0 || ~8.1.0 || ~8.2.0",
         "psr/container": "^1.0 || ^2.0",
