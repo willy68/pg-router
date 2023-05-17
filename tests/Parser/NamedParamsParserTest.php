@@ -3,17 +3,17 @@
 namespace Parser;
 
 use Pg\Router\Exception\DuplicateAttributeException;
-use Pg\Router\Parser\DataParser;
+use Pg\Router\Parser\NamedParamsParser;
 use PHPUnit\Framework\TestCase;
 
-class DataParserTest extends TestCase
+class NamedParamsParserTest extends TestCase
 {
-    protected DataParser $dataParser;
+    protected NamedParamsParser $dataParser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dataParser = new DataParser();
+        $this->dataParser = new NamedParamsParser();
     }
 
     public function testStaticPath()
@@ -26,56 +26,59 @@ class DataParserTest extends TestCase
     public function testVariableWithDefaultToken()
     {
         $data = $this->dataParser->parse('/foo/{bar}');
-        $expect = [['/foo/([^/]+)'], ['bar' => 'bar']];
+        $expect = [['/foo/(?P<bar>[^/]+)'], ['bar' => 'bar']];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableWithToken()
     {
         $data = $this->dataParser->parse('/foo/{bar:[a-z]+}');
-        $expect = [['/foo/([a-z]+)'], ['bar' => 'bar']];
+        $expect = [['/foo/(?P<bar>[a-z]+)'], ['bar' => 'bar']];
         $this->assertSame($expect, $data);
     }
 
     public function testFullUriVariable()
     {
         $data = $this->dataParser->parse('http://google.com/?q={q}');
-        $expect = [['http://google.com/?q=([^/]+)'], ['q' => 'q']];
+        $expect = [['http://google.com/?q=(?P<q>[^/]+)'], ['q' => 'q']];
         $this->assertSame($expect, $data);
     }
 
     public function testFullUriVariableWithToken()
     {
         $data = $this->dataParser->parse('http://google.com/?q={q:[a-z]+}');
-        $expect = [['http://google.com/?q=([a-z]+)'], ['q' => 'q']];
+        $expect = [['http://google.com/?q=(?P<q>[a-z]+)'], ['q' => 'q']];
         $this->assertSame($expect, $data);
     }
 
     public function testStaticAndOptionalWithDefaultToken()
     {
         $data = $this->dataParser->parse('/foo/bar[/{baz}]');
-        $expect = [['/foo/bar', '/foo/bar/([^/]+)'], ['baz' => 'baz']];
+        $expect = [['/foo/bar', '/foo/bar/(?P<baz>[^/]+)'], ['baz' => 'baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testStaticAndOptionalWithToken()
     {
         $data = $this->dataParser->parse('/foo/bar[/{baz:[a-z]+}]');
-        $expect = [['/foo/bar', '/foo/bar/([a-z]+)'], ['baz' => 'baz']];
+        $expect = [['/foo/bar', '/foo/bar/(?P<baz>[a-z]+)'], ['baz' => 'baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testStaticAndMultipleOptionalsWithToken()
     {
         $data = $this->dataParser->parse('/foo[/{bar:[a-z]+};{baz:\d+}]');
-        $expect = [['/foo', '/foo/([a-z]+)', '/foo/([a-z]+)/(\d+)'], ['bar' => 'bar', 'baz' => 'baz']];
+        $expect = [
+            ['/foo', '/foo/(?P<bar>[a-z]+)', '/foo/(?P<bar>[a-z]+)/(?P<baz>\d+)'],
+            ['bar' => 'bar', 'baz' => 'baz']
+        ];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableAndOptionalWithToken()
     {
         $data = $this->dataParser->parse('/foo/{bar:\d+}[/{baz:[a-z]+}]');
-        $expect = [['/foo/(\d+)', '/foo/(\d+)/([a-z]+)'], ['bar' => 'bar', 'baz' => 'baz']];
+        $expect = [['/foo/(?P<bar>\d+)', '/foo/(?P<bar>\d+)/(?P<baz>[a-z]+)'], ['bar' => 'bar', 'baz' => 'baz']];
         $this->assertSame($expect, $data);
     }
 
@@ -83,7 +86,10 @@ class DataParserTest extends TestCase
     {
         $data = $this->dataParser->parse('/foo/{slug:[a-z]+}[/{bar:[0-9]+};{baz:\d+}]');
         $expect = [
-            ['/foo/([a-z]+)', '/foo/([a-z]+)/([0-9]+)', '/foo/([a-z]+)/([0-9]+)/(\d+)'],
+            [
+                '/foo/(?P<slug>[a-z]+)', '/foo/(?P<slug>[a-z]+)/(?P<bar>[0-9]+)',
+                '/foo/(?P<slug>[a-z]+)/(?P<bar>[0-9]+)/(?P<baz>\d+)'
+            ],
             ['slug' => 'slug', 'bar' => 'bar', 'baz' => 'baz']
         ];
         $this->assertSame($expect, $data);
@@ -92,14 +98,17 @@ class DataParserTest extends TestCase
     public function testOptionalStartPathWithToken()
     {
         $data = $this->dataParser->parse('[/{bar:[a-z]+}]');
-        $expect = [['/', '/([a-z]+)'], ['bar' => 'bar']];
+        $expect = [['/', '/(?P<bar>[a-z]+)'], ['bar' => 'bar']];
         $this->assertSame($expect, $data);
     }
     public function testVariableAndMultipleOptionalsWithTokenAndSpace()
     {
         $data = $this->dataParser->parse('/foo/ { slug : [a-z]+ } [ / { bar : [0-9]+ } ; { baz : \d+ } ]');
         $expect = [
-            ['/foo/([a-z]+)', '/foo/([a-z]+)/([0-9]+)', '/foo/([a-z]+)/([0-9]+)/(\d+)'],
+            [
+                '/foo/(?P<slug>[a-z]+)', '/foo/(?P<slug>[a-z]+)/(?P<bar>[0-9]+)',
+                '/foo/(?P<slug>[a-z]+)/(?P<bar>[0-9]+)/(?P<baz>\d+)'
+            ],
             ['slug' => 'slug', 'bar' => 'bar', 'baz' => 'baz']
         ];
         $this->assertSame($expect, $data);
