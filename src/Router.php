@@ -20,6 +20,7 @@ use RuntimeException;
 class Router implements RouterInterface
 {
     use MiddlewareAwareStackTrait;
+    use RouteCollectionTrait;
 
     protected ?DuplicateDetectorInterface $detector = null;
     /** @var Route[] */
@@ -34,8 +35,12 @@ class Router implements RouterInterface
         $this->regexCollector = $regexCollector;
     }
 
-    public function route(string $path, callable|string $callback, ?string $name = null, ?array $methods = null): Route
-    {
+    public function route(
+        string $path,
+        callable|array|string $callback,
+        ?string $name = null,
+        ?array $methods = null
+    ): Route {
         $route = new Route($path, $callback, $name, $methods);
         $this->addRoute($route);
 
@@ -62,50 +67,6 @@ class Router implements RouterInterface
         return $this->detector;
     }
 
-    protected function getMatcher(?array $routes = null): MatcherInterface
-    {
-        if (!$this->matcherFactory) {
-            $this->matcherFactory = $this->getMatcherFactory();
-        }
-
-        $factory = $this->matcherFactory;
-
-        if (!$routes) {
-            $routes = $this->getParsedData();
-        }
-
-        return $factory($routes);
-    }
-
-    protected function getRegexCollector(): RegexCollectorInterface
-    {
-        if ($this->regexCollector) {
-            return $this->regexCollector;
-        }
-
-        $this->regexCollector = new MarkRegexCollector(fn(): ParserInterface => new DataParser());
-
-        return $this->regexCollector;
-    }
-
-    /** Good place to cache data*/
-    protected function getParsedData(): array
-    {
-        foreach ($this->routes as $route) {
-            $this->getRegexCollector()->addRoute($route);
-        }
-
-        return $this->regexCollector->getData();
-    }
-
-    /**
-     * @return callable(array|object): MatcherInterface
-     */
-    protected function getMatcherFactory(): callable
-    {
-        return fn($routes): MatcherInterface => new MarkDataMatcher($routes);
-    }
-
     public function match(Request $request): RouteResult
     {
         $uri = $request->getUri()->getPath();
@@ -121,6 +82,50 @@ class Router implements RouterInterface
         $allowedMethods = $matcher->getAllowedMethods();
 
         return RouteResult::fromRouteFailure(!empty($allowedMethods) ? $allowedMethods : null);
+    }
+
+    protected function getMatcher(?array $routes = null): MatcherInterface
+    {
+        if (!$this->matcherFactory) {
+            $this->matcherFactory = $this->getMatcherFactory();
+        }
+
+        $factory = $this->matcherFactory;
+
+        if (!$routes) {
+            $routes = $this->getParsedData();
+        }
+
+        return $factory($routes);
+    }
+
+    /**
+     * @return callable(array|object): MatcherInterface
+     */
+    protected function getMatcherFactory(): callable
+    {
+        return fn($routes): MatcherInterface => new MarkDataMatcher($routes);
+    }
+
+    /** Good place to cache data*/
+    protected function getParsedData(): array
+    {
+        foreach ($this->routes as $route) {
+            $this->getRegexCollector()->addRoute($route);
+        }
+
+        return $this->regexCollector->getData();
+    }
+
+    protected function getRegexCollector(): RegexCollectorInterface
+    {
+        if ($this->regexCollector) {
+            return $this->regexCollector;
+        }
+
+        $this->regexCollector = new MarkRegexCollector(fn(): ParserInterface => new DataParser());
+
+        return $this->regexCollector;
     }
 
     public function generateUri(string $name, array $substitutions = [], array $options = []): string

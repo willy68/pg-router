@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pg\Router\Generator;
 
 use Pg\Router\Exception\MissingAttributeException;
+use Pg\Router\Exception\RouteNotFoundException;
 use Pg\Router\Exception\RuntimeException;
 use Pg\Router\Regex\Regex;
 use Pg\Router\Route;
@@ -33,7 +34,15 @@ class UrlGenerator implements GeneratorInterface
 
     public function generate(string $name, array $attributes = []): string
     {
-        $this->route = $this->router->getRouteName($name);
+        $route = $this->router->getRouteName($name);
+
+        if (null === $route) {
+            throw new RouteNotFoundException(
+                sprintf('Route with name [%s] not found', $name)
+            );
+        }
+
+        $this->route = $route;
         $this->url = $this->route->getPath();
         $this->data = $attributes;
 
@@ -89,7 +98,7 @@ class UrlGenerator implements GeneratorInterface
                     $token
                 ));
             }
-            $this->repl[$match[0]] = $val;
+            $this->repl[$match[0]] = rawurlencode((string)$val);
         }
     }
 
@@ -161,7 +170,7 @@ class UrlGenerator implements GeneratorInterface
             }
 
             // encode the optional value
-            $repl .= '/' . $val;
+            $repl .= '/' . rawurlencode((string)$val);
         }
 
         return $repl;

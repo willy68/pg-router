@@ -37,7 +37,7 @@ class Route
 
     public function __construct(
         string $path,
-        callable|string $callback,
+        callable|array|string $callback,
         ?string $name = null,
         ?array $methods = self::HTTP_METHOD_ANY
     ) {

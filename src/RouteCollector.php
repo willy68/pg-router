@@ -50,13 +50,17 @@ class RouteCollector implements RouteCollectionInterface
      * Accepts a combination of a path and callback, and optionally the HTTP methods allowed.
      *
      * @param string $path
-     * @param callable|string $callback
+     * @param callable|array|string $callback
      * @param null|string $name The name of the route.
      * @param null|array $methods HTTP method to accept; null indicates any.
      * @return Route
      */
-    public function route(string $path, callable|string $callback, ?string $name = null, ?array $methods = null): Route
-    {
+    public function route(
+        string $path,
+        callable|array|string $callback,
+        ?string $name = null,
+        ?array $methods = null
+    ): Route {
         $route = new Route($path, $callback, $name, $methods);
         $this->routes[$route->getName()] = $route;
         $this->router->addRoute($route);

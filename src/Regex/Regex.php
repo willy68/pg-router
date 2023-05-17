@@ -12,5 +12,5 @@ class Regex
     public const REGEX = '~\s*\{\s*([a-zA-Z0-9_][a-zA-Z0-9_-]*)\s*(?::\s*([^{}]*{*[^{}]*}*[^{}]*)\s*)?}~';
     // For new format
     //public const OPT_REGEX = '~\s*\[\s*/\s*({\s*[a-zA-Z0-9_][a-zA-Z0-9_-]*\s*:*\s*[^{}]*{*[^{}]*}*[^/]*}*)]~';
-    public const OPT_REGEX = '~\s*\[\s*/\s*({\s*[a-zA-Z0-9_][a-zA-Z0-9_-]*\s*(?::\s*[^{}]*{*[^{}]*}*[^/]*)?}*)]~';
+    public const OPT_REGEX = '~\s*\[\s*/\s*({\s*[a-zA-Z0-9_][a-zA-Z0-9_-]*\s*(?::*\s*[^{}]*{*[^{}]*}*[^/]*)?}*)]~';
 }
