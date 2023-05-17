@@ -27,6 +27,7 @@
         "symfony/var-dumper": "^6.0",
         "phpunit/phpunit": "^10.1",
         "guzzlehttp/psr7": "^2.2",
+        "fig/http-message-util": "1.1.5",
         "nikic/fast-route": "v1.3.0",
         "squizlabs/php_codesniffer": "^3.6",
         "willy68/response-sender": "^1.0"

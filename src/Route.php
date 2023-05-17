@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pg\Router;
 
+use Pg\Router\Exception\ImmutableProperty;
+use Pg\Router\Exception\InvalidArgumentException;
 use Pg\Router\Middlewares\Stack\MiddlewareAwareStackTrait;
 
 use function array_map;
@@ -42,6 +44,11 @@ class Route
         ?array $methods = self::HTTP_METHOD_ANY
     ) {
         $methods = is_string($methods) ? [$methods] : $methods;
+
+        if (empty($methods)) {
+            throw new InvalidArgumentException('Http methods array is empty');
+        }
+
         $this->methods = is_array($methods) ? array_map('strtoupper', $methods) : self::HTTP_METHOD_ANY;
         if ($name === null || $name === '') {
             $name = $this->methods === self::HTTP_METHOD_ANY
@@ -53,7 +60,7 @@ class Route
         $this->path = $path;
     }
 
-    public function getCallback(): callable|string
+    public function getCallback(): callable|array|string
     {
         return $this->callback;
     }
@@ -95,13 +102,17 @@ class Route
     }
 
     /**
-     * Set the route name.
+     * Set the route name if null.
      *
      * @param non-empty-string $name
      * @return Route
      */
     public function setName(string $name): self
     {
+        if (null !== $this->name) {
+            $message = static::class . ' ::$name is immutable once set';
+            throw new ImmutableProperty($message);
+        }
         $this->name = $name;
         return $this;
     }
