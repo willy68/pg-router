@@ -45,17 +45,15 @@ class Route
     ) {
         $methods = is_string($methods) ? [$methods] : $methods;
 
-        if (is_array($methods) && empty($methods)) {
-            throw new InvalidArgumentException('Http methods array is empty');
-        }
-
         // Place to validate http methods
-        $this->methods = is_array($methods) ? array_map('strtoupper', $methods) : self::HTTP_METHOD_ANY;
+        $this->methods = is_array($methods) ? $this->validateHttpMethods($methods) : self::HTTP_METHOD_ANY;
+
         if ($name === null || $name === '') {
             $name = $this->methods === self::HTTP_METHOD_ANY
                 ? $path
                 : $path . '^' . implode(self::HTTP_METHOD_SEPARATOR, $this->methods);
         }
+
         $this->name = $name;
         $this->callback = $callback;
         $this->path = $path;
@@ -205,5 +203,16 @@ class Route
     public function allowsAnyScheme(): bool
     {
         return $this->schemes === self::HTTP_SCHEME_ANY;
+    }
+
+    protected function validateHttpMethods(array $methods): array
+    {
+        if (empty($methods)) {
+            throw new InvalidArgumentException('Http methods array is empty');
+        }
+
+        //Place to match valide http methods
+
+        return array_map('strtoupper', $methods);
     }
 }
