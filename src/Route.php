@@ -45,10 +45,11 @@ class Route
     ) {
         $methods = is_string($methods) ? [$methods] : $methods;
 
-        if (empty($methods)) {
+        if (is_array($methods) && empty($methods)) {
             throw new InvalidArgumentException('Http methods array is empty');
         }
 
+        // Place to validate http methods
         $this->methods = is_array($methods) ? array_map('strtoupper', $methods) : self::HTTP_METHOD_ANY;
         if ($name === null || $name === '') {
             $name = $this->methods === self::HTTP_METHOD_ANY
