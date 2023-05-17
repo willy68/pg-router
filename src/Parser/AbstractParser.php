@@ -41,7 +41,7 @@ abstract class AbstractParser implements ParserInterface
             $repl = '';
 
             foreach ($parts as $part) {
-                $repl .= '/' . $part;
+                $repl .= '/' . trim($part);
                 $routes[] = str_replace($matches[0], $repl, $this->regex);
             }
         }
