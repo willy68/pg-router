@@ -58,13 +58,17 @@ class RouteGroup
      * Accepts a combination of a path and callback, and optionally the HTTP methods allowed.
      *
      * @param string $path
-     * @param callable|string $callback
+     * @param callable|array|string $callback
      * @param null|string $name The name of the route.
      * @param null|array $methods HTTP method to accept; null indicates any.
      * @return Route
      */
-    public function route(string $path, callable|string $callback, ?string $name = null, ?array $methods = null): Route
-    {
+    public function route(
+        string $path,
+        callable|array|string $callback,
+        ?string $name = null,
+        ?array $methods = null
+    ): Route {
         $path = $path === '/' ? $this->prefix : $this->prefix . sprintf('/%s', ltrim($path, '/'));
         $route = $this->router->route($path, $callback, $name, $methods);
         $route->setParentGroup($this);
@@ -74,16 +78,18 @@ class RouteGroup
     /**
      * Perform all crud routes for a given class controller
      *
-     * @param callable|string $callable The class name generally
+     * @param callable|array|string $callback The class name generally
+     * @param string $prefixName
+     * @return RouteGroup
      */
-    public function crud(callable|string $callable, string $prefixName): self
+    public function crud(callable|array|string $callback, string $prefixName): self
     {
-        $this->get("/", $callable . '::index', "$prefixName.index");
-        $this->get("/new", $callable . '::create', "$prefixName.create");
-        $this->post("/new", $callable . '::create', "$prefixName.create.post");
-        $this->get("/{id:\d+}", $callable . '::edit', "$prefixName.edit");
-        $this->post("/{id:\d+}", $callable . '::edit', "$prefixName.edit.post");
-        $this->delete("/{id:\d+}", $callable . '::delete', "$prefixName.delete");
+        $this->get("/", $callback . '::index', "$prefixName.index");
+        $this->get("/new", $callback . '::create', "$prefixName.create");
+        $this->post("/new", $callback . '::create', "$prefixName.create.post");
+        $this->get("/{id:\d+}", $callback . '::edit', "$prefixName.edit");
+        $this->post("/{id:\d+}", $callback . '::edit', "$prefixName.edit.post");
+        $this->delete("/{id:\d+}", $callback . '::delete', "$prefixName.delete");
         return $this;
     }
 

@@ -13,6 +13,7 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_string;
+use function strcmp;
 use function strlen;
 use function strtolower;
 use function strtoupper;
@@ -83,7 +84,7 @@ class Route
         $prefix = $group->getPrefix();
         $path = $this->getPath();
 
-        if (\strcmp($prefix, substr($path, 0, strlen($prefix))) === 0) {
+        if (strcmp($prefix, substr($path, 0, strlen($prefix))) === 0) {
             $this->group = $group;
         }
 
