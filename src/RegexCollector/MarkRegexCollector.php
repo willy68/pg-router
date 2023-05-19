@@ -61,6 +61,7 @@ class MarkRegexCollector implements RegexCollectorInterface
 
     public function getData(): ?array
     {
+        // Good place to cache data
         return $this->computeRegex();
     }
 
