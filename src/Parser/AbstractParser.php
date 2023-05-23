@@ -78,8 +78,9 @@ abstract class AbstractParser implements ParserInterface
 
                 $subpattern = $this->getSubpattern($name, $token);
                 $route = str_replace($match[0], $subpattern, $route);
-                $attributes[$name] = $vars[$name] = $name;
+                $vars[$name] = $name;
             }
+            $attributes = $attributes + $vars;
             $regex[] = $route;
         }
 
