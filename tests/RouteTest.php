@@ -48,8 +48,8 @@ class RouteTest extends TestCase
     public function testImmutableName()
     {
         $route = new Route('/foo', $this->callback, 'test');
-        $this->expectException(ImmutableProperty::class);
-        $this->expectExceptionMessage(Route::class . ' ::$name is immutable once set');
+        self::expectException(ImmutableProperty::class);
+        self::expectExceptionMessage(Route::class . ' ::$name is immutable once set');
         $route->setName('/bar');
     }
 
@@ -110,8 +110,8 @@ class RouteTest extends TestCase
 
     public function testConstructorShouldRaiseExceptionIfMethodsArgumentIsAnEmptyArray(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Http methods array is empty');
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('Http methods array is empty');
 
         new Route('/foo', $this->callback, 'test', []);
     }
@@ -130,7 +130,7 @@ class RouteTest extends TestCase
         );
 
         $route->setParentGroup($routeGroup);
-        $this->assertSame($routeGroup, $route->getParentGroup());
+        self::assertSame($routeGroup, $route->getParentGroup());
     }
 
     /**
@@ -150,6 +150,64 @@ class RouteTest extends TestCase
         );
 
         $route = $routeGroup->route('/foo', $this->callback, 'test');
-        $this->assertSame('/prefix/foo', $route->getPath());
+        self::assertSame('/prefix/foo', $route->getPath());
+    }
+
+    public function testRouteGetHostNullByDefault()
+    {
+        $route = new Route('/foo', $this->callback, 'test');
+        
+        self::assertNull($route->getHost());
+    }
+
+    public function testRouteGetHost()
+    {
+        $route = new Route('/foo', $this->callback, 'test');
+        
+        $route->setHost('my-domain.com');
+        self::assertSame('my-domain.com', $route->getHost());
+    }
+
+    public function testRouteGetPortNullByDefault()
+    {
+        $route = new Route('/foo', $this->callback, 'test');
+        
+        self::assertNull($route->getPort());
+    }
+
+    public function testRouteGetPort()
+    {
+        $route = new Route('/foo', $this->callback, 'test');
+        
+        $route->setPort(8000);
+        self::assertSame(8000, $route->getPort());
+    }
+
+    public function testRouteAnySchemesByDefault(): void
+    {
+        $route = new Route('/foo', $this->callback);
+
+        self::assertTrue($route->allowsAnyScheme());
+        self::assertSame(Route::HTTP_SCHEME_ANY, $route->getSchemes());
+    }
+
+    public function testRouteGetAllowedSchemes(): void
+    {
+        $schemes = ['http', 'https'];
+        $route   = new Route('/foo', $this->callback, 'test');
+
+        $route->setSchemes($schemes);
+        self::assertSame($schemes, $route->getSchemes());
+    }
+
+    public function testRouteCanMatchScheme(): void
+    {
+        $schemes = ['http', 'https'];
+        $route   = new Route('/foo', $this->callback, 'test');
+
+        $route->setSchemes($schemes);
+        self::assertTrue($route->allowsScheme('http'));
+        self::assertTrue($route->allowsScheme('https'));
+        self::assertFalse($route->allowsAnyScheme());
     }
 }

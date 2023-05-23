@@ -29,9 +29,9 @@ class Route
 
     protected string $path;
     protected ?array $method;
-    protected ?string $host;
-    protected ?int $port;
-    protected ?array $schemes;
+    protected ?string $host = null;
+    protected ?int $port = null;
+    protected ?array $schemes = null;
     protected $callback;
     protected ?RouteGroup $group = null;
     protected ?string $name = null;
