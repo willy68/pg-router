@@ -8,6 +8,9 @@ use Pg\Router\Parser\DataParser;
 use Pg\Router\Parser\ParserInterface;
 use Pg\Router\Route;
 
+/**
+ * Compile route into combined regular expression for each allowed methods
+ */
 class MarkRegexCollector implements RegexCollectorInterface
 {
     public const ANY_METHODS = 'ANY';
@@ -59,7 +62,7 @@ class MarkRegexCollector implements RegexCollectorInterface
         }
     }
 
-    public function getData(): ?array
+    public function getData(): array
     {
         // Good place to cache data
         return $this->computeRegex();

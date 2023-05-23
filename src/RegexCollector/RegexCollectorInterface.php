@@ -7,13 +7,17 @@ use Pg\Router\Route;
 interface RegexCollectorInterface
 {
     /**
-     * Get route data as an array
-     *      [routeName => ['GET','POST'],parsedRouteRegex]
+     * Route to parse
      *
      * @param Route $route
      * @return void
      */
     public function addRoute(Route $route): void;
 
-    public function getData(): ?array;
+    /**
+     * Get data as an array or null
+     *
+     * @return array
+     */
+    public function getData(): array;
 }
