@@ -156,14 +156,14 @@ class RouteTest extends TestCase
     public function testRouteGetHostNullByDefault()
     {
         $route = new Route('/foo', $this->callback, 'test');
-        
+
         self::assertNull($route->getHost());
     }
 
     public function testRouteGetHost()
     {
         $route = new Route('/foo', $this->callback, 'test');
-        
+
         $route->setHost('my-domain.com');
         self::assertSame('my-domain.com', $route->getHost());
     }
@@ -171,14 +171,14 @@ class RouteTest extends TestCase
     public function testRouteGetPortNullByDefault()
     {
         $route = new Route('/foo', $this->callback, 'test');
-        
+
         self::assertNull($route->getPort());
     }
 
     public function testRouteGetPort()
     {
         $route = new Route('/foo', $this->callback, 'test');
-        
+
         $route->setPort(8000);
         self::assertSame(8000, $route->getPort());
     }
