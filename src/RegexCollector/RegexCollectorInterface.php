@@ -15,7 +15,7 @@ interface RegexCollectorInterface
     public function addRoute(Route $route): void;
 
     /**
-     * Get data as an array or null
+     * Get data as an array
      *
      * @return array
      */
