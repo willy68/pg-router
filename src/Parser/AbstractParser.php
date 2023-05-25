@@ -28,22 +28,42 @@ abstract class AbstractParser implements ParserInterface
      */
     protected function parseOptionalParts(): array
     {
+        $routes = $this->getVariablePart();
+
+        preg_match(Regex::OPT_REGEX, $this->regex, $matches);
+        if ($matches) {
+            $routes = $this->getOptionalParts($routes, $matches);
+        }
+
+        return $routes;
+    }
+
+    /**
+     * Get the first part (variable and/or static) in array at index 0
+     *
+     * @return array
+     */
+    protected function getVariablePart(): array
+    {
         $routes = [];
+
         $regex = preg_split(Regex::OPT_REGEX, $this->regex);
         if (is_array($regex)) {
             // Put variable part (or static) in first without optional part
             $routes[] = $regex[0] ?: '/';
         }
 
-        preg_match(Regex::OPT_REGEX, $this->regex, $matches);
-        if ($matches) {
-            $parts = explode(';', $matches[1]);
-            $repl = '';
+        return $routes;
+    }
 
-            foreach ($parts as $part) {
-                $repl .= '/' . trim($part);
-                $routes[] = str_replace($matches[0], $repl, $this->regex);
-            }
+    protected function getOptionalParts(array $routes, array $matches): array
+    {
+        $parts = explode(';', $matches[1]);
+        $repl = '';
+
+        foreach ($parts as $part) {
+            $repl .= '/' . trim($part);
+            $routes[] = str_replace($matches[0], $repl, $this->regex);
         }
 
         return $routes;
