@@ -22,7 +22,7 @@ class NamedParser implements ParserInterface
     }
 
     /**
-     * Split in different pattern route with optionals parts
+     * Split in different pattern route with optionals parts.
      *
      * @return void
      */
@@ -79,7 +79,7 @@ class NamedParser implements ParserInterface
     }
 
     /**
-     * Generate regex for all routes needed by the path
+     * Generate the regex for all routes needed by the path.
      *
      * @return void
      */
@@ -107,6 +107,13 @@ class NamedParser implements ParserInterface
         }
     }
 
+    /**
+     * Return the sub pattern for a token with the attribute name.
+     *
+     * @param string $name
+     * @param string|null $token
+     * @return string
+     */
     protected function getSubpattern(string $name, ?string $token = null): string
     {
         // is there a custom subpattern for the name?

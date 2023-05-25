@@ -19,10 +19,17 @@ abstract class AbstractParser implements ParserInterface
     protected string $regex;
     protected array $routes;
 
+    /**
+     * Parse the path in multiple routes or one route depending on parser system.
+     *
+     * @param string $path
+     * @return string|array
+     */
     abstract public function parse(string $path): string|array;
 
     /**
-     * Split in different pattern route with optionals parts
+     * Split in different regexes with optionals parts, one route per optional part.
+     * The routes[0] is the variable/static part.
      *
      * @return array
      */
@@ -39,7 +46,8 @@ abstract class AbstractParser implements ParserInterface
     }
 
     /**
-     * Get the first part (variable and/or static) in array at index 0
+     * Get the first part (variable and/or static) in the array at index 0.
+     * If the path start by optional part, the array is empty.
      *
      * @return array
      */
@@ -56,6 +64,13 @@ abstract class AbstractParser implements ParserInterface
         return $routes;
     }
 
+    /**
+     * Generate all routes for all optional parts.
+     *
+     * @param array $routes
+     * @param array $matches
+     * @return array
+     */
     protected function getOptionalParts(array $routes, array $matches): array
     {
         $parts = explode(';', $matches[1]);
@@ -70,7 +85,7 @@ abstract class AbstractParser implements ParserInterface
     }
 
     /**
-     * Generate regex for all routes needed by the path
+     * Generate the regex for all routes needed by the path.
      *
      * @param array $routes
      * @return void
@@ -107,5 +122,12 @@ abstract class AbstractParser implements ParserInterface
         $this->routes = [$regex, $attributes];
     }
 
+    /**
+     * Return the sub pattern for a token with or without the attribute name.
+     *
+     * @param string $name
+     * @param string|null $token
+     * @return string
+     */
     abstract protected function getSubpattern(string $name, ?string $token = null): string;
 }
