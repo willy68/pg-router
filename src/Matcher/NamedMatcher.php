@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Pg\Router\Matcher;
 
-use function array_unique;
-use function preg_match;
-use function rawurldecode;
-use function strtoupper;
+use Pg\Router\Parser\ParserInterface;
 
-class MarkDataMatcher implements MatcherInterface
+class NamedMatcher implements MatcherInterface
 {
+    protected ?ParserInterface $parser = null;
     protected array $data;
     protected array $attributes = [];
     protected ?string $matchedRoute;
@@ -30,6 +28,7 @@ class MarkDataMatcher implements MatcherInterface
         if (isset($this->data[$httpMethod])) {
             $matches = $this->matchPath($uri, $this->data[$httpMethod]);
             if ($matches) {
+                $this->attributes = $this->foundAttributes($matches);
                 return [$this->matchedRoute => $httpMethod, $this->attributes];
             }
         }
@@ -38,19 +37,20 @@ class MarkDataMatcher implements MatcherInterface
         if (isset($this->data['ANY'])) {
             $matches = $this->matchPath($uri, $this->data['ANY']);
             if ($matches) {
+                $this->attributes = $this->foundAttributes($matches);
                 return [$this->matchedRoute => $httpMethod, $this->attributes];
             }
         }
 
         // Method not allowed
-        foreach ($this->data as $methods => $regexToRouteVars) {
-            $matches = $this->matchPath($uri, $regexToRouteVars);
+        foreach ($this->data as $methods => $regexToRoute) {
+            $matches = $this->matchPath($uri, $regexToRoute);
 
             if (!$matches) {
                 continue;
             }
 
-            $name = $matches['MARK'];
+            $name = $this->matchedRoute;
 
             // Memorize failed route method
             $this->failedRoutesMethod[] = $name;
@@ -60,17 +60,13 @@ class MarkDataMatcher implements MatcherInterface
         return false;
     }
 
-    protected function matchPath(string $uri, array $regexToRouteVars): bool|array
+    protected function matchPath(string $uri, array $regexToRoute): bool|array
     {
-        foreach ($regexToRouteVars as $routes) {
-            if (!preg_match($routes['regex'], $uri, $matches)) {
+        foreach ($regexToRoute as $name => $routes) {
+            if (!preg_match('~^' . $routes['regex'] . '$~x', $uri, $matches)) {
                 continue;
             }
 
-            $name = $matches['MARK'];
-            $varNames = $routes['routeVars'][$name]['vars'];
-
-            $this->attributes = $this->foundAttributes($matches, $varNames);
             $this->matchedRoute = $name;
 
             return $matches;
@@ -79,19 +75,12 @@ class MarkDataMatcher implements MatcherInterface
         return false;
     }
 
-    public function getAllowedMethods(): array
-    {
-        return array_unique($this->allowedMethods);
-    }
-
-    protected function foundAttributes(array $matches, array $varNames): array
+    protected function foundAttributes(array $matches): array
     {
         $attributes = [];
-
-        $i = 1;
-        foreach ($varNames as $varName) {
-            if (isset($matches[$i]) && '' !== $matches[$i]) {
-                $attributes[$varName] = rawurldecode($matches[$i++]);
+        foreach ($matches as $key => $val) {
+            if (is_string($key) && $val !== '') {
+                $attributes[$key] = rawurldecode($val);
             }
         }
 
@@ -106,5 +95,10 @@ class MarkDataMatcher implements MatcherInterface
     public function getFailedRoutesMethod(): array
     {
         return $this->failedRoutesMethod;
+    }
+
+    public function getAllowedMethods(): array
+    {
+        return array_unique($this->allowedMethods);
     }
 }
