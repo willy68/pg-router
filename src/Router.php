@@ -104,7 +104,7 @@ class Router implements RouterInterface
      */
     protected function getMatcherFactory(): callable
     {
-        return fn($routes): MatcherInterface => new MarkDataMatcher($routes);
+        return fn ($routes): MatcherInterface => new MarkDataMatcher($routes);
     }
 
     /** Good place to cache data*/
@@ -123,7 +123,7 @@ class Router implements RouterInterface
             return $this->regexCollector;
         }
 
-        $this->regexCollector = new MarkRegexCollector(fn(): ParserInterface => new DataParser());
+        $this->regexCollector = new MarkRegexCollector();
 
         return $this->regexCollector;
     }

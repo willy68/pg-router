@@ -16,33 +16,20 @@ class MarkRegexCollector implements RegexCollectorInterface
     public const ANY_METHODS = 'ANY';
 
     protected ?array $data = null;
-    /** @var callable(): ParserInterface */
-    protected $parserFactory;
-    private ParserInterface $parser;
+    private ?ParserInterface $parser = null;
 
-    public function __construct(callable $parserFactory = null)
+    public function __construct(ParserInterface $parser = null)
     {
-        $this->parserFactory = $parserFactory;
-        $this->parser = $this->getParser();
+        $this->parser = $parser;
     }
 
     protected function getParser(): ParserInterface
     {
-        if (!$this->parserFactory) {
-            $this->parserFactory = $this->getParserFactory();
+        if (!$this->parser) {
+            $this->parser = new DataParser();
         }
 
-        $factory = $this->parserFactory;
-
-        return $factory();
-    }
-
-    /**
-     * @return callable(): ParserInterface
-     */
-    protected function getParserFactory(): callable
-    {
-        return fn(): ParserInterface => new DataParser();
+        return $this->parser;
     }
 
     /**
@@ -54,7 +41,8 @@ class MarkRegexCollector implements RegexCollectorInterface
     {
         $methods = $route->getAllowedMethods() ?? [MarkRegexCollector::ANY_METHODS];
         $name = $route->getName();
-        $data = $this->parser->parse($route->getPath());
+
+        $data = $this->getParser()->parse($route->getPath());
         [$regex, $vars] = $data;
 
         foreach ($methods as $method) {
