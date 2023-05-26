@@ -6,8 +6,6 @@ use Pg\Router\Route;
 
 interface RegexCollectorInterface
 {
-    public const ANY_METHODS = 'ANY';
-
     /**
      * Route to parse
      *

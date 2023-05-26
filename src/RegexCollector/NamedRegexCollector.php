@@ -10,6 +10,8 @@ use Pg\Router\Route;
 
 class NamedRegexCollector implements RegexCollectorInterface
 {
+    public const ANY_METHODS = 'ANY';
+
     protected ?array $data = null;
     private ?ParserInterface $parser = null;
 
@@ -32,7 +34,7 @@ class NamedRegexCollector implements RegexCollectorInterface
      */
     public function addRoute(Route $route): void
     {
-        $methods = $route->getAllowedMethods() ?? [RegexCollectorInterface::ANY_METHODS];
+        $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
         $name = $route->getName();
 
         $regex = $this->getParser()->parse($route->getPath());
