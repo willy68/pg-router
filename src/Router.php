@@ -10,8 +10,6 @@ use Pg\Router\Generator\UrlGenerator;
 use Pg\Router\Matcher\MarkDataMatcher;
 use Pg\Router\Matcher\MatcherInterface;
 use Pg\Router\Middlewares\Stack\MiddlewareAwareStackTrait;
-use Pg\Router\Parser\DataParser;
-use Pg\Router\Parser\ParserInterface;
 use Pg\Router\RegexCollector\MarkRegexCollector;
 use Pg\Router\RegexCollector\RegexCollectorInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
