@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Pg\Router\Matcher;
 
-use Pg\Router\Parser\ParserInterface;
-
 class NamedMatcher implements MatcherInterface
 {
-    protected ?ParserInterface $parser = null;
     protected array $data;
     protected array $attributes = [];
     protected ?string $matchedRoute;
