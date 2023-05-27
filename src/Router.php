@@ -6,6 +6,7 @@ namespace Pg\Router;
 
 use Pg\Router\DuplicateDetector\DuplicateDetectorInterface;
 use Pg\Router\DuplicateDetector\DuplicateMethodMapDetector;
+use Pg\Router\Exception\RouteNotFoundException;
 use Pg\Router\Generator\UrlGenerator;
 use Pg\Router\Matcher\MarkDataMatcher;
 use Pg\Router\Matcher\MatcherInterface;
@@ -13,7 +14,6 @@ use Pg\Router\Middlewares\Stack\MiddlewareAwareStackTrait;
 use Pg\Router\RegexCollector\MarkRegexCollector;
 use Pg\Router\RegexCollector\RegexCollectorInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use RuntimeException;
 
 class Router implements RouterInterface
 {
@@ -129,7 +129,7 @@ class Router implements RouterInterface
     public function generateUri(string $name, array $substitutions = [], array $options = []): string
     {
         if (!isset($this->routes[$name])) {
-            throw new RuntimeException(sprintf("Route not found with name [%s]", $name));
+            throw new RouteNotFoundException(sprintf("Route not found with name [%s]", $name));
         }
         return (new UrlGenerator($this))->generate($name, $substitutions);
     }
