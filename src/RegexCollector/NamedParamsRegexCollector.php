@@ -8,10 +8,8 @@ use Pg\Router\Parser\NamedParamsParser;
 use Pg\Router\Parser\ParserInterface;
 use Pg\Router\Route;
 
-class NamedParamsRegexCollector implements RegexCollectorInterface
+class NamedParamsRegexCollector extends AbstractRegexCollector
 {
-    public const ANY_METHODS = 'ANY';
-
     protected ?array $data = null;
     private ?ParserInterface $parser = null;
 

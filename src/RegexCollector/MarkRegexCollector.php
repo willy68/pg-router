@@ -11,10 +11,8 @@ use Pg\Router\Route;
 /**
  * Compile route into combined regular expression for each allowed methods
  */
-class MarkRegexCollector implements RegexCollectorInterface
+class MarkRegexCollector extends AbstractRegexCollector
 {
-    public const ANY_METHODS = 'ANY';
-
     protected ?array $data = null;
     private ?ParserInterface $parser = null;
 
