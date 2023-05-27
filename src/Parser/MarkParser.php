@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pg\Router\Parser;
 
-class DataParser extends AbstractParser
+class MarkParser extends AbstractParser
 {
     public function parse(string $path): string|array
     {

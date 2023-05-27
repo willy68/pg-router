@@ -3,17 +3,17 @@
 namespace PgTest\Router\Parser;
 
 use Pg\Router\Exception\DuplicateAttributeException;
-use Pg\Router\Parser\DataParser;
+use Pg\Router\Parser\MarkParser;
 use PHPUnit\Framework\TestCase;
 
 class DataParserTest extends TestCase
 {
-    protected DataParser $dataParser;
+    protected MarkParser $dataParser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dataParser = new DataParser();
+        $this->dataParser = new MarkParser();
     }
 
     public function testStaticPath()

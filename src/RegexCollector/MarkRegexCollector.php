@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pg\Router\RegexCollector;
 
-use Pg\Router\Parser\DataParser;
+use Pg\Router\Parser\MarkParser;
 use Pg\Router\Parser\ParserInterface;
 use Pg\Router\Route;
 
@@ -24,7 +24,7 @@ class MarkRegexCollector extends AbstractRegexCollector
     protected function getParser(): ParserInterface
     {
         if (!$this->parser) {
-            $this->parser = new DataParser();
+            $this->parser = new MarkParser();
         }
 
         return $this->parser;
