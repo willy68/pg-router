@@ -44,7 +44,7 @@ class MarkRegexCollector extends AbstractRegexCollector
         [$regex, $vars] = $data;
 
         foreach ($methods as $method) {
-            $this->data[$method][$name] = [$regex, $vars, $methods];
+            $this->data[$method][$name] = [$regex, $vars];
         }
     }
 
@@ -72,11 +72,11 @@ class MarkRegexCollector extends AbstractRegexCollector
         $regexes = [];
 
         foreach ($regexToVars as $name => $route) {
-            [$routePaths, $vars, $methods] = $route;
+            [$routePaths, $vars] = $route;
             foreach ($routePaths as $path) {
                 $regexes[] = $path . '(*MARK:' . $name . ')';
             }
-            $routeVars[$name] = ['vars' => $vars, 'methods' => $methods];
+            $routeVars[$name] = ['vars' => $vars];
         }
 
         $regex = '~^(?|' . implode('|', $regexes) . ')$~x';

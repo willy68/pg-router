@@ -38,7 +38,7 @@ class NamedRegexCollector extends AbstractRegexCollector
         $regex = $this->getParser()->parse($route->getPath());
 
         foreach ($methods as $method) {
-            $this->data[$method][$name] = ['regex' => $regex, 'methods' => $methods];
+            $this->data[$method][$name] = ['regex' => $regex];
         }
     }
 

@@ -39,7 +39,7 @@ class NamedParamsRegexCollector extends AbstractRegexCollector
         [$regex, ] = $data;
 
         foreach ($methods as $method) {
-            $this->data[$method][$name] = ['regex' => $regex, 'methods' => $methods];
+            $this->data[$method][$name] = ['regex' => $regex];
         }
     }
 
