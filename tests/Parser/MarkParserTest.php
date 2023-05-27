@@ -6,7 +6,7 @@ use Pg\Router\Exception\DuplicateAttributeException;
 use Pg\Router\Parser\MarkParser;
 use PHPUnit\Framework\TestCase;
 
-class DataParserTest extends TestCase
+class MarkParserTest extends TestCase
 {
     protected MarkParser $dataParser;
 
