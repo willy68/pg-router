@@ -103,7 +103,7 @@ class NamedRegexCollectorTest extends TestCase
         $this->assertSame($expected, $data);
     }
 
-    public function testStartWithMultipleOptionalPartsPathWithMethodGet()
+    public function testPathStartWithMultipleOptionalPartsWithMethodGet()
     {
         $route = new Route(
             '[/{baz:\d+};{raz:[a-z]+}]',
