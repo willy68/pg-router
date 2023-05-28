@@ -66,21 +66,21 @@ class MarkRegexCollector extends AbstractRegexCollector
         return $data;
     }
 
-    protected function computeRegexData(array $regexToVars): array
+    protected function computeRegexData(array $routeDatas): array
     {
-        $routeVars = [];
+        $attributes = [];
         $regexes = [];
 
-        foreach ($regexToVars as $name => $route) {
+        foreach ($routeDatas as $name => $route) {
             [$routePaths, $vars] = $route;
             foreach ($routePaths as $path) {
                 $regexes[] = $path . '(*MARK:' . $name . ')';
             }
-            $routeVars[$name] = ['vars' => $vars];
+            $attributes[$name] = $vars;
         }
 
         $regex = '~^(?|' . implode('|', $regexes) . ')$~x';
 
-        return ['regex' => $regex, 'routeVars' => $routeVars];
+        return ['regex' => $regex, 'attributes' => $attributes];
     }
 }

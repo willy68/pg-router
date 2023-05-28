@@ -18,7 +18,7 @@ class MarkRegexCollectorTest extends TestCase
 
     protected function getCallback(): \Closure
     {
-        return fn () => 'callback';
+        return fn() => 'callback';
     }
 
     public function testOnlyStaticPathWithMethodGet()
@@ -26,7 +26,7 @@ class MarkRegexCollectorTest extends TestCase
         $route = new Route('/foo', $this->getCallback(), 'test', ['GET']);
         $this->collector->addRoute($route);
 
-        $expected = ['GET' => [['regex' => '~^(?|/foo(*MARK:test))$~x', 'routeVars' => ['test' => ['vars' => []]]]]];
+        $expected = ['GET' => [['regex' => '~^(?|/foo(*MARK:test))$~x', 'attributes' => ['test' => []]]]];
 
         $data = $this->collector->getData();
         $this->assertSame($expected, $data);
@@ -37,7 +37,7 @@ class MarkRegexCollectorTest extends TestCase
         $route = new Route('/foo', $this->getCallback(), 'test');
         $this->collector->addRoute($route);
 
-        $expected = ['ANY' => [['regex' => '~^(?|/foo(*MARK:test))$~x', 'routeVars' => ['test' => ['vars' => []]]]]];
+        $expected = ['ANY' => [['regex' => '~^(?|/foo(*MARK:test))$~x', 'attributes' => ['test' => []]]]];
 
         $data = $this->collector->getData();
         $this->assertSame($expected, $data);
@@ -52,7 +52,31 @@ class MarkRegexCollectorTest extends TestCase
             'GET' => [
                 [
                     'regex' => '~^(?|/foo/([a-z]+)(*MARK:test))$~x',
-                    'routeVars' => ['test' => ['vars' => ['bar' => 'bar']]]
+                    'attributes' => ['test' => ['bar' => 'bar']]
+                ]
+            ]
+        ];
+
+        $data = $this->collector->getData();
+        $this->assertSame($expected, $data);
+    }
+
+    public function testPathWithVariablePartWith2Method()
+    {
+        $route = new Route('/foo/{bar:[a-z]+}', $this->getCallback(), 'test', ['GET', 'POST']);
+        $this->collector->addRoute($route);
+
+        $expected = [
+            'GET' => [
+                [
+                    'regex' => '~^(?|/foo/([a-z]+)(*MARK:test))$~x',
+                    'attributes' => ['test' => ['bar' => 'bar']]
+                ]
+            ],
+            'POST' => [
+                [
+                    'regex' => '~^(?|/foo/([a-z]+)(*MARK:test))$~x',
+                    'attributes' => ['test' => ['bar' => 'bar']]
                 ]
             ]
         ];
@@ -70,7 +94,7 @@ class MarkRegexCollectorTest extends TestCase
             'ANY' => [
                 [
                     'regex' => '~^(?|/foo/([a-z]+)(*MARK:test))$~x',
-                    'routeVars' => ['test' => ['vars' => ['bar' => 'bar']]]
+                    'attributes' => ['test' => ['bar' => 'bar']]
                 ]
             ]
         ];
@@ -88,7 +112,7 @@ class MarkRegexCollectorTest extends TestCase
             'GET' => [
                 [
                     'regex' => '~^(?|/foo/([a-z]+)(*MARK:test)|/foo/([a-z]+)/(\d+)(*MARK:test))$~x',
-                    'routeVars' => ['test' => ['vars' => ['bar' => 'bar', 'baz' => 'baz']]]
+                    'attributes' => ['test' => ['bar' => 'bar', 'baz' => 'baz']]
                 ]
             ]
         ];
@@ -106,7 +130,7 @@ class MarkRegexCollectorTest extends TestCase
             'ANY' => [
                 [
                     'regex' => '~^(?|/foo/([a-z]+)(*MARK:test)|/foo/([a-z]+)/(\d+)(*MARK:test))$~x',
-                    'routeVars' => ['test' => ['vars' => ['bar' => 'bar', 'baz' => 'baz']]]
+                    'attributes' => ['test' => ['bar' => 'bar', 'baz' => 'baz']]
                 ]
             ]
         ];
@@ -131,7 +155,7 @@ class MarkRegexCollectorTest extends TestCase
                     'regex' => '~^(?|/foo/([a-z]+)(*MARK:test)|' .
                         '/foo/([a-z]+)/(\d+)(*MARK:test)|' .
                         '/foo/([a-z]+)/(\d+)/([a-z]+)(*MARK:test))$~x',
-                    'routeVars' => ['test' => ['vars' => ['bar' => 'bar', 'baz' => 'baz', 'raz' => 'raz']]]
+                    'attributes' => ['test' => ['bar' => 'bar', 'baz' => 'baz', 'raz' => 'raz']]
                 ]
             ]
         ];
@@ -156,7 +180,7 @@ class MarkRegexCollectorTest extends TestCase
                     'regex' => '~^(?|/(*MARK:test)|' .
                         '/(\d+)(*MARK:test)|' .
                         '/(\d+)/([a-z]+)(*MARK:test))$~x',
-                    'routeVars' => ['test' => ['vars' => ['baz' => 'baz', 'raz' => 'raz']]]
+                    'attributes' => ['test' => ['baz' => 'baz', 'raz' => 'raz']]
                 ]
             ]
         ];

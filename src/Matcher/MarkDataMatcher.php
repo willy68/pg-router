@@ -43,8 +43,8 @@ class MarkDataMatcher implements MatcherInterface
         }
 
         // Method not allowed
-        foreach ($this->data as $methods => $regexToRouteVars) {
-            $matches = $this->matchPath($uri, $regexToRouteVars);
+        foreach ($this->data as $methods => $routesDatas) {
+            $matches = $this->matchPath($uri, $routesDatas);
 
             if (!$matches) {
                 continue;
@@ -60,17 +60,17 @@ class MarkDataMatcher implements MatcherInterface
         return false;
     }
 
-    protected function matchPath(string $uri, array $regexToRouteVars): bool|array
+    protected function matchPath(string $uri, array $routesDatas): bool|array
     {
-        foreach ($regexToRouteVars as $routes) {
+        foreach ($routesDatas as $routes) {
             if (!preg_match($routes['regex'], $uri, $matches)) {
                 continue;
             }
 
             $name = $matches['MARK'];
-            $varNames = $routes['routeVars'][$name]['vars'];
+            $attributesNames = $routes['attributes'][$name];
 
-            $this->attributes = $this->foundAttributes($matches, $varNames);
+            $this->attributes = $this->foundAttributes($matches, $attributesNames);
             $this->matchedRoute = $name;
 
             return $matches;
@@ -84,14 +84,14 @@ class MarkDataMatcher implements MatcherInterface
         return array_unique($this->allowedMethods);
     }
 
-    protected function foundAttributes(array $matches, array $varNames): array
+    protected function foundAttributes(array $matches, array $attributesNames): array
     {
         $attributes = [];
 
         $i = 1;
-        foreach ($varNames as $varName) {
+        foreach ($attributesNames as $attributeName) {
             if (isset($matches[$i]) && '' !== $matches[$i]) {
-                $attributes[$varName] = rawurldecode($matches[$i++]);
+                $attributes[$attributeName] = rawurldecode($matches[$i++]);
             }
         }
 
