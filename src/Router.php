@@ -25,7 +25,7 @@ class Router implements RouterInterface
     protected array $routes = [];
     /** @var callable(array|object): MatcherInterface */
     protected $matcherFactory = null;
-    private ?RegexCollectorInterface $regexCollector = null;
+    private ?RegexCollectorInterface $regexCollector;
 
     public function __construct(?RegexCollectorInterface $regexCollector = null, ?callable $matcherFactory = null)
     {

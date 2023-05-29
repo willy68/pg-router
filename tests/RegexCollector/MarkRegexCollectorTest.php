@@ -188,4 +188,24 @@ class MarkRegexCollectorTest extends TestCase
         $data = $this->collector->getData();
         $this->assertSame($expected, $data);
     }
+
+    public function testChunk()
+    {
+        $callback = fn ($request) => $request->getAttribute('id');
+        for ($i = 0; $i <= 20; $i++) {
+            $this->collector->addRoute(
+                new Route(
+                    "/foo$i/{bar:\d+}[/{baz:[a-z]+}]",
+                    $callback,
+                    'test' . $i,
+                    ['GET']
+                )
+            );
+        }
+
+        $data = $this->collector->getData();
+        $this->assertCount(2, $data['GET']);
+        $this->assertCount(15, $data['GET'][0]['attributes']);
+        $this->assertCount(6, $data['GET'][1]['attributes']);
+    }
 }

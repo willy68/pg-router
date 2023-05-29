@@ -14,7 +14,7 @@ use Pg\Router\Route;
 class MarkRegexCollector extends AbstractRegexCollector
 {
     protected ?array $data = null;
-    private ?ParserInterface $parser = null;
+    private ?ParserInterface $parser;
 
     public function __construct(ParserInterface $parser = null)
     {
