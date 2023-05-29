@@ -9,12 +9,6 @@ use function rawurldecode;
 
 class MarkDataMatcher extends AbstractNamedMatcher
 {
-    protected array $data;
-    protected array $attributes = [];
-    protected ?string $matchedRoute;
-    protected array $failedRoutesMethod = [];
-    protected array $allowedMethods = [];
-
     protected function matchPath(string $uri, array $routeDatas): bool|array
     {
         foreach ($routeDatas as $routes) {
