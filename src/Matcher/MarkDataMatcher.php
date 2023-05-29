@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Pg\Router\Matcher;
 
-use function array_unique;
 use function preg_match;
 use function rawurldecode;
-use function strtoupper;
 
 class MarkDataMatcher extends AbstractNamedMatcher
 {

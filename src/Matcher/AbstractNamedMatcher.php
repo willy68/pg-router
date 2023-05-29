@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pg\Router\Matcher;
 
+use function array_unique;
+use function strtoupper;
+
 abstract class AbstractNamedMatcher implements MatcherInterface
 {
     protected array $data;
