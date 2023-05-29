@@ -11,7 +11,7 @@ use Pg\Router\Route;
 class NamedRegexCollector extends AbstractRegexCollector
 {
     protected ?array $data = null;
-    private ?ParserInterface $parser = null;
+    private ?ParserInterface $parser;
 
     public function __construct(ParserInterface $parser = null)
     {

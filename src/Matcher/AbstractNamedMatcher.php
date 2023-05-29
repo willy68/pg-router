@@ -25,7 +25,6 @@ abstract class AbstractNamedMatcher implements MatcherInterface
         if (isset($this->data[$httpMethod])) {
             $matches = $this->matchPath($uri, $this->data[$httpMethod]);
             if ($matches) {
-                $this->attributes = $this->foundAttributes($matches);
                 return [$this->matchedRoute => $httpMethod, $this->attributes];
             }
         }
@@ -34,14 +33,13 @@ abstract class AbstractNamedMatcher implements MatcherInterface
         if (isset($this->data['ANY'])) {
             $matches = $this->matchPath($uri, $this->data['ANY']);
             if ($matches) {
-                $this->attributes = $this->foundAttributes($matches);
                 return [$this->matchedRoute => $httpMethod, $this->attributes];
             }
         }
 
         // Method not allowed
-        foreach ($this->data as $methods => $regexToRoute) {
-            $matches = $this->matchPath($uri, $regexToRoute);
+        foreach ($this->data as $methods => $routeDatas) {
+            $matches = $this->matchPath($uri, $routeDatas);
 
             if (!$matches) {
                 continue;
@@ -57,19 +55,9 @@ abstract class AbstractNamedMatcher implements MatcherInterface
         return false;
     }
 
-    abstract protected function matchPath(string $uri, array $regexToRoute): bool|array;
+    abstract protected function matchPath(string $uri, array $routeDatas): bool|array;
 
-    protected function foundAttributes(array $matches): array
-    {
-        $attributes = [];
-        foreach ($matches as $key => $val) {
-            if (is_string($key) && $val !== '') {
-                $attributes[$key] = rawurldecode($val);
-            }
-        }
-
-        return $attributes;
-    }
+    abstract protected function foundAttributes(array $matches, ?array $attributesNames = null): array;
 
     public function getAttributes(): array
     {
