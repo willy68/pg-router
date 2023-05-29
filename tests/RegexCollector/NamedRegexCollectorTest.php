@@ -2,6 +2,7 @@
 
 namespace PgTest\Router\RegexCollector;
 
+use Closure;
 use Pg\Router\RegexCollector\NamedRegexCollector;
 use Pg\Router\Route;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +17,7 @@ class NamedRegexCollectorTest extends TestCase
         $this->collector = new NamedRegexCollector();
     }
 
-    protected function getCallback(): \Closure
+    protected function getCallback(): Closure
     {
         return fn () => 'callback';
     }
