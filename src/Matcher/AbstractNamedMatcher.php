@@ -48,7 +48,7 @@ abstract class AbstractNamedMatcher implements MatcherInterface
                 continue;
             }
 
-            $name = $this->matchedRoute;
+            $name = $this->getMatchedRouteName();
 
             // Memorize failed route method
             $this->failedRoutesMethod[] = $name;
@@ -61,6 +61,11 @@ abstract class AbstractNamedMatcher implements MatcherInterface
     abstract protected function matchPath(string $uri, array $routeDatas): bool|array;
 
     abstract protected function foundAttributes(array $matches, ?array $attributesNames = null): array;
+
+    public function getMatchedRouteName(): ?string
+    {
+        return $this->matchedRoute;
+    }
 
     public function getAttributes(): array
     {
