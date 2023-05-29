@@ -11,11 +11,11 @@ use function sprintf;
 
 /**
  * Ex:
- * ```
+ * ```php
  * $router->group('/admin', function (RouteGroup $route) {
- * $route->route('/acme/route1', 'AcmeController::actionOne', 'route1', [GET]);
- * $route->route('/acme/route2', 'AcmeController::actionTwo', 'route2', [GET])->setScheme('https');
- * $route->route('/acme/route3', 'AcmeController::actionThree', 'route3', [GET]);
+ *      $route->route('/acme/route1', 'AcmeController::actionOne', 'route1', ['GET']);
+ *      $route->route('/acme/route2', 'AcmeController::actionTwo', 'route2', ['GET'])->setSchemes(['https']);
+ *      $route->route('/acme/route3', 'AcmeController::actionThree', 'route3', ['GET']);
  * })
  * ->middleware(Middleware::class);
  * ```
