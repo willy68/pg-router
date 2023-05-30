@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Pg\Router;
 
 use Exception;
+use Pg\Router\Exception\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use RuntimeException;
 
 /**
  * Interface defining required router capabilities.
@@ -17,16 +17,15 @@ interface RouterInterface
      * Add a route.
      *
      * This method adds a route against which the underlying implementation may
-     * match. Implementations MUST aggregate route instances, but MUST NOT use
-     * the details to inject the underlying router until `match()` and/or
-     * `generateUri()` is called.  This is required to allow consumers to
-     * modify route instances before matching (e.g., to provide route options,
-     * inject a name, etc.).
+     * match. Implementations MUST aggregate route instances.
      */
     public function addRoute(Route $route): void;
 
     /**
-     * Add a route to the collection
+     * Add a route.
+     *
+     * This method creates `Route` instance with all params given,
+     * MUST call `addRoute()` method to populate the collection and returns the `Route`.
      *
      * @param string $path
      * @param callable|string $callback
@@ -61,10 +60,7 @@ interface RouterInterface
      * the URI, this should be performed afterwards; consider passing the URI
      * to league/uri to encode it.
      *
-     * @see https://github.com/auraphp/Aura.Router/blob/3.x/docs/generating-paths.md
-     * @see https://docs.laminas.dev/laminas-router/routing/
-     *
-     * @throws Exception|RuntimeException If unable to generate the given URI.
+     * @throws Exception|RouteNotFoundException If unable to generate the given URI.
      */
     public function generateUri(string $name, array $substitutions = [], array $options = []): string;
 

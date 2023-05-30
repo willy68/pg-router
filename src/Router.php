@@ -128,9 +128,6 @@ class Router implements RouterInterface
 
     public function generateUri(string $name, array $substitutions = [], array $options = []): string
     {
-        if (!isset($this->routes[$name])) {
-            throw new RouteNotFoundException(sprintf("Route not found with name [%s]", $name));
-        }
         return (new UrlGenerator($this))->generate($name, $substitutions);
     }
 
