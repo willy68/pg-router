@@ -192,6 +192,8 @@ class MarkRegexCollectorTest extends TestCase
 
     public function testChunk()
     {
+        $toChunk = [];
+        $expected = [];
         $callback = fn ($request) => $request->getAttribute('id');
         for ($i = 0; $i <= 20; $i++) {
             $this->collector->addRoute(
@@ -202,11 +204,35 @@ class MarkRegexCollectorTest extends TestCase
                     ['GET']
                 )
             );
+            $attributes = ['bar' => 'bar', 'baz' => 'baz'];
+            $toChunk['GET']["test$i"] = ["/foo$i/(\d+)(*MARK:test$i)|/foo$i/(\d+)/([a-z]+)(*MARK:test$i)",$attributes];
+        }
+
+        foreach ($toChunk as $method => $route) {
+            $chunk = array_chunk($route, 15, true);
+            $expected[$method] = array_map([$this, 'computeRegexData'], $chunk);
         }
 
         $data = $this->collector->getData();
         $this->assertCount(2, $data['GET']);
         $this->assertCount(15, $data['GET'][0]['attributes']);
         $this->assertCount(6, $data['GET'][1]['attributes']);
+        $this->assertSame($expected, $data);
+    }
+
+    protected function computeRegexData(array $routes): array
+    {
+        $regexes = [];
+        $attributes = [];
+
+        foreach ($routes as $name => $route) {
+            [$regex, $vars] = $route;
+            $attributes[$name] = $vars;
+            $regexes[] = $regex;
+        }
+
+        $regex = '~^(?|' . implode('|', $regexes) . ')$~x';
+
+        return ['regex' => $regex, 'attributes' => $attributes];
     }
 }
