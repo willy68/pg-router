@@ -13,6 +13,7 @@ interface GeneratorInterface
      * Takes the named route and any substitutions, and attempts to generate a
      * URI from it.
      * Variable attributes must be given. Optionals attributes could be omitted.
+     * Variable and optional attributes must match route regex.
      *
      * @throws Exception|RouteNotFoundException If unable to generate the given URI.
      */
