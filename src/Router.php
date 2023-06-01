@@ -6,7 +6,6 @@ namespace Pg\Router;
 
 use Pg\Router\DuplicateDetector\DuplicateDetectorInterface;
 use Pg\Router\DuplicateDetector\DuplicateMethodMapDetector;
-use Pg\Router\Exception\RouteNotFoundException;
 use Pg\Router\Generator\UrlGenerator;
 use Pg\Router\Matcher\MarkDataMatcher;
 use Pg\Router\Matcher\MatcherInterface;
