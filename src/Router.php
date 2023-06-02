@@ -73,7 +73,10 @@ class Router implements RouterInterface
         $route = $matcher->match($uri, $method);
 
         if ($route) {
-            return RouteResult::fromRouteSuccess($this->routes[array_key_first($route)], $matcher->getAttributes());
+            return RouteResult::fromRouteSuccess(
+                $this->routes[$matcher->getMatchedRouteName()],
+                $matcher->getAttributes()
+            );
         }
 
         $allowedMethods = $matcher->getAllowedMethods();
