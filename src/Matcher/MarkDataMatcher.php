@@ -19,8 +19,8 @@ class MarkDataMatcher extends AbstractNamedMatcher
             $name = $matches['MARK'];
             $attributesNames = $routes['attributes'][$name];
 
-            $this->attributes = $this->foundAttributes($matches, $attributesNames);
             $this->matchedRoute = $name;
+            $this->attributes = $this->foundAttributes($matches, $attributesNames);
 
             return $matches;
         }

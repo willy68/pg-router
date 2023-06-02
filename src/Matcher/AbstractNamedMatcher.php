@@ -48,7 +48,7 @@ abstract class AbstractNamedMatcher implements MatcherInterface
                 continue;
             }
 
-            $name = $this->getMatchedRouteName();
+            $name = $this->matchedRoute;
 
             // Memorize failed route method
             $this->failedRoutesMethod[] = $name;

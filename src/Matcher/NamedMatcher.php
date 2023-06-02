@@ -17,8 +17,8 @@ class NamedMatcher extends AbstractNamedMatcher
                 continue;
             }
 
-            $this->attributes = $this->foundAttributes($matches);
             $this->matchedRoute = $name;
+            $this->attributes = $this->foundAttributes($matches);
 
             return $matches;
         }
