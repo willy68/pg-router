@@ -44,7 +44,7 @@ class MarkRegexCollectorTest extends TestCase
         $this->assertSame($expected, $data);
     }
 
-    public function testWithVariablePartPathWithMethodGet()
+    public function testPathWithVariablePartWithMethodGet()
     {
         $route = new Route('/foo/{bar:[a-z]+}', $this->getCallback(), 'test', ['GET']);
         $this->collector->addRoute($route);

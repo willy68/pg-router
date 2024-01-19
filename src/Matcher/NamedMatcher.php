@@ -8,7 +8,7 @@ use function is_string;
 use function preg_match;
 use function rawurldecode;
 
-class NamedMatcher extends AbstractNamedMatcher
+class NamedMatcher extends AbstractMatcher
 {
     protected function matchPath(string $uri, array $routeDatas): bool|array
     {

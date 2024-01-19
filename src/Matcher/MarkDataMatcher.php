@@ -7,7 +7,7 @@ namespace Pg\Router\Matcher;
 use function preg_match;
 use function rawurldecode;
 
-class MarkDataMatcher extends AbstractNamedMatcher
+class MarkDataMatcher extends AbstractMatcher
 {
     protected function matchPath(string $uri, array $routeDatas): bool|array
     {

@@ -7,7 +7,7 @@ namespace Pg\Router\Matcher;
 use function array_unique;
 use function strtoupper;
 
-abstract class AbstractNamedMatcher implements MatcherInterface
+abstract class AbstractMatcher implements MatcherInterface
 {
     protected array $data;
     protected array $attributes = [];
