@@ -60,7 +60,7 @@ abstract class AbstractNamedMatcher implements MatcherInterface
 
     abstract protected function matchPath(string $uri, array $routeDatas): bool|array;
 
-    abstract protected function foundAttributes(array $matches, ?array $attributesNames = null): array;
+    abstract protected function foundAttributes(array $matches, ?array $routeAttributes = null): array;
 
     public function getMatchedRouteName(): ?string
     {

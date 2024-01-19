@@ -26,7 +26,7 @@ class NamedMatcher extends AbstractNamedMatcher
         return false;
     }
 
-    protected function foundAttributes(array $matches, ?array $attributesNames = null): array
+    protected function foundAttributes(array $matches, ?array $routeAttributes = null): array
     {
         $attributes = [];
         foreach ($matches as $key => $val) {

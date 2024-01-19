@@ -8,8 +8,6 @@ use Pg\Router\Route;
 
 abstract class AbstractRegexCollector implements RegexCollectorInterface
 {
-    public const ANY_METHODS = 'ANY';
-
     /**
      * @inheritDoc
      */

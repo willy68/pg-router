@@ -17,10 +17,10 @@ class MarkDataMatcher extends AbstractNamedMatcher
             }
 
             $name = $matches['MARK'];
-            $attributesNames = $routes['attributes'][$name];
+            $routeAttributes = $routes['attributes'][$name];
 
             $this->matchedRoute = $name;
-            $this->attributes = $this->foundAttributes($matches, $attributesNames);
+            $this->attributes = $this->foundAttributes($matches, $routeAttributes);
 
             return $matches;
         }
@@ -28,12 +28,12 @@ class MarkDataMatcher extends AbstractNamedMatcher
         return false;
     }
 
-    protected function foundAttributes(array $matches, ?array $attributesNames = null): array
+    protected function foundAttributes(array $matches, ?array $routeAttributes = null): array
     {
         $attributes = [];
 
         $i = 1;
-        foreach ($attributesNames as $attributeName) {
+        foreach ($routeAttributes as $attributeName) {
             if (isset($matches[$i]) && '' !== $matches[$i]) {
                 $attributes[$attributeName] = rawurldecode($matches[$i++]);
             }
