@@ -58,15 +58,17 @@ class RouterTest extends TestCase
     public function testMatchSuccess(): void
     {
         $router = new Router();
-        $router->route('/hello', 'HelloController::sayHello', 'hello', ['GET']);
+        $router->route('/hello-{name:\w+}', 'HelloController::sayHello', 'hello', ['GET']);
 
-        $request = new ServerRequest('GET', '/hello');
+        $request = new ServerRequest('GET', '/hello-john');
         $result = $router->match($request);
 
         $this->assertTrue($result->isSuccess());
+        $this->assertSame('hello', $result->getMatchedRouteName());
+        $this->assertSame(['name' => 'john'], $result->getMatchedAttributes());
     }
 
-    public function testMatchFailure(): void
+    public function testMatchFailureMethodNotAllowed(): void
     {
         $router = new Router();
         $router->route('/hello', 'HelloController::sayHello', 'hello', ['GET']);
@@ -75,6 +77,8 @@ class RouterTest extends TestCase
         $result = $router->match($request);
 
         $this->assertFalse($result->isSuccess());
+        $this->assertTrue($result->isMethodFailure());
+        $this->assertEquals(['GET'], $result->getAllowedMethods());
     }
 
     public function testCrudRoutes(): void
