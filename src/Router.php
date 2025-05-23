@@ -28,8 +28,8 @@ class Router implements RouterInterface
 
     public function __construct(?RegexCollectorInterface $regexCollector = null, ?callable $matcherFactory = null)
     {
-        $this->matcherFactory = $matcherFactory;
         $this->regexCollector = $regexCollector;
+        $this->matcherFactory = $matcherFactory;
     }
 
     public function route(
@@ -50,7 +50,7 @@ class Router implements RouterInterface
         $this->routes[$route->getName()] = $route;
     }
 
-    protected function duplicateRoute(Route $route)
+    protected function duplicateRoute(Route $route): void
     {
         $this->getDuplicateDetector()->detectDuplicate($route);
     }
