@@ -15,7 +15,7 @@ class MarkRegexCollector implements RegexCollectorInterface
 {
     protected ?array $data = null;
     private ?ParserInterface $parser;
-    private int $chunk = 15;
+    private int $chunk;
 
     public function __construct(ParserInterface $parser = null, int $chunk = 15)
     {
