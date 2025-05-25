@@ -15,10 +15,12 @@ class MarkRegexCollector implements RegexCollectorInterface
 {
     protected ?array $data = null;
     private ?ParserInterface $parser;
+    private int $chunk = 15;
 
-    public function __construct(ParserInterface $parser = null)
+    public function __construct(ParserInterface $parser = null, int $chunk = 15)
     {
         $this->parser = $parser;
+        $this->chunk = $chunk;
     }
 
     protected function getParser(): ParserInterface
@@ -59,7 +61,7 @@ class MarkRegexCollector implements RegexCollectorInterface
         $data = [];
 
         foreach ($this->data as $method => $route) {
-            $chunk = array_chunk($route, 15, true);
+            $chunk = array_chunk($route, $this->chunk, true);
             $data[$method] = array_map([$this, 'computeRegexData'], $chunk);
         }
 
