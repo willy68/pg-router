@@ -23,23 +23,18 @@ class Router implements RouterInterface
     use MiddlewareAwareStackTrait;
     use RouteCollectionTrait;
 
-    /**
-     * @const string Configuration key used to enable/disable caching
-     */
     public const CONFIG_CACHE_ENABLED = 'cache_enabled';
-    /**
-     * @const string Configuration key used to set the cache file path
-     */
     public const CONFIG_CACHE_FILE = 'cache_file';
+
     private string $cacheFile = 'route_file.php';
     private string $cacheKey = 'router_parsed_data';
     private ?CacheItemPoolInterface $cachePool = null;
     protected ?DuplicateDetectorInterface $detector = null;
     /** @var Route[] */
     protected array $routes = [];
-    /** @var callable(array|object): MatcherInterface */
+    /** @var callable(array|object): MatcherInterface|null */
     protected $matcherFactory = null;
-    private ?RegexCollectorInterface $regexCollector;
+    private ?RegexCollectorInterface $regexCollector = null;
 
     /**
      * $router = new Router(
@@ -67,14 +62,14 @@ class Router implements RouterInterface
     }
 
     /**
-     * Load configuration parameters
+     * Load configuration parameters.
      *
-     * @param null|array $config Array of custom configuration options.
+     * @param array|null $config
      * @throws CacheException
      */
     private function loadConfig(array $config = null): void
     {
-        if (null === $config) {
+        if ($config === null) {
             return;
         }
 
@@ -91,7 +86,7 @@ class Router implements RouterInterface
      */
     private function loadCachePool(): void
     {
-        if (!$this->cachePool) {
+        if ($this->cachePool === null) {
             $this->cachePool = new PhpFilesAdapter(
                 '',
                 0,
@@ -109,7 +104,6 @@ class Router implements RouterInterface
     ): Route {
         $route = new Route($path, $callback, $name, $methods);
         $this->addRoute($route);
-
         return $route;
     }
 
@@ -118,7 +112,6 @@ class Router implements RouterInterface
         $this->duplicateRoute($route);
         $this->routes[$route->getName()] = $route;
     }
-
 
     protected function duplicateRoute(Route $route): void
     {
@@ -158,10 +151,7 @@ class Router implements RouterInterface
      */
     protected function getMatcher(?array $routes = null): MatcherInterface
     {
-        if (!$this->matcherFactory) {
-            $this->matcherFactory = $this->getMatcherFactory();
-        }
-
+        $this->matcherFactory ??= $this->getMatcherFactory();
         $routes ??= $this->getParsedData();
         return ($this->matcherFactory)($routes);
     }
@@ -174,7 +164,7 @@ class Router implements RouterInterface
         return fn ($routes): MatcherInterface => new MarkDataMatcher($routes);
     }
 
-    /** Good place to cache data
+    /**
      * @throws InvalidArgumentException
      */
     protected function getParsedData(): array
@@ -193,7 +183,7 @@ class Router implements RouterInterface
 
         $data = $this->regexCollector->getData();
 
-        if ($this->cachePool) {
+        if ($this->cachePool && $cacheItem) {
             $cacheItem->set($data);
             $this->cachePool->save($cacheItem);
         }
@@ -212,29 +202,17 @@ class Router implements RouterInterface
     }
 
     /**
-     * Create multiple routes with same prefix
-     *
-     * Ex:
-     * ```
-     * $router->group('/admin', function (RouteGroup $route) {
-     *  $route->route('/acme/route1', 'AcmeController::actionOne', 'route1', [GET]);
-     *  $route->route('/acme/route2', 'AcmeController::actionTwo', 'route2', [GET])->middleware(Middleware::class);
-     *  $route->route('/acme/route3', 'AcmeController::actionThree', 'route3', [GET]);
-     * })
-     * ->middleware(Middleware::class);
-     * ```
+     * Create multiple routes with same prefix.
      */
     public function group(string $prefix, callable $callable): RouteGroup
     {
         $group = new RouteGroup($prefix, $callable, $this);
-        /* run group to inject routes on router*/
         $group();
-
         return $group;
     }
 
     /**
-     * Generate crud Routes
+     * Generate CRUD routes.
      *
      * @param string $prefixPath
      * @param callable|string $callable
