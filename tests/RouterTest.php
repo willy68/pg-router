@@ -207,7 +207,7 @@ class RouterTest extends TestCase
             null,
             [
             Router::CONFIG_CACHE_ENABLED => true,
-            Router::CONFIG_CACHE_FILE => $tmpDir,
+            Router::CONFIG_CACHE_FILE => $cacheFile,
             ]
         );
 
@@ -227,7 +227,7 @@ class RouterTest extends TestCase
             null,
             [
             Router::CONFIG_CACHE_ENABLED => true,
-            Router::CONFIG_CACHE_FILE => $tmpDir,
+            Router::CONFIG_CACHE_FILE => $cacheFile,
             ]
         );
     // Add the same route (simulate fresh boot, but cache should be hit)
