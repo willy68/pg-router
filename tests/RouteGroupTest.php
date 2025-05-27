@@ -25,7 +25,6 @@ class RouteGroupTest extends TestCase
         $group = new RouteGroup('/prefix', $callback, $router);
 
         $this->assertSame('/prefix', $group->getPrefix());
-        $this->assertInstanceOf(RouteGroup::class, $group);
     }
 
     /**
