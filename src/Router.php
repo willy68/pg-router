@@ -54,7 +54,7 @@ class Router implements RouterInterface
     public function __construct(
         ?RegexCollectorInterface $regexCollector = null,
         ?callable $matcherFactory = null,
-        array $config = null
+        ?array $config = null
     ) {
         $this->regexCollector = $regexCollector;
         $this->matcherFactory = $matcherFactory;
@@ -67,7 +67,7 @@ class Router implements RouterInterface
      * @param array|null $config
      * @throws CacheException
      */
-    private function loadConfig(array $config = null): void
+    private function loadConfig(?array $config = null): void
     {
         if ($config === null) {
             return;
