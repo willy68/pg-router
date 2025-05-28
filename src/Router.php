@@ -17,6 +17,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException as InvalidCacheArgumentException;
 
 class Router implements RouterInterface
 {
@@ -37,7 +38,7 @@ class Router implements RouterInterface
     protected array $routes = [];
     /** @var callable(array|object): MatcherInterface|null */
     protected $matcherFactory = null;
-    private ?RegexCollectorInterface $regexCollector = null;
+    private ?RegexCollectorInterface $regexCollector;
 
     /**
      * $router = new Router(
@@ -94,11 +95,13 @@ class Router implements RouterInterface
         if ($this->cachePool === null) {
             $cachePoolFactory = $this->cachePoolFactory;
             if (!is_callable($cachePoolFactory)) {
-                throw new InvalidArgumentException('Cache pool factory must be a callable.');
+                throw new InvalidCacheArgumentException('Cache pool factory must be a callable.');
             }
             $this->cachePool = $cachePoolFactory();
             if (!$this->cachePool instanceof CacheItemPoolInterface) {
-                throw new InvalidArgumentException('Cache pool factory must return an instance of CacheItemPoolInterface.');
+                throw new InvalidCacheArgumentException(
+                    'Cache pool factory must return an instance of CacheItemPoolInterface.'
+                );
             }
         }
     }
@@ -107,7 +110,6 @@ class Router implements RouterInterface
      * Get the default cache pool factory callable.
      *
      * @return callable (array|object): CacheItemPoolInterface
-     * @throws CacheException
      */
     protected function getCachePoolFactory(): callable
     {
