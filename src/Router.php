@@ -25,9 +25,12 @@ class Router implements RouterInterface
 
     public const CONFIG_CACHE_ENABLED = 'cache_enabled';
     public const CONFIG_CACHE_FILE = 'cache_file';
+    public const CONFIG_CACHEPOOL_FACTORY = 'cachepool_factory';
 
     private string $cacheFile = 'route_file.php';
     private string $cacheKey = 'router_parsed_data';
+    /** @var callable: CachePoolInterface */
+    private $cachePoolFactory = null;
     private ?CacheItemPoolInterface $cachePool = null;
     protected ?DuplicateDetectorInterface $detector = null;
     /** @var Route[] */
@@ -75,6 +78,7 @@ class Router implements RouterInterface
 
         $cacheEnabled = (bool)($config[self::CONFIG_CACHE_ENABLED] ?? false);
         $this->cacheFile = (string)($config[self::CONFIG_CACHE_FILE] ?? 'route_file.php');
+        $this->cachePoolFactory = $config[self::CONFIG_CACHEPOOL_FACTORY] ?? $this->getCachePoolFactory();
 
         if ($cacheEnabled) {
             $this->loadCachePool();
@@ -87,13 +91,31 @@ class Router implements RouterInterface
     private function loadCachePool(): void
     {
         if ($this->cachePool === null) {
-            $this->cachePool = new PhpFilesAdapter(
-                '',
-                0,
-                self::CONFIG_CACHE_FILE,
-                true
-            );
+            $cachePoolFactory = $this->cachePoolFactory;
+            if (!is_callable($cachePoolFactory)) {
+                throw new InvalidArgumentException('Cache pool factory must be a callable.');
+            }
+            $this->cachePool = $cachePoolFactory();
+            if (!$this->cachePool instanceof CacheItemPoolInterface) {
+                throw new InvalidArgumentException('Cache pool factory must return an instance of CacheItemPoolInterface.');
+            }
         }
+    }
+
+    /**
+     * Get the default cache pool factory callable.
+     *
+     * @return callable (array|object): CacheItemPoolInterface
+     * @throws CacheException
+     */
+    protected function getCachePoolFactory(): callable
+    {
+        return fn(): CacheItemPoolInterface => new PhpFilesAdapter(
+            '',
+            0,
+            $this->cacheFile,
+            true
+        );
     }
 
     public function route(
@@ -161,7 +183,7 @@ class Router implements RouterInterface
      */
     protected function getMatcherFactory(): callable
     {
-        return fn ($routes): MatcherInterface => new MarkDataMatcher($routes);
+        return fn($routes): MatcherInterface => new MarkDataMatcher($routes);
     }
 
     /**
