@@ -25,10 +25,10 @@ class Router implements RouterInterface
     use RouteCollectionTrait;
 
     public const CONFIG_CACHE_ENABLED = 'cache_enabled';
-    public const CONFIG_CACHE_FILE = 'cache_file';
+    public const CONFIG_CACHE_DIR = 'cache_dir';
     public const CONFIG_CACHE_POOL_FACTORY = 'cache_pool_factory';
 
-    private string $cacheFile = 'route_file.php';
+    private string $cacheDir = '/tmp/cache/router';
     private string $cacheKey = 'router_parsed_data';
     /** @var callable: CachePoolInterface */
     private $cachePoolFactory = null;
@@ -46,8 +46,8 @@ class Router implements RouterInterface
      *     null,
      *     [
      *          self::CONFIG_CACHE_ENABLED => ($env === 'prod'),
-     *          self::CONFIG_CACHE_FILE => '/dir/cache/router/cache_file.php',
-     *          self::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {}
+     *          self::CONFIG_CACHE_DIR => '/tmp/cache/router',
+     *          self::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...}
      *     ]
      * )
      *
@@ -79,7 +79,7 @@ class Router implements RouterInterface
         }
 
         $cacheEnabled = (bool)($config[self::CONFIG_CACHE_ENABLED] ?? false);
-        $this->cacheFile = (string)($config[self::CONFIG_CACHE_FILE] ?? 'route_file.php');
+        $this->cacheDir = (string)($config[self::CONFIG_CACHE_DIR] ?? $this->cacheDir);
         $this->cachePoolFactory = $config[self::CONFIG_CACHE_POOL_FACTORY] ?? $this->getCachePoolFactory();
 
         if ($cacheEnabled) {
@@ -114,9 +114,9 @@ class Router implements RouterInterface
     protected function getCachePoolFactory(): callable
     {
         return fn(): CacheItemPoolInterface => new PhpFilesAdapter(
-            '',
+            'Router',
             0,
-            $this->cacheFile,
+            $this->cacheDir,
             true
         );
     }

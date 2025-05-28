@@ -23,6 +23,17 @@ class RouterTest extends TestCase
 {
     use VarDumperTestTrait;
 
+    public function delTree($dir): bool
+    {
+        $files = array_diff(scandir($dir), ['.','..']);
+        foreach ($files as $file) {
+            (is_dir("$dir/$file") && !is_link($dir)) ?
+                $this->delTree("$dir/$file") :
+                unlink("$dir/$file");
+        }
+        return rmdir($dir);
+    }
+
     public function testAddAndGetRoute(): void
     {
         $router = new Router();
@@ -125,7 +136,7 @@ class RouterTest extends TestCase
 
         $router = new Router(null, null, [
             Router::CONFIG_CACHE_ENABLED => true,
-            Router::CONFIG_CACHE_FILE => '/tmp/cache_file.php'
+            Router::CONFIG_CACHE_DIR => '/tmp/cache_dir'
         ]);
 
         $reflection = new ReflectionClass($router);
@@ -136,6 +147,17 @@ class RouterTest extends TestCase
         $data = $this->invokeParsedData($router);
 
         $this->assertSame($cachedData, $data);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function invokeParsedData(Router $router): array
+    {
+        $reflection = new ReflectionClass($router);
+        $method = $reflection->getMethod('getParsedData');
+        $method->setAccessible(true);
+        return $method->invoke($router);
     }
 
     /**
@@ -161,7 +183,7 @@ class RouterTest extends TestCase
 
         $router = new Router($regexCollector, null, [
             Router::CONFIG_CACHE_ENABLED => true,
-            Router::CONFIG_CACHE_FILE => '/tmp/cache_file.php'
+            Router::CONFIG_CACHE_DIR => '/tmp/cache_dir'
         ]);
         $router->addRoute($route);
 
@@ -202,21 +224,19 @@ class RouterTest extends TestCase
     public function testCacheStoresAndRestoresParsedData(): void
     {
         $tmpDir = sys_get_temp_dir() . '/router_cache_' . uniqid();
-        mkdir($tmpDir);
-        $cacheFile = $tmpDir . '/router_cache.php';
 
         $router = new Router(
             null,
             null,
             [
-            Router::CONFIG_CACHE_ENABLED => true,
-            Router::CONFIG_CACHE_FILE => $cacheFile,
+                Router::CONFIG_CACHE_ENABLED => true,
+                Router::CONFIG_CACHE_DIR => $tmpDir,
             ]
         );
 
         $router->route('/cache-test/{id:\d+}', 'TestController::cache', 'cache.route', ['GET']);
 
-    // First match to populate cache
+        // First match to populate cache
         $request = new ServerRequest('GET', '/cache-test/123');
         $result = $router->match($request);
 
@@ -224,16 +244,16 @@ class RouterTest extends TestCase
         $this->assertSame('cache.route', $result->getMatchedRouteName());
         $this->assertSame(['id' => '123'], $result->getMatchedAttributes());
 
-    // Simulate a new Router instance with same cache config
+        // Simulate a new Router instance with same cache config
         $router2 = new Router(
             null,
             null,
             [
-            Router::CONFIG_CACHE_ENABLED => true,
-            Router::CONFIG_CACHE_FILE => $cacheFile,
+                Router::CONFIG_CACHE_ENABLED => true,
+                Router::CONFIG_CACHE_DIR => $tmpDir,
             ]
         );
-    // Add the same route (simulate fresh boot, but cache should be hit)
+        // Add the same route (simulate fresh boot, but cache should be hit)
         $router2->route('/cache-test/{id:\d+}', 'TestController::cache', 'cache.route', ['GET']);
 
         $request2 = new ServerRequest('GET', '/cache-test/456');
@@ -243,19 +263,7 @@ class RouterTest extends TestCase
         $this->assertSame('cache.route', $result2->getMatchedRouteName());
         $this->assertSame(['id' => '456'], $result2->getMatchedAttributes());
 
-    // Clean up
-        array_map('unlink', glob($tmpDir . '/*'));
-        rmdir($tmpDir);
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function invokeParsedData(Router $router): array
-    {
-        $reflection = new ReflectionClass($router);
-        $method = $reflection->getMethod('getParsedData');
-        $method->setAccessible(true);
-        return $method->invoke($router);
+        // Clean up
+        $this->delTree($tmpDir);
     }
 }
