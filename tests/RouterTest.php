@@ -214,7 +214,7 @@ class RouterTest extends TestCase
         $router->route('/cache-test/{id:\d+}', 'TestController::cache', 'cache.route', ['GET']);
 
     // First match to populate cache
-        $request = new \GuzzleHttp\Psr7\ServerRequest('GET', '/cache-test/123');
+        $request = new ServerRequest('GET', '/cache-test/123');
         $result = $router->match($request);
 
         $this->assertTrue($result->isSuccess());
@@ -233,7 +233,7 @@ class RouterTest extends TestCase
     // Add the same route (simulate fresh boot, but cache should be hit)
         $router2->route('/cache-test/{id:\d+}', 'TestController::cache', 'cache.route', ['GET']);
 
-        $request2 = new \GuzzleHttp\Psr7\ServerRequest('GET', '/cache-test/456');
+        $request2 = new ServerRequest('GET', '/cache-test/456');
         $result2 = $router2->match($request2);
 
         $this->assertTrue($result2->isSuccess());
