@@ -14,12 +14,15 @@ use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 
 class RouterTest extends TestCase
 {
+    use VarDumperTestTrait;
+
     public function testAddAndGetRoute(): void
     {
         $router = new Router();
