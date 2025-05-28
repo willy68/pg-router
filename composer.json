@@ -29,7 +29,7 @@
     "psr/cache": "^3.0"
   },
   "require-dev": {
-    "symfony/var-dumper": "^6.0",
+    "symfony/var-dumper": "^7.0",
     "phpunit/phpunit": "^10.1",
     "guzzlehttp/psr7": "^2.2",
     "nikic/fast-route": "v1.3.0",
