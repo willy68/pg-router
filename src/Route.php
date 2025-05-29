@@ -212,8 +212,20 @@ class Route
             throw new InvalidArgumentException('Http methods array is empty');
         }
 
-        //Place to match valide http methods
+        // Define allowed HTTP methods
+        $validMethods = [
+            'GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'CONNECT', 'TRACE'
+        ];
 
-        return array_map('strtoupper', $methods);
+        // Normalize and validate each method
+        $normalized = array_map('strtoupper', $methods);
+
+        foreach ($normalized as $method) {
+            if (!in_array($method, $validMethods, true)) {
+                throw new InvalidArgumentException(sprintf('Invalid HTTP method: %s', $method));
+            }
+        }
+
+        return $normalized;
     }
 }
