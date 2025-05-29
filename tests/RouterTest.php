@@ -14,15 +14,12 @@ use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 
 class RouterTest extends TestCase
 {
-    use VarDumperTestTrait;
-
     public function delTree($dir): bool
     {
         $files = array_diff(scandir($dir), ['.','..']);
@@ -147,6 +144,7 @@ class RouterTest extends TestCase
         $data = $this->invokeParsedData($router);
 
         $this->assertSame($cachedData, $data);
+        $this->delTree('/tmp/cache_dir');
     }
 
     /**
@@ -193,6 +191,9 @@ class RouterTest extends TestCase
         $property->setValue($router, $cachePool);
 
         $this->invokeParsedData($router);
+
+        // Clean up
+        $this->delTree('/tmp/cache_dir');
     }
 
     /**
