@@ -35,6 +35,9 @@ class UrlGeneratorTest extends TestCase
         return new UrlGenerator($collector);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGenerateWithInlineToken()
     {
         $collector = $this->getCollector();
@@ -45,6 +48,9 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/blog/42/edit', $url);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGenerateMatchingException()
     {
         $collector = $this->getCollector();
@@ -53,9 +59,12 @@ class UrlGeneratorTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Parameter value for [id] did not match the regex `([0-9]+)`');
-        $url = $generator->generate('test', ['id' => '4 2', 'foo' => 'bar']);
+        $generator->generate('test', ['id' => '4 2', 'foo' => 'bar']);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGenerateMissing()
     {
         $collector = $this->getCollector();
@@ -64,6 +73,9 @@ class UrlGeneratorTest extends TestCase
         $this->getGenerator($collector)->generate('no-such-route');
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGenerateWithOptional()
     {
         $collector = $this->getCollector();
@@ -88,17 +100,23 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/archive/foo/1979/11/07', $url);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGenerateOnFullUri()
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('http://google.com/?q={q}', ['action', 'google-search'], 'test');
+        $collector->route('https://google.com/?q={q}', ['action', 'google-search'], 'test');
 
         $actual = $generator->generate('test', ['q' => "what's up doc?"]);
-        $expect = "http://google.com/?q=what%27s%20up%20doc%3F";
+        $expect = "https://google.com/?q=what%27s%20up%20doc%3F";
         $this->assertSame($expect, $actual);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testGenerateWithHost()
     {
         $collector = $this->getCollector();
