@@ -3,6 +3,7 @@
 namespace PgTest\Router;
 
 use Exception;
+use FilesystemIterator;
 use GuzzleHttp\Psr7\ServerRequest;
 use Pg\Router\Exception\MissingAttributeException;
 use Pg\Router\Exception\RouteNotFoundException;
@@ -14,21 +15,32 @@ use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
 
 class RouterTest extends TestCase
 {
-    public function delTree($dir): bool
+    public function delTree(string $dir): bool
     {
-        $files = array_diff(scandir($dir), ['.','..']);
-        foreach ($files as $file) {
-            (is_dir("$dir/$file") && !is_link($dir)) ?
-                $this->delTree("$dir/$file") :
-                unlink("$dir/$file");
+        if (!is_dir($dir)) {
+            return false;
         }
-        return rmdir($dir);
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileInfo) {
+            $todo = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
+            $todo($fileInfo->getRealPath());
+        }
+
+        rmdir($dir);
+        return true;
     }
 
     public function testAddAndGetRoute(): void
