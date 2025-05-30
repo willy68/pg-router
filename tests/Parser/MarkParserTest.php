@@ -26,28 +26,28 @@ class MarkParserTest extends TestCase
     public function testVariableWithDefaultToken()
     {
         $data = $this->dataParser->parse('/foo/{bar}');
-        $expect = [['/foo/([^/]+)'], [0 => 'bar']];
+        $expect = [['/foo/([^/]+)'], ['bar']];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableWithToken()
     {
         $data = $this->dataParser->parse('/foo/{bar:[a-z]+}');
-        $expect = [['/foo/([a-z]+)'], [0 => 'bar']];
+        $expect = [['/foo/([a-z]+)'], ['bar']];
         $this->assertSame($expect, $data);
     }
 
     public function testFullUriVariable()
     {
-        $data = $this->dataParser->parse('http://google.com/?q={q}');
-        $expect = [['http://google.com/?q=([^/]+)'], [0 => 'q']];
+        $data = $this->dataParser->parse('https://google.com/?q={q}');
+        $expect = [['https://google.com/?q=([^/]+)'], ['q']];
         $this->assertSame($expect, $data);
     }
 
     public function testFullUriVariableWithToken()
     {
-        $data = $this->dataParser->parse('http://google.com/?q={q:[a-z]+}');
-        $expect = [['http://google.com/?q=([a-z]+)'], [0 => 'q']];
+        $data = $this->dataParser->parse('https://google.com/?q={q:[a-z]+}');
+        $expect = [['https://google.com/?q=([a-z]+)'], ['q']];
         $this->assertSame($expect, $data);
     }
 
@@ -61,21 +61,21 @@ class MarkParserTest extends TestCase
     public function testStaticAndOptionalWithToken()
     {
         $data = $this->dataParser->parse('/foo/bar[/{baz:[a-z]+}]');
-        $expect = [['/foo/bar', '/foo/bar/([a-z]+)'], [0 => 'baz']];
+        $expect = [['/foo/bar', '/foo/bar/([a-z]+)'], ['baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testStaticAndMultipleOptionalsWithToken()
     {
         $data = $this->dataParser->parse('/foo[/{bar:[a-z]+};{baz:\d+}]');
-        $expect = [['/foo', '/foo/([a-z]+)', '/foo/([a-z]+)/(\d+)'], [0 => 'bar', 1 => 'baz']];
+        $expect = [['/foo', '/foo/([a-z]+)', '/foo/([a-z]+)/(\d+)'], ['bar', 'baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableAndOptionalWithToken()
     {
         $data = $this->dataParser->parse('/foo/{bar:\d+}[/{baz:[a-z]+}]');
-        $expect = [['/foo/(\d+)', '/foo/(\d+)/([a-z]+)'], [0 => 'bar', 1 => 'baz']];
+        $expect = [['/foo/(\d+)', '/foo/(\d+)/([a-z]+)'], ['bar', 'baz']];
         $this->assertSame($expect, $data);
     }
 
@@ -84,7 +84,7 @@ class MarkParserTest extends TestCase
         $data = $this->dataParser->parse('/foo/{slug:[a-z]+}[/{bar:[0-9]+};{baz:\d+}]');
         $expect = [
             ['/foo/([a-z]+)', '/foo/([a-z]+)/([0-9]+)', '/foo/([a-z]+)/([0-9]+)/(\d+)'],
-            [0 => 'slug', 1 => 'bar', 2 => 'baz']
+            ['slug', 'bar', 'baz']
         ];
         $this->assertSame($expect, $data);
     }
@@ -92,7 +92,7 @@ class MarkParserTest extends TestCase
     public function testOptionalStartPathWithToken()
     {
         $data = $this->dataParser->parse('[/{bar:[a-z]+}]');
-        $expect = [['/', '/([a-z]+)'], [0 => 'bar']];
+        $expect = [['/', '/([a-z]+)'], ['bar']];
         $this->assertSame($expect, $data);
     }
     public function testVariableAndMultipleOptionalsWithTokenAndSpace()
@@ -100,7 +100,7 @@ class MarkParserTest extends TestCase
         $data = $this->dataParser->parse('/foo/ { slug : [a-z]+ } [ / { bar : [0-9]+ } ; { baz : \d+ } ]');
         $expect = [
             ['/foo/([a-z]+)', '/foo/([a-z]+)/([0-9]+)', '/foo/([a-z]+)/([0-9]+)/(\d+)'],
-            [0 => 'slug', 1 => 'bar', 2 => 'baz']
+            ['slug', 'bar', 'baz']
         ];
         $this->assertSame($expect, $data);
     }
