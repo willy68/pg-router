@@ -93,11 +93,11 @@ class RouteCollector implements RouteCollectionInterface
      * Generate crud Routes
      *
      * @param string $prefixPath
-     * @param callable|string $callable
+     * @param string $callable
      * @param string $prefixName
      * @return RouteGroup
      */
-    public function crud(string $prefixPath, callable|string $callable, string $prefixName): RouteGroup
+    public function crud(string $prefixPath, string $callable, string $prefixName): RouteGroup
     {
         $group = new RouteGroup(
             $prefixPath,

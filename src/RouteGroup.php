@@ -78,11 +78,11 @@ class RouteGroup
     /**
      * Perform all crud routes for a given class controller
      *
-     * @param callable|array|string $callback The class name generally
+     * @param string $callback The class name generally
      * @param string $prefixName
      * @return RouteGroup
      */
-    public function crud(callable|array|string $callback, string $prefixName): self
+    public function crud(string $callback, string $prefixName): self
     {
         $this->get("/", $callback . '::index', "$prefixName.index");
         $this->get("/new", $callback . '::create', "$prefixName.create");
