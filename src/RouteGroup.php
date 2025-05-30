@@ -87,6 +87,7 @@ class RouteGroup
         $this->get("/", $callback . '::index', "$prefixName.index");
         $this->get("/new", $callback . '::create', "$prefixName.create");
         $this->post("/new", $callback . '::create', "$prefixName.create.post");
+        $this->get("/{id:\d+}", $callback . '::edit', "$prefixName.edit");
         $this->post("/{id:\d+}", $callback . '::edit', "$prefixName.edit.post");
         $this->delete("/{id:\d+}", $callback . '::delete', "$prefixName.delete");
         return $this;
