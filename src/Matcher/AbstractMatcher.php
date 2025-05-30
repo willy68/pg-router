@@ -11,7 +11,7 @@ abstract class AbstractMatcher implements MatcherInterface
 {
     protected array $data;
     protected array $attributes = [];
-    protected ?string $matchedRoute;
+    protected ?string $matchedRoute = null;
     protected array $failedRoutesMethod = [];
     protected array $allowedMethods = [];
 
