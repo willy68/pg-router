@@ -14,7 +14,7 @@ class MarkDataMatcherTest extends TestCase
                 [
                     'regex' => '~^(?|/blog/category/([0-9]+)/post/([0-9]+)(*MARK:profile))$~x',
                     'attributes' => [
-                        'profile' => ['category_id' => 'category_id', 'id' => 'id']
+                        'profile' => [0 => 'category_id', 1 => 'id']
                     ]
                 ]
             ],
@@ -22,7 +22,7 @@ class MarkDataMatcherTest extends TestCase
                 [
                     'regex' => '~^(?|/submit/form/(\w+)(*MARK:form))$~x',
                     'attributes' => [
-                        'form' => ['token' => 'token']
+                        'form' => [0 => 'token']
                     ]
                 ]
             ],

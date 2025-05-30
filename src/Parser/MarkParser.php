@@ -17,122 +17,87 @@ class MarkParser implements ParserInterface
         $this->regex = $path;
         $this->routes = [];
 
-        $routes = $this->parseOptionalParts();
-        $this->parseVariableParts($routes);
+        $routes = $this->extractRouteVariants();
+        $this->compileRoutes($routes);
 
         return $this->routes;
     }
 
     /**
-     * Split in different regexes with optionals parts, one route per optional part.
-     * The routes[0] is the variable/static part.
-     *
-     * @return array
+     * Extract possible path variants including optional segments.
      */
-    protected function parseOptionalParts(): array
+    protected function extractRouteVariants(): array
     {
-        $routes = $this->getVariablePart();
-
+        $base = $this->extractBasePath();
         preg_match(Regex::OPT_REGEX, $this->regex, $matches);
-        if ($matches) {
-            $routes = $this->getOptionalParts($routes, $matches);
-        }
 
-        return $routes;
+        return $matches ? $this->expandOptionalSegments($base, $matches) : $base;
     }
 
     /**
-     * Get the first part (variable and/or static) in the array at index 0.
-     * If the path start by optional part, the array is empty.
-     *
-     * @return array
+     * Extract static/variable prefix before optional segments.
      */
-    protected function getVariablePart(): array
+    protected function extractBasePath(): array
     {
-        $routes = [];
-
-        $regex = preg_split(Regex::OPT_REGEX, $this->regex);
-        if (is_array($regex)) {
-            // Put variable part (or static) in first without optional part
-            $routes[] = $regex[0] ?: '/';
-        }
-
-        return $routes;
+        $parts = preg_split(Regex::OPT_REGEX, $this->regex);
+        return [($parts[0] ?? '') ?: '/'];
     }
 
     /**
-     * Generate all routes for all optional parts.
-     *
-     * @param array $routes
-     * @param array $matches
-     * @return array
+     * Expand a base route into variants using optional parts.
      */
-    protected function getOptionalParts(array $routes, array $matches): array
+    protected function expandOptionalSegments(array $base, array $matches): array
     {
-        $parts = explode(';', $matches[1]);
-        $repl = '';
+        $optionalParts = explode(';', $matches[1]);
+        $variants = $base;
+        $current = '';
 
-        foreach ($parts as $part) {
-            $repl .= '/' . trim($part);
-            $routes[] = str_replace($matches[0], $repl, $this->regex);
+        foreach ($optionalParts as $part) {
+            $current .= '/' . trim($part);
+            $variants[] = str_replace($matches[0], $current, $this->regex);
         }
 
-        return $routes;
+        return $variants;
     }
 
     /**
-     * Generate the regex for all routes needed by the path.
-     *
-     * @param array $routes
-     * @return void
+     * Compile all route variants into final regex and attribute map.
      */
-    protected function parseVariableParts(array $routes): void
+    protected function compileRoutes(array $routes): void
     {
-        $attributes = [];
-        $regex = [];
+        $allAttributes = [];
+        $compiledRoutes = [];
 
         foreach ($routes as $route) {
-            $vars = [];
+            $attributes = [];
             preg_match_all(Regex::REGEX, $route, $matches, PREG_SET_ORDER);
-            foreach ($matches as $match) {
-                $name = $match[1];
-                $token = $match[2] ?? null;
 
-                if (isset($vars[$name])) {
+            foreach ($matches as $match) {
+                [$full, $name, $token] = array_pad($match, 3, null);
+
+                if (isset($attributes[$name])) {
                     throw new DuplicateAttributeException(
-                        sprintf(
-                            'Cannot use the same attribute twice [%s]',
-                            $name
-                        )
+                        sprintf('Cannot use the same attribute twice [%s]', $name)
                     );
                 }
 
-                $subpattern = $this->getSubpattern($name, $token);
-                $route = str_replace($match[0], $subpattern, $route);
-                $vars[$name] = $name;
+                $subPattern = $this->getSubpattern($name, $token);
+                $route = str_replace($full, $subPattern, $route);
+                $attributes[$name] = true;
             }
-            $attributes = $attributes + $vars;
-            $regex[] = $route;
+
+            $allAttributes += array_fill_keys(array_keys($attributes), true);
+            $compiledRoutes[] = $route;
         }
 
-        $this->routes = [$regex, $attributes];
+        $this->routes = [$compiledRoutes, array_keys($allAttributes)];
     }
 
     /**
-     * Return the sub pattern for a token with or without the attribute name.
-     *
-     * @param string $name
-     * @param string|null $token
-     * @return string
+     * Return subpattern for a route variable.
      */
     protected function getSubpattern(string $name, ?string $token = null): string
     {
-        // is there a custom subpattern for the name?
-        if ($token) {
-            return '(' . trim($token) . ')';
-        }
-
-        // use a default subpattern
-        return "([^/]+)";
+        return $token ? '(' . trim($token) . ')' : '([^/]+)';
     }
 }
