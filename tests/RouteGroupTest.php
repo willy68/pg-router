@@ -30,18 +30,6 @@ class RouteGroupTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGetPrefixReturnsPrefix()
-    {
-        /** @var RouteCollectionInterface $router */
-        $router = $this->createMock(RouteCollectionInterface::class);
-        $group = new RouteGroup('/admin', function () {
-        }, $router);
-        $this->assertEquals('/admin', $group->getPrefix());
-    }
-
-    /**
-     * @throws Exception
-     */
     public function testGetPrefix()
     {
         /** @var RouterInterface $router */
