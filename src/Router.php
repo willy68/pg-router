@@ -47,7 +47,7 @@ class Router implements RouterInterface
      *     [
      *          self::CONFIG_CACHE_ENABLED => ($env === 'prod'),
      *          self::CONFIG_CACHE_DIR => '/tmp/cache/router',
-     *          self::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...}
+     *          self::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...},
      *     ]
      * )
      *

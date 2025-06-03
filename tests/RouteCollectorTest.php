@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PgTest\Router;
 
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Pg\Router\RouteCollector;
 use Pg\Router\RouterInterface;
@@ -13,7 +14,7 @@ use Pg\Router\RouteGroup;
 
 class RouteCollectorTest extends TestCase
 {
-    private $routerMock;
+    private RouterInterface|MockObject $routerMock;
     private RouteCollector $routeCollector;
 
     /**
@@ -39,7 +40,6 @@ class RouteCollectorTest extends TestCase
 
         $route = $this->routeCollector->route($path, $callback, $name, $methods);
 
-        $this->assertInstanceOf(Route::class, $route);
         $this->assertEquals($name, $route->getName());
         $this->assertSame($route, $this->routeCollector->getRouteName($name));
     }
@@ -78,7 +78,7 @@ class RouteCollectorTest extends TestCase
         };
 
         // Mock RouteGroup to check it is called
-        $routeGroupMock = $this->getMockBuilder(RouteGroup::class)
+        $this->getMockBuilder(RouteGroup::class)
             ->setConstructorArgs([$prefix, $callable, $this->routeCollector])
             ->onlyMethods(['__invoke'])
             ->getMock();
