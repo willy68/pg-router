@@ -116,14 +116,25 @@ class RouteGroupTest extends TestCase
 
         $expected1 = ['/', 'UserController::index', 'user.index'];
         $expected2 = ['/new', 'UserController::create', 'user.create'];
-        $matcher = $this->exactly(2);
+        $expected3 = ['/new', 'UserController::edit', 'user.edit'];
+        $matcher = $this->exactly(3);
         $group->expects($matcher)
             ->method('get')
             ->willReturnCallback(
-                function (string $path, string $callback, string $name) use ($matcher, $expected1, $expected2) {
+                function (
+                    string $path,
+                    string $callback,
+                    string $name
+                ) use (
+                    $matcher,
+                    $expected1,
+                    $expected2,
+                    $expected3
+                ) {
                     match ($matcher->numberOfInvocations()) {
                         1 => $this->assertSame($expected1, [$path, $callback, $name]),
                         2 => $this->assertSame($expected2, [$path, $callback, $name]),
+                        3 => $this->assertSame($expected3, [$path, $callback, $name]),
                     };
                 }
             )
@@ -171,7 +182,7 @@ class RouteGroupTest extends TestCase
             ->onlyMethods(['get', 'post', 'delete'])
             ->getMock();
 
-        $group->expects($this->exactly(2))->method('get');
+        $group->expects($this->exactly(3))->method('get');
         $group->expects($this->exactly(2))->method('post');
         $group->expects($this->once())->method('delete');
 
