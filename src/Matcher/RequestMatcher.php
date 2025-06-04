@@ -75,8 +75,8 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Convertit un chemin type /users/{id} en regex : #^/users/(?P<id>[^/]+)#
-     * Convertit un chemin type /users/{id:\d+} en regex : #^/users/(?P<id>\d+)#
+     * Convertit un chemin type /users/{id} en regex : #/users/(?P<id>[^/]+)#
+     * Convertit un chemin type /users/{id:\d+} en regex : #/users/(?P<id>\d+)#
      */
     private function convertPathToRegex(string $pattern): string
     {
@@ -85,7 +85,7 @@ class RequestMatcher implements RequestMatcherInterface
             fn($matches) => '(?P<' . $matches[1] . '>' . (isset($matches[2]) ? $matches[2] . ')' : '[^/]+)'),
             $pattern
         );
-        return '#^' . $regex . '#';
+        return '#' . $regex . '#';
     }
 
     /**

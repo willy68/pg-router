@@ -10,7 +10,7 @@ class RequestMatcherTest extends TestCase
 {
     public function testMatchesStaticPath()
     {
-        $matcher = new RequestMatcher('/users', ['GET']);
+        $matcher = new RequestMatcher('^/users', ['GET']);
         $request = new ServerRequest('GET', '/users/123');
 
         $this->assertTrue($matcher->match($request));
