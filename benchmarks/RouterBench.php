@@ -13,6 +13,9 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
+/**
+ * ./vendor/bin/phpbench run --report=default
+ */
 #[Bench\Revs(100)]
 #[Bench\Iterations(5)]
 #[Bench\OutputTimeUnit('microseconds')]
