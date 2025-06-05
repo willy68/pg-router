@@ -18,11 +18,10 @@ use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
  */
 #[Bench\Revs(100)]
 #[Bench\Iterations(5)]
-#[Bench\OutputTimeUnit('microseconds')]
-#[Bench\OutputMode('throughput')]
+#[Bench\Warmup(3)]
 class RouterBench
 {
-    private Router $router;
+    private ?Router $router = null;
     private string $cacheDir = 'tmp/cache/router_bench';
 
     public function delTree(string $dir): bool
@@ -104,19 +103,6 @@ class RouterBench
     }
 
     /**
-     * Match route with warm cache.
-     * @throws InvalidArgumentException
-     * @throws CacheException
-     */
-    #[Bench\Subject]
-    public function benchMatchWithCache(): void
-    {
-        $this->setupRouterWithCache(50);
-        $request = new ServerRequest('GET', '/route10');
-        $this->router->match($request);
-    }
-
-    /**
      * Match route with cold (no) cache.
      * @throws InvalidArgumentException
      */
@@ -129,6 +115,19 @@ class RouterBench
         }
         $request = new ServerRequest('GET', '/route10');
         $router->match($request);
+    }
+
+    /**
+     * Match route with warm cache.
+     * @throws InvalidArgumentException
+     * @throws CacheException
+     */
+    #[Bench\Subject]
+    public function benchMatchWithCache(): void
+    {
+        $this->setupRouterWithCache(50);
+        $request = new ServerRequest('GET', '/route10');
+        $this->router->match($request);
     }
 
     /**
@@ -169,7 +168,7 @@ class RouterBench
     private function setupRouterWithCache(int $routeCount): void
     {
         // Clean cache
-        /*if (is_dir($this->cacheDir)) {
+        /*if (!$this->router && is_dir($this->cacheDir)) {
             $this->delTree($this->cacheDir);
         }*/
 
@@ -187,9 +186,5 @@ class RouterBench
         foreach (range(1, $routeCount) as $i) {
             $this->router->route("/route$i", fn () => null, "route_$i");
         }
-
-        // Prime the cache
-        $request = new ServerRequest('GET', '/route1');
-        $this->router->match($request);
     }
 }

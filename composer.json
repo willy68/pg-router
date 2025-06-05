@@ -10,7 +10,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "PgTest\\Router\\": "tests"
+      "PgTest\\Router\\": "tests",
+      "Benchmarks\\": "benchmarks/"
     }
   },
   "authors": [
