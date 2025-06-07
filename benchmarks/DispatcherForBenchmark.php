@@ -6,6 +6,10 @@ namespace Benchmarks;
 
 use Exception;
 use FilesystemIterator;
+use Pg\Router\Matcher\MarkDataMatcher;
+use Pg\Router\Matcher\MatcherInterface;
+use Pg\Router\Matcher\NamedMatcher;
+use Pg\Router\RegexCollector\NamedRegexCollector;
 use Pg\Router\Router;
 use Psr\Cache\CacheException;
 use RecursiveDirectoryIterator;
@@ -17,13 +21,14 @@ final class DispatcherForBenchmark
     public const CACHE_DIR = 'tmp/cache/router_bench';
 
     /**
+     * @param string $router
      * @param bool $cache
      * @return Router
      * @throws CacheException
      */
-    public static function realLifeExample(bool $cache = false): Router
+    public static function realLifeExample(string $router, bool $cache = false): Router
     {
-        $routes = DispatcherForBenchmark::setupRouter($cache);
+        $routes = DispatcherForBenchmark::setupRouter($router, $cache);
 
 
         $routes->route('/', 'callback', 'home', ['GET']);
@@ -89,9 +94,9 @@ final class DispatcherForBenchmark
     /**
      * @throws CacheException
      */
-    public static function manyRoutes(bool $cache, int $routeCount = 400): Router
+    public static function manyRoutes(string $router, bool $cache = false, int $routeCount = 400): Router
     {
-        $routes = DispatcherForBenchmark::setupRouter($cache);
+        $routes = DispatcherForBenchmark::setupRouter($router, $cache);
 
         for ($i = 0; $i < $routeCount; ++$i) {
             $routes->route('/abc' . $i, 'callback', 'static-' . $i, ['GET']);
@@ -126,17 +131,11 @@ final class DispatcherForBenchmark
      * @throws CacheException
      * @throws Exception
      */
-    private static function setupRouter(bool $cache): Router
+    private static function setupRouter(string $router, bool $cache): Router
     {
-        // Clean cache
-        /*if (!$this->router && is_dir($this->cacheDir)) {
-            $this->delTree($this->cacheDir);
-        }*/
-
-        if ($cache === true) {
-            return new Router(
-                null,
-                null,
+        $config = null;
+        if ($cache) {
+            $config =
                 [
                     Router::CONFIG_CACHE_ENABLED => true,
                     Router::CONFIG_CACHE_DIR => DispatcherForBenchmark::CACHE_DIR,
@@ -146,10 +145,21 @@ final class DispatcherForBenchmark
                             0,
                             DispatcherForBenchmark::CACHE_DIR
                         )
-                ]
-            );
+                ];
         }
 
-        return new Router();
+        if ($router === 'mark') {
+            return new Router(
+                null,
+                null,
+                $config
+            );
+        } elseif ($router === 'named') {
+            return new Router(
+                new NamedRegexCollector(),
+                fn($routes): MatcherInterface => new NamedMatcher($routes),
+                $config
+            );
+        }
     }
 }

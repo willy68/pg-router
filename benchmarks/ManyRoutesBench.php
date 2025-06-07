@@ -27,8 +27,10 @@ final class ManyRoutesBench
     public function registerDispatchers(): void
     {
         $this->router = [
-            'cache_disabled' => DispatcherForBenchmark::manyRoutes(false),
-            'cache_enabled' => DispatcherForBenchmark::manyRoutes(true),
+            'mark_cache_disabled' => DispatcherForBenchmark::manyRoutes('mark', false),
+            'mark_cache_enabled' => DispatcherForBenchmark::manyRoutes('mark', true),
+            'named_cache_disabled' => DispatcherForBenchmark::manyRoutes('named', false),
+            'named_cache_enabled' => DispatcherForBenchmark::manyRoutes('named', true),
         ];
     }
 
@@ -110,7 +112,9 @@ final class ManyRoutesBench
     /** @return iterable<string, array<string, mixed>> */
     public function dispatchers(): iterable
     {
-        foreach (['cache_disabled', 'cache_enabled'] as $router) {
+        foreach (
+            ['mark_cache_disabled', 'mark_cache_enabled', 'named_cache_disabled', 'named_cache_enabled'] as $router
+        ) {
             yield $router => ['router' => $router];
         }
     }

@@ -27,8 +27,10 @@ final class RealLifeExampleBench
     public function registerDispatchers(): void
     {
         $this->router = [
-            'cache_disabled' => DispatcherForBenchmark::realLifeExample(),
-            'cache_enabled' => DispatcherForBenchmark::realLifeExample(true),
+            'mark_cache_disabled' => DispatcherForBenchmark::realLifeExample('mark'),
+            'mark_cache_enabled' => DispatcherForBenchmark::realLifeExample('mark', true),
+            'named_cache_disabled' => DispatcherForBenchmark::realLifeExample('named'),
+            'named_cache_enabled' => DispatcherForBenchmark::realLifeExample('named', true),
         ];
     }
 
@@ -125,7 +127,9 @@ final class RealLifeExampleBench
     /** @return iterable<string, array<string, mixed>> */
     public function dispatchers(): iterable
     {
-        foreach (['cache_disabled', 'cache_enabled'] as $router) {
+        foreach (
+            ['mark_cache_disabled', 'mark_cache_enabled', 'named_cache_disabled', 'named_cache_enabled'] as $router
+        ) {
             yield $router => ['router' => $router];
         }
     }
