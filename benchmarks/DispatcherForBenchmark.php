@@ -13,6 +13,7 @@ use Pg\Router\Router;
 use Psr\Cache\CacheException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 final class DispatcherForBenchmark
@@ -130,7 +131,7 @@ final class DispatcherForBenchmark
      * @throws CacheException
      * @throws Exception
      */
-    private static function setupRouter(string $router, bool $cache): Router
+    private static function setupRouter(string $routerType, bool $cache): Router
     {
         $config = null;
         if ($cache) {
@@ -147,19 +148,14 @@ final class DispatcherForBenchmark
                 ];
         }
 
-        if ($router === 'mark') {
-            return new Router(
-                null,
-                null,
-                $config
-            );
-        } elseif ($router === 'named') {
-            return new Router(
+        return match ($routerType) {
+            'mark' =>  new Router(null, null, $config),
+            'named' => new Router(
                 new NamedRegexCollector(),
                 fn($routes): MatcherInterface => new NamedMatcher($routes),
                 $config
-            );
-        }
-        return new Router();
+            ),
+            default => throw new RuntimeException("No router with this type $routerType")
+        };
     }
 }
