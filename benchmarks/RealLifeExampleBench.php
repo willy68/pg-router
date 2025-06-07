@@ -14,7 +14,7 @@ use Psr\Cache\InvalidArgumentException;
 #[Bench\Revs(250)]
 #[Bench\Warmup(3)]
 #[Bench\BeforeMethods(['registerDispatchers'])]
-#[Bench\AfterClassMethods(['delTree'])]
+#[Bench\AfterMethods(['delTree'])]
 #[Bench\ParamProviders(['dispatchers'])]
 final class RealLifeExampleBench
 {
@@ -119,7 +119,7 @@ final class RealLifeExampleBench
         );
     }
 
-    public static function delTree(): void
+    public function delTree(): void
     {
         DispatcherForBenchmark::delTree(DispatcherForBenchmark::CACHE_DIR);
     }

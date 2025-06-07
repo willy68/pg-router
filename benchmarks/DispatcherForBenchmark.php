@@ -6,7 +6,6 @@ namespace Benchmarks;
 
 use Exception;
 use FilesystemIterator;
-use Pg\Router\Matcher\MarkDataMatcher;
 use Pg\Router\Matcher\MatcherInterface;
 use Pg\Router\Matcher\NamedMatcher;
 use Pg\Router\RegexCollector\NamedRegexCollector;
@@ -161,5 +160,6 @@ final class DispatcherForBenchmark
                 $config
             );
         }
+        return new Router();
     }
 }
