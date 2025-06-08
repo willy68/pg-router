@@ -14,7 +14,7 @@ use Pg\Router\Matcher\NamedMatcher;
 #[Bench\Warmup(3)]
 #[Bench\BeforeMethods(['registerMatchers'])]
 #[Bench\ParamProviders(['matchers'])]
-class RoutingWithRealLifeExampleBench
+final class RoutingWithRealLifeExampleBench
 {
     /** @var array<string, MatcherInterface> */
     private array $router;
