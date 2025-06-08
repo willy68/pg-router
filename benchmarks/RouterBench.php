@@ -3,15 +3,12 @@
 namespace Benchmarks;
 
 use Exception;
-use FilesystemIterator;
 use Pg\Router\Router;
 use GuzzleHttp\Psr7\ServerRequest;
 use PhpBench\Attributes as Bench;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * ./vendor/bin/phpbench run --report=default
@@ -23,26 +20,6 @@ class RouterBench
 {
     private ?Router $router = null;
     private string $cacheDir = 'tmp/cache/router_bench';
-
-    public function delTree(string $dir): bool
-    {
-        if (!is_dir($dir)) {
-            return false;
-        }
-
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($files as $fileInfo) {
-            $todo = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
-            $todo($fileInfo->getRealPath());
-        }
-
-        rmdir($dir);
-        return true;
-    }
 
     /**
      * Basic benchmark: add a single route.
@@ -123,9 +100,9 @@ class RouterBench
      * @throws CacheException
      */
     #[Bench\Subject]
+    #[Bench\BeforeMethods(['setupRouterWithCache'])]
     public function benchMatchWithCache(): void
     {
-        $this->setupRouterWithCache(50);
         $request = new ServerRequest('GET', '/route10');
         $this->router->match($request);
     }
@@ -165,12 +142,8 @@ class RouterBench
      * @throws CacheException
      * @throws Exception
      */
-    private function setupRouterWithCache(int $routeCount): void
+    public function setupRouterWithCache(): void
     {
-        // Clean cache
-        /*if (!$this->router && is_dir($this->cacheDir)) {
-            $this->delTree($this->cacheDir);
-        }*/
 
         $this->router = new Router(
             null,
@@ -179,11 +152,11 @@ class RouterBench
                 Router::CONFIG_CACHE_ENABLED => true,
                 Router::CONFIG_CACHE_DIR => $this->cacheDir,
                 Router::CONFIG_CACHE_POOL_FACTORY => fn() =>
-                new PhpFilesAdapter('RouterBench', 0, $this->cacheDir)
+                new ArrayAdapter(0)
             ]
         );
 
-        foreach (range(1, $routeCount) as $i) {
+        foreach (range(1, 50) as $i) {
             $this->router->route("/route$i", fn () => null, "route_$i");
         }
     }
