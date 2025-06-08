@@ -153,10 +153,21 @@ class RouterTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($router, $cachePool);
 
-        $data = $this->invokeParsedData($router);
+        $data = $this->invokeLoadParsedData($router);
 
         $this->assertSame($cachedData, $data);
         $this->delTree('/tmp/cache_dir');
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function invokeLoadParsedData(Router $router): array
+    {
+        $reflection = new ReflectionClass($router);
+        $method = $reflection->getMethod('loadParsedData');
+        $method->setAccessible(true);
+        return $method->invoke($router);
     }
 
     /**

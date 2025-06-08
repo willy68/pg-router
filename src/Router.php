@@ -33,6 +33,8 @@ class Router implements RouterInterface
     /** @var callable: CachePoolInterface */
     private $cachePoolFactory = null;
     private ?CacheItemPoolInterface $cachePool = null;
+    private ?array $parsedData = null;
+    private bool $hasParsedData = false;
     protected ?DuplicateDetectorInterface $detector = null;
     /** @var Route[] */
     protected array $routes = [];
@@ -84,6 +86,7 @@ class Router implements RouterInterface
 
         if ($cacheEnabled) {
             $this->loadCachePool();
+            $this->loadParsedData();
         }
     }
 
@@ -194,26 +197,48 @@ class Router implements RouterInterface
      */
     protected function getParsedData(): array
     {
-        $cacheItem = null;
-        if ($this->cachePool) {
-            $cacheItem = $this->cachePool->getItem($this->cacheKey);
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
-            }
+        if ($this->hasParsedData) {
+            return $this->parsedData;
         }
 
         foreach ($this->routes as $route) {
             $this->getRegexCollector()->addRoute($route);
         }
 
-        $data = $this->regexCollector->getData();
+        $data = $this->getRegexCollector()->getData();
 
-        if ($this->cachePool && $cacheItem) {
+        if ($this->cachePool) {
+            $cacheItem = $this->cachePool->getItem($this->cacheKey);
             $cacheItem->set($data);
             $this->cachePool->save($cacheItem);
         }
 
         return $data;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function loadParsedData(): ?array
+    {
+        $parsedData = null;
+        if ($this->cachePool) {
+            $cacheItem = $this->cachePool->getItem($this->cacheKey);
+            if ($cacheItem->isHit()) {
+                $parsedData = $cacheItem->get();
+            }
+        }
+
+        if ($parsedData === null) {
+            return null;
+        }
+
+        if (!is_array($parsedData)) {
+            throw new \InvalidArgumentException("Parse data must be an array.");
+        }
+
+        $this->hasParsedData = true;
+        return ($this->parsedData = $parsedData);
     }
 
     protected function getRegexCollector(): RegexCollectorInterface
