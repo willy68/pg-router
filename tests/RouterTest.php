@@ -20,6 +20,7 @@ use RecursiveIteratorIterator;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class RouterTest extends TestCase
 {
@@ -289,5 +290,51 @@ class RouterTest extends TestCase
 
         // Clean up
         $this->delTree($tmpDir);
+    }
+
+    /**
+     * @throws CacheException
+     * @throws InvalidArgumentException
+     */
+    public function testMatchRouteWithCache(): void
+    {
+        $cache = new ArrayAdapter();
+
+        $router = new Router(
+            null,
+            null,
+            [
+                Router::CONFIG_CACHE_ENABLED => true,
+                Router::CONFIG_CACHE_POOL_FACTORY => fn(): CacheItemPoolInterface => $cache,
+            ]
+        );
+
+        $router->route('/about', fn() => 'about', 'about', ['GET']);
+
+        // Premiers accès : force la génération et la mise en cache
+        $request = new ServerRequest('GET', '/about');
+        $result = $router->match($request);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertSame('about', $result->getMatchedRoute()->getName());
+
+        // Simule une nouvelle instance du routeur => le cache devrait être utilisé
+        $router2 = new Router(
+            null,
+            null,
+            [
+                Router::CONFIG_CACHE_ENABLED => true,
+                Router::CONFIG_CACHE_POOL_FACTORY => fn(): CacheItemPoolInterface => $cache,
+            ]
+        );
+
+        // Important : il faut ajouter la même route pour que le nom soit reconnu
+        $router2->route('/about', fn() => 'about', 'about', ['GET']);
+
+        $request2 = new ServerRequest('GET', '/about');
+        $result2 = $router2->match($request2);
+
+        $this->assertTrue($result2->isSuccess());
+        $this->assertSame('about', $result2->getMatchedRoute()->getName());
     }
 }
