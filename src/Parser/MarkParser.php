@@ -53,7 +53,7 @@ class MarkParser implements ParserInterface
         $current = '';
 
         foreach ($optionalParts as $part) {
-            $current .= '/' . trim($part);
+            $current .= trim($part);
             $variants[] = str_replace($matches[0], $current, $this->regex);
         }
 

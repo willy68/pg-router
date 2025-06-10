@@ -50,7 +50,7 @@ class NamedParser implements ParserInterface
         $head = $this->getRegexOptionalAttributesReplacementHead($parts);
         $tail = $head !== '' ? ')?' : '';
         foreach ($parts as $name) {
-            $head .= '(?:/' . trim($name);
+            $head .= '(?:' . trim($name);
             $tail .= ')?';
         }
 
@@ -73,6 +73,7 @@ class NamedParser implements ParserInterface
         $head = '';
         if (str_starts_with($this->regex, '[/')) {
             $name = array_shift($parts);
+            $name = ltrim($name, '/');
             $head = '/(?:' . trim($name);
         }
         return $head;
