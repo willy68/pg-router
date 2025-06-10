@@ -91,8 +91,8 @@ class MarkParserTest extends TestCase
 
     public function testOptionalStartPathWithToken()
     {
-        $data = $this->dataParser->parse('[/{bar:[a-z]+}]');
-        $expect = [['/', '/([a-z]+)'], ['bar']];
+        $data = $this->dataParser->parse('[/{bar:[a-z]+};/test/{test:\w+}]');
+        $expect = [['/', '/([a-z]+)', '/([a-z]+)/test/(\w+)'], ['bar', 'test']];
         $this->assertSame($expect, $data);
     }
     public function testVariableAndMultipleOptionalsWithTokenAndSpace()
