@@ -46,6 +46,10 @@ class UrlGenerator implements GeneratorInterface
         $this->url = $this->route->getPath();
         $this->data = $attributes;
 
+        if (str_starts_with($this->url, '[/') && empty($this->data)) {
+            return '/';
+        }
+
         $this->buildTokenReplacements();
         $this->buildOptionalReplacements();
         $this->url = strtr($this->url, $this->repl);
@@ -116,20 +120,27 @@ class UrlGenerator implements GeneratorInterface
             return;
         }
 
+        $optionalParts = explode(';', $matches[1]);
+
         // the optional attribute names in the token
-        $names = [];
-        preg_match_all(Regex::REGEX, $matches[1], $exMatches, PREG_SET_ORDER);
-        foreach ($exMatches as $match) {
-            $name = $match[1];
-            $token = $match[2] ?? null;
-            $names[] = $token ? [$name, $token] : $name;
+        //$names = [];
+        $tokenStr = '';
+        foreach ($optionalParts as $part) {
+            $names = [];
+            preg_match_all(Regex::REGEX, $part/*$matches[1]*/, $exMatches, PREG_SET_ORDER);
+            foreach ($exMatches as $match) {
+                $tokenStr = $match[0];
+                $name = $match[1];
+                $token = $match[2] ?? null;
+                $names[] = $token ? [$name, $token] : $name;
+            }
+
+            // this is the full token to replace in the path
+            $key = $matches[0];
+
+            // build the replacement string
+            $this->repl[$key] .= $this->buildOptionalReplacement($names, $tokenStr, $part);
         }
-
-        // this is the full token to replace in the path
-        $key = $matches[0];
-
-        // build the replacement string
-        $this->repl[$key] = $this->buildOptionalReplacement($names);
     }
 
     /**
@@ -137,10 +148,11 @@ class UrlGenerator implements GeneratorInterface
      * Builds the optional replacement for attribute names.
      *
      * @param array $names The optional replacement names.
-     *
+     * @param string $tokenStr
+     * @param string $subject
      * @return string
      */
-    protected function buildOptionalReplacement(array $names): string
+    protected function buildOptionalReplacement(array $names, string $tokenStr, string $subject): string
     {
         $repl = '';
 
@@ -170,9 +182,8 @@ class UrlGenerator implements GeneratorInterface
             }
 
             // encode the optional value
-            $repl .= '/' . rawurlencode((string)$val);
+            $repl .= str_replace($tokenStr, rawurlencode((string)$val), $subject);
         }
-
         return $repl;
     }
 }

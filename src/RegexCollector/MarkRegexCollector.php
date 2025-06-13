@@ -9,7 +9,7 @@ use Pg\Router\Parser\ParserInterface;
 use Pg\Router\Route;
 
 /**
- * Compile route into combined regular expression for each allowed methods
+ * Compile route into combined regular expression for each allowed method
  */
 class MarkRegexCollector implements RegexCollectorInterface
 {
@@ -17,7 +17,7 @@ class MarkRegexCollector implements RegexCollectorInterface
     private ?ParserInterface $parser;
     private int $chunk;
 
-    public function __construct(ParserInterface $parser = null, int $chunk = 15)
+    public function __construct(?ParserInterface $parser = null, int $chunk = 15)
     {
         $this->parser = $parser;
         $this->chunk = $chunk;
