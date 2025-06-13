@@ -123,11 +123,11 @@ class UrlGenerator implements GeneratorInterface
         $optionalParts = explode(';', $matches[1]);
 
         // the optional attribute names in the token
-        //$names = [];
         $tokenStr = '';
+        $replacements = '';
         foreach ($optionalParts as $part) {
             $names = [];
-            preg_match_all(Regex::REGEX, $part/*$matches[1]*/, $exMatches, PREG_SET_ORDER);
+            preg_match_all(Regex::REGEX, $part, $exMatches, PREG_SET_ORDER);
             foreach ($exMatches as $match) {
                 $tokenStr = $match[0];
                 $name = $match[1];
@@ -139,8 +139,9 @@ class UrlGenerator implements GeneratorInterface
             $key = $matches[0];
 
             // build the replacement string
-            $this->repl[$key] .= $this->buildOptionalReplacement($names, $tokenStr, $part);
+            $replacements .= $this->buildOptionalReplacement($names, $tokenStr, $part);
         }
+        $this->repl[$matches[0]] = $replacements;
     }
 
     /**
