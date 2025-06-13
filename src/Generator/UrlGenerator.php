@@ -135,9 +135,6 @@ class UrlGenerator implements GeneratorInterface
                 $names[] = $token ? [$name, $token] : $name;
             }
 
-            // this is the full token to replace in the path
-            $key = $matches[0];
-
             // build the replacement string
             $replacements .= $this->buildOptionalReplacement($names, $tokenStr, $part);
         }
