@@ -123,19 +123,17 @@ class UrlGenerator implements GeneratorInterface
         $optionalParts = explode(';', $matches[1]);
 
         // the optional attribute names in the token
-        $tokenStr = '';
         $replacements = '';
         foreach ($optionalParts as $part) {
             $names = [];
+            $tokenStr = [];
             preg_match_all(Regex::REGEX, $part, $exMatches, PREG_SET_ORDER);
             foreach ($exMatches as $match) {
-                $tokenStr = $match[0];
+                $tokenStr[] = $match[0];
                 $name = $match[1];
                 $token = $match[2] ?? null;
                 $names[] = $token ? [$name, $token] : $name;
             }
-
-            // build the replacement string
             $replacements .= $this->buildOptionalReplacement($names, $tokenStr, $part);
         }
         $this->repl[$matches[0]] = $replacements;
@@ -146,13 +144,14 @@ class UrlGenerator implements GeneratorInterface
      * Builds the optional replacement for attribute names.
      *
      * @param array $names The optional replacement names.
-     * @param string $tokenStr
+     * @param array $tokenStr
      * @param string $subject
      * @return string
      */
-    protected function buildOptionalReplacement(array $names, string $tokenStr, string $subject): string
+    protected function buildOptionalReplacement(array $names, array $tokenStr, string $subject): string
     {
         $repl = '';
+        $replacements = [];
 
         foreach ($names as $name) {
             $token = "([^/]+)";
@@ -178,10 +177,9 @@ class UrlGenerator implements GeneratorInterface
                     $token
                 ));
             }
-
-            // encode the optional value
-            $repl .= str_replace($tokenStr, rawurlencode((string)$val), $subject);
+            $replacements[] = rawurlencode((string)$val);
         }
-        return $repl;
+        // encode the optional value
+        return str_replace($tokenStr, $replacements, $subject);
     }
 }
