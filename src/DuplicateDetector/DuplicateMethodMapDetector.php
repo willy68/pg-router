@@ -11,70 +11,76 @@ use function sprintf;
 
 class DuplicateMethodMapDetector implements DuplicateDetectorInterface
 {
-    protected array $methodToPathMap = [];
-    protected array $routes = [];
+    /** @var array<string, string> */
+    private array $routes = [];
+
+    /** @var array<string, array<string, string>> */
+    private array $pathToMethodMap = [];
 
     public function detectDuplicate(Route $route): void
     {
-        $this->detectDuplicateRoute($route);
+        $name = $route->getName();
+        $path = $route->getPath();
+        $allowedMethods = $route->getAllowedMethods() ?? ['ANY'];
+
+        // Vérification du nom de route en double
+        if (isset($this->routes[$name])) {
+            $this->throwDuplicateRoute(sprintf(
+                'Route with name `%s` already exists',
+                $name
+            ));
+        }
+
+        // Vérification des doublons de chemin/méthode
+        if (isset($this->pathToMethodMap[$path])) {
+            $this->checkPathConflicts($path, $allowedMethods);
+        }
+
         $this->memorizeRoute($route);
     }
-    protected function detectDuplicateRoute(Route $route): void
+
+    private function checkPathConflicts(string $path, array $allowedMethods): void
     {
-        if (isset($this->routes[$route->getName()])) {
-            $this->throwDuplicateRoute(
-                sprintf(
-                    'Route with name `%s` already exists',
-                    $route->getName()
-                )
-            );
+        $existingMethods = $this->pathToMethodMap[$path];
+
+        // Vérification des conflits avec ANY existant
+        if (isset($existingMethods['ANY'])) {
+            $this->throwConflictError($path, 'ANY', $existingMethods['ANY']);
         }
 
-        $path = $route->getPath();
-
-        if (isset($this->methodToPathMap['ANY'][$path])) {
-            $this->throwDuplicateRoute(
-                sprintf(
-                    'Route with path `%s` already exists with method [%s]',
-                    $path,
-                    'ANY'
-                )
-            );
-        }
-
-        $allowedMethods = $route->getAllowedMethods() ?? ['ANY'];
-        foreach ($this->methodToPathMap as $method => $routePath) {
-            foreach ($allowedMethods as $allowedMethod) {
-                if (
-                    isset($this->methodToPathMap[$allowedMethod][$path]) ||
-                    ($allowedMethod === 'ANY' && isset($this->methodToPathMap[$method][$path]))
-                ) {
-                    $this->throwDuplicateRoute(
-                        sprintf(
-                            'Route with path `%s` already exists with method [%s] and name [%s]',
-                            $route->getPath(),
-                            $method,
-                            $this->methodToPathMap[$method][$path]
-                        )
-                    );
-                }
+        // Vérification des conflits de méthodes
+        foreach ($existingMethods as $method => $routeName) {
+            if (
+                $method === 'ANY' ||
+                in_array('ANY', $allowedMethods, true) ||
+                in_array($method, $allowedMethods, true)
+            ) {
+                $this->throwConflictError($path, $method, $routeName);
             }
         }
     }
 
-    protected function memorizeRoute(Route $route): void
+    private function throwConflictError(string $path, string $method, string $routeName): void
+    {
+        $this->throwDuplicateRoute(sprintf(
+            'Route with path `%s` already exists with method [%s] and name [%s]',
+            $path,
+            $method,
+            $routeName
+        ));
+    }
+
+    private function memorizeRoute(Route $route): void
     {
         $name = $route->getName();
         $path = $route->getPath();
+
         $this->routes[$name] = $name;
 
-        if ($route->allowsAnyMethod()) {
-            $this->methodToPathMap['ANY'][$path] = $name;
-            return;
-        }
+        $methods = $route->allowsAnyMethod() ? ['ANY'] : $route->getAllowedMethods();
 
-        foreach ($route->getAllowedMethods() as $method) {
-            $this->methodToPathMap[$method][$path] = $name;
+        foreach ($methods as $method) {
+            $this->pathToMethodMap[$path][$method] = $name;
         }
     }
 
