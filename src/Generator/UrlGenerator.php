@@ -66,43 +66,41 @@ class UrlGenerator implements GeneratorInterface
     protected function buildTokenReplacements(): void
     {
         // For new format
-        $regex = preg_split(Regex::OPT_REGEX, $this->url);
+        $matches = preg_split(Regex::OPT_REGEX, $this->url);
 
-        if (false === $regex  || $regex[0] === '/' || $regex[0] === '') {
+        if (false === $matches  || $matches[0] === '/' || $matches[0] === '') {
             return;
         }
+        $mainUrl = $matches[0];
 
-        preg_match_all(Regex::REGEX, $regex[0], $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            if (empty($this->data)) {
-                throw new MissingAttributeException(sprintf(
-                    'No replacement attributes found for this route [%s]',
-                    $this->route->getName()
-                ));
+        if (preg_match_all(Regex::REGEX, $mainUrl, $matches, PREG_SET_ORDER) > 0) {
+            $routeName = $this->route->getName();
+
+            foreach ($matches as $match) {
+                $name = $match[1];
+                $token = $match[2] ?? "([^/]+)";
+
+                if (!isset($this->data[$name])) {
+                    throw new MissingAttributeException(sprintf(
+                        'Parameter value for [%s] is missing for route [%s]',
+                        $name,
+                        $routeName
+                    ));
+                }
+
+                $value = (string)$this->data[$name];
+
+                if (!preg_match('~^' . $token . '$~x', $value)) {
+                    throw new RuntimeException(sprintf(
+                        'Parameter value for [%s] did not match the regex `%s` in route [%s]',
+                        $name,
+                        $token,
+                        $routeName
+                    ));
+                }
+
+                $this->repl[$match[0]] = rawurlencode($value);
             }
-
-            $name = $match[1];
-
-            // is there data for this variable attribute?
-            if (!isset($this->data[$name])) {
-                // Variables attributes are not optional
-                throw new MissingAttributeException(sprintf(
-                    'Parameter value for [%s] is missing',
-                    $name
-                ));
-            }
-
-            $val = $this->data[$name];
-            $token = $match[2] ?? "([^/]+)";
-
-            if (!preg_match('~^' . $token . '$~x', (string)$val)) {
-                throw new RuntimeException(sprintf(
-                    'Parameter value for [%s] did not match the regex `%s`',
-                    $name,
-                    $token
-                ));
-            }
-            $this->repl[$match[0]] = rawurlencode((string)$val);
         }
     }
 
@@ -114,29 +112,34 @@ class UrlGenerator implements GeneratorInterface
      */
     protected function buildOptionalReplacements(): void
     {
-        // replacements for optional attributes, if any
-        preg_match(Regex::OPT_REGEX, $this->url, $matches);
-        if (!$matches) {
+        if (!preg_match(Regex::OPT_REGEX, $this->url, $matches)) {
             return;
         }
 
+        $optionalSegment = $matches[0];
         $optionalParts = explode(';', $matches[1]);
+        $replacements = [];
 
-        // the optional attribute names in the token
-        $replacements = '';
         foreach ($optionalParts as $part) {
-            $names = [];
-            $tokenStr = [];
-            preg_match_all(Regex::REGEX, $part, $exMatches, PREG_SET_ORDER);
-            foreach ($exMatches as $match) {
-                $tokenStr[] = $match[0];
-                $name = $match[1];
-                $token = $match[2] ?? null;
-                $names[] = $token ? [$name, $token] : $name;
+            if (preg_match_all(Regex::REGEX, $part, $exMatches, PREG_SET_ORDER) > 0) {
+                $tokenStr = [];
+                $names = [];
+
+                foreach ($exMatches as $match) {
+                    $tokenStr[] = $match[0];
+                    $names[] = isset($match[2]) ? [$match[1], $match[2]] : $match[1];
+                }
+
+                $replacement = $this->buildOptionalReplacement($names, $tokenStr, $part);
+                if ($replacement !== '') {
+                    $replacements[] = $replacement;
+                }
             }
-            $replacements .= $this->buildOptionalReplacement($names, $tokenStr, $part);
         }
-        $this->repl[$matches[0]] = $replacements;
+
+        if ($replacements !== []) {
+            $this->repl[$optionalSegment] = implode('', $replacements);
+        }
     }
 
     /**
@@ -150,36 +153,29 @@ class UrlGenerator implements GeneratorInterface
      */
     protected function buildOptionalReplacement(array $names, array $tokenStr, string $subject): string
     {
-        $repl = '';
         $replacements = [];
 
         foreach ($names as $name) {
-            $token = "([^/]+)";
-            if (is_array($name)) {
-                $token = $name[1];
-                $name = $name[0];
+            $token = is_array($name) ? $name[1] : '([^/]+)';
+            $paramName = is_array($name) ? $name[0] : $name;
+
+            if (!isset($this->data[$paramName])) {
+                return ''; // Options are sequentially optional
             }
 
-            // is there data for this optional attribute?
-            if (!isset($this->data[$name])) {
-                // options are *sequentially* optional, so if one is
-                // missing, we're done
-                return $repl;
-            }
+            $value = (string)$this->data[$paramName];
 
-            $val = $this->data[$name];
-
-            // Check val matching token
-            if (!preg_match('~^' . $token . '$~x', (string)$val)) {
+            if (!preg_match('~^' . $token . '$~x', $value)) {
                 throw new RuntimeException(sprintf(
                     'Parameter value for [%s] did not match the regex `%s`',
-                    $name,
+                    $paramName,
                     $token
                 ));
             }
-            $replacements[] = rawurlencode((string)$val);
+
+            $replacements[] = rawurlencode($value);
         }
-        // encode the optional value
+
         return str_replace($tokenStr, $replacements, $subject);
     }
 }
