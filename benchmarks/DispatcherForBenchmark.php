@@ -135,13 +135,14 @@ final class DispatcherForBenchmark
     {
         $config = null;
         if ($cache) {
+            $routerType === 'named' ? $namespace = 'NamedRouter' : $namespace = 'RouterBench';
             $config =
                 [
                     Router::CONFIG_CACHE_ENABLED => true,
                     Router::CONFIG_CACHE_DIR => DispatcherForBenchmark::CACHE_DIR,
                     Router::CONFIG_CACHE_POOL_FACTORY =>
                         fn() => new PhpFilesAdapter(
-                            'RouterBench',
+                            $namespace,
                             0,
                             DispatcherForBenchmark::CACHE_DIR
                         )
