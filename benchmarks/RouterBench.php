@@ -3,6 +3,11 @@
 namespace Benchmarks;
 
 use Exception;
+use Pg\Router\Matcher\MarkDataMatcher;
+use Pg\Router\Matcher\MatcherInterface;
+use Pg\Router\Parser\MarkParser;
+use Pg\Router\RegexCollector\MarkRegexCollector;
+use Pg\Router\Route;
 use Pg\Router\Router;
 use GuzzleHttp\Psr7\ServerRequest;
 use PhpBench\Attributes as Bench;
@@ -19,6 +24,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 class RouterBench
 {
     private ?Router $router = null;
+    private ?MatcherInterface $matcher = null;
     private string $cacheDir = 'tmp/cache/router_bench';
 
     /**
@@ -123,6 +129,21 @@ class RouterBench
         }
         $request = new ServerRequest('GET', "/route{$params['target']}");
         $router->match($request);
+    }
+
+    #[Bench\Subject]
+    #[Bench\BeforeMethods(['setupMatchers'])]
+    public function benchWithMarkMatcher()
+    {
+        $this->matcher->match('/user/42', 'GET');
+    }
+
+    public function setupMatchers(): void
+    {
+        $parser = new MarkParser();
+        $collector = new MarkRegexCollector($parser);
+        $collector->addRoute(new Route('user/{id}', 'callable', 'user_show', ['GET']));
+        $this->matcher = new MarkDataMatcher($collector->getData());
     }
 
     /**
