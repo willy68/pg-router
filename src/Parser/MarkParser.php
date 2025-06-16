@@ -94,7 +94,7 @@ class MarkParser implements ParserInterface
     }
 
     /**
-     * Return subpattern for a route variable.
+     * Return a subpattern for a route variable.
      */
     protected function getSubpattern(string $name, ?string $token = null): string
     {

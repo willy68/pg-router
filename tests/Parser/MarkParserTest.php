@@ -22,6 +22,37 @@ class MarkParserTest extends TestCase
         $expect = [['/foo/bar'], []];
         $this->assertSame($expect, $data);
     }
+    public function testEmptyPath()
+    {
+        $data = $this->dataParser->parse('');
+        $expect = [['/'], []];
+        $this->assertSame($expect, $data);
+    }
+
+    public function testRootPath()
+    {
+        $data = $this->dataParser->parse('/');
+        $expect = [['/'], []];
+        $this->assertSame($expect, $data);
+    }
+
+    public function testAttributeWithSpecialChars()
+    {
+        $data = $this->dataParser->parse('/foo/{b-ar}');
+        $expect = [['/foo/([^/]+)'], ['b-ar']];
+        $this->assertSame($expect, $data);
+
+        $data = $this->dataParser->parse('/foo/{b_ar}');
+        $expect = [['/foo/([^/]+)'], ['b_ar']];
+        $this->assertSame($expect, $data);
+    }
+
+    public function testMultipleVariablesInSameSegment()
+    {
+        $data = $this->dataParser->parse('/foo/{bar}-{baz}');
+        $expect = [['/foo/([^/]+)-([^/]+)'], ['bar', 'baz']];
+        $this->assertSame($expect, $data);
+    }
 
     public function testVariableWithDefaultToken()
     {
