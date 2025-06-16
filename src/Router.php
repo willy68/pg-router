@@ -17,7 +17,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
-use Symfony\Component\Cache\Exception\InvalidArgumentException as InvalidCacheArgumentException;
 
 class Router implements RouterInterface
 {
@@ -43,15 +42,17 @@ class Router implements RouterInterface
     private ?RegexCollectorInterface $regexCollector;
 
     /**
-     * $router = new Router(
-     *     null,
-     *     null,
-     *     [
+     * @code
+     * $router = new Router (
+     *      null,
+     *      null,
+     *      [
      *          Router::CONFIG_CACHE_ENABLED => ($env === 'prod'),
      *          Router::CONFIG_CACHE_DIR => '/tmp/cache/router',
      *          Router::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...},
-     *     ]
+     *      ]
      * )
+     * @endcode
      *
      * @param RegexCollectorInterface|null $regexCollector
      * @param callable|null $matcherFactory
@@ -98,11 +99,13 @@ class Router implements RouterInterface
         if ($this->cachePool === null) {
             $cachePoolFactory = $this->cachePoolFactory;
             if (!is_callable($cachePoolFactory)) {
-                throw new InvalidCacheArgumentException('Cache pool factory must be a callable.');
+                throw new \Symfony\Component\Cache\Exception\InvalidArgumentException(
+                    'Cache pool factory must be a callable.'
+                );
             }
             $this->cachePool = $cachePoolFactory();
             if (!$this->cachePool instanceof CacheItemPoolInterface) {
-                throw new InvalidCacheArgumentException(
+                throw new \Symfony\Component\Cache\Exception\InvalidArgumentException(
                     'Cache pool factory must return an instance of CacheItemPoolInterface.'
                 );
             }
@@ -252,7 +255,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Create multiple routes with same prefix.
+     * Create multiple routes with the same prefix.
      */
     public function group(string $prefix, callable $callable): RouteGroup
     {
