@@ -46,7 +46,7 @@ class RequestMatcher implements RequestMatcherInterface
                 return false;
             }
 
-            // Extraire les groupes nommés uniquement
+            // Extract named groups only
             $this->matchedParams = array_filter(
                 $matches,
                 fn($key) => !is_int($key),

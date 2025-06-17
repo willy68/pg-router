@@ -43,13 +43,13 @@ class PathParser implements ParserInterface
         for ($i = 0; $i < $length; ++$i) {
             $char = $path[$i];
 
-            // Gestion des paramètres {}
+            // Handle {} parameters
             if ($char === '{' && !$inParam) {
                 $inParam = true;
                 $bracketCount = 1;
                 $buffer .= $char;
             } elseif ($char === '{' && $inParam) {
-                // Un autre crochet ouvrant dans un paramètre (pour les expressions régulières)
+                // Another opening bracket within a parameter (for regular expressions)
                 $bracketCount++;
                 $buffer .= $char;
             } elseif ($char === '}' && $inParam) {
@@ -58,12 +58,12 @@ class PathParser implements ParserInterface
                 if ($bracketCount === 0) {
                     $inParam = false;
                 }
-            } elseif ($char === '[' && !$inParam) { // Gestion des groupes optionnels []
+            } elseif ($char === '[' && !$inParam) { // Handle optional groups []
                 if ($buffer !== '') {
                     $tokens[] = $buffer;
                 }
                 $tokens[] = substr($path, $i);
-                // Fin de la chaine
+                // End of the string
                 return $tokens;
             } else {
                     $buffer .= $char;
@@ -89,7 +89,7 @@ class PathParser implements ParserInterface
 
         foreach ($tokens as $token) {
             if ($token[0] === '[' && str_ends_with($token, ']')) {
-                // Groupe optionnel avec parties séquentielles séparées par un ' ;'
+                // Optional group with sequential parts separated by a ';'
                 $inner = substr($token, 1, -1);
                 $parts = explode(';', $inner);
                 $repl = $this->getRegexOptionalAttributesReplacement($parts);

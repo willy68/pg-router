@@ -49,6 +49,26 @@ $router->group('/admin', function ($group) {
 })->middleware(AdminMiddleware::class);
 ```
 
+## Optional Segments
+
+You can define optional segments in your routes by enclosing them in square brackets `[]`. Optional segments should be separated by forward slashes `/`.
+
+```php
+// Example route with optional segments
+$router->route('/article[/{id}[/{slug}]]', function ($request) {
+    $id = $request->getAttribute('id');
+    $slug = $request->getAttribute('slug');
+    // ...
+}, 'article.show', ['GET']);
+```
+
+In this example, the following URLs will match:
+- `/article`
+- `/article/123`
+- `/article/123/my-article`
+
+Parameters will be available in the request based on the provided segments.
+
 ## CRUD Helper
 
 ```php

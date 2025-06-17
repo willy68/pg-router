@@ -23,7 +23,7 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
         $path = $route->getPath();
         $allowedMethods = $route->getAllowedMethods() ?? ['ANY'];
 
-        // Vérification du nom de route en double
+        // Check for duplicate route name
         if (isset($this->routes[$name])) {
             $this->throwDuplicateRoute(sprintf(
                 'Route with name `%s` already exists',
@@ -31,7 +31,7 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
             ));
         }
 
-        // Vérification des doublons de chemin/méthode
+        // Check for duplicate path/method
         if (isset($this->pathToMethodMap[$path])) {
             $this->checkPathConflicts($path, $allowedMethods);
         }
@@ -43,12 +43,12 @@ class DuplicateMethodMapDetector implements DuplicateDetectorInterface
     {
         $existingMethods = $this->pathToMethodMap[$path];
 
-        // Vérification des conflits avec ANY existant
+        // Check for conflicts with existing ANY method
         if (isset($existingMethods['ANY'])) {
             $this->throwConflictError($path, 'ANY', $existingMethods['ANY']);
         }
 
-        // Vérification des conflits de méthodes
+        // Check for method conflicts
         foreach ($existingMethods as $method => $routeName) {
             if (
                 $method === 'ANY' ||

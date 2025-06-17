@@ -311,14 +311,14 @@ class RouterTest extends TestCase
 
         $router->route('/about', fn() => 'about', 'about', ['GET']);
 
-        // Premiers accès : force la génération et la mise en cache
+        // First access: forces generation and caching
         $request = new ServerRequest('GET', '/about');
         $result = $router->match($request);
 
         $this->assertTrue($result->isSuccess());
         $this->assertSame('about', $result->getMatchedRoute()->getName());
 
-        // Simule une nouvelle instance du routeur => le cache devrait être utilisé
+        // Simulates a new router instance => cache should be used
         $router2 = new Router(
             null,
             null,
@@ -328,7 +328,7 @@ class RouterTest extends TestCase
             ]
         );
 
-        // Important : il faut ajouter la même route pour que le nom soit reconnu
+        // Important: we need to add the same route for the name to be recognized
         $router2->route('/about', fn() => 'about', 'about', ['GET']);
 
         $request2 = new ServerRequest('GET', '/about');
