@@ -2,9 +2,11 @@
 /clover.xml
 /composer.lock
 /coveralls-upload.json
+.phpunit.cache
 /vendor
 /tmp
 /public
+/build
 /.idea/
 /.vscode/
 php_errors.log
