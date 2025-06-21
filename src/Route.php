@@ -6,7 +6,7 @@ namespace Pg\Router;
 
 use Pg\Router\Exception\ImmutableProperty;
 use Pg\Router\Exception\InvalidArgumentException;
-use Pg\Router\Middlewares\Stack\MiddlewareAwareStackTrait;
+use Pg\Router\Middlewares\MiddlewareAwareStackTrait;
 
 use function array_map;
 use function implode;

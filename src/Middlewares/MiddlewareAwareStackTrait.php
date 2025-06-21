@@ -6,9 +6,8 @@
 
 declare(strict_types=1);
 
-namespace Pg\Router\Middlewares\Stack;
+namespace Pg\Router\Middlewares;
 
-use Pg\Router\Middlewares\RoutePrefixMiddleware;
 use Pg\Router\Route;
 use Pg\Router\RouteGroup;
 use Pg\Router\Router;
@@ -39,7 +38,7 @@ trait MiddlewareAwareStackTrait
     }
 
     /**
-     * Add middlewares array
+     * Add a middlewares array
      *
      * @param string[]|MiddlewareInterface $middlewares
      * @return Router|MiddlewareAwareStackTrait|Route|RouteGroup
@@ -61,13 +60,6 @@ trait MiddlewareAwareStackTrait
     public function prependMiddleware(string|MiddlewareInterface $middleware): self
     {
         array_unshift($this->middlewares, $middleware);
-        return $this;
-    }
-
-    public function routePrefix(ContainerInterface $c, string $routePrefix, string $middleware): self
-    {
-        $middleware = new RoutePrefixMiddleware($c, $routePrefix, $middleware);
-        $this->middlewares[] = $middleware;
         return $this;
     }
 
