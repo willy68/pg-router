@@ -2,11 +2,11 @@
 
 A fast, flexible, and PSR-7 compatible router for PHP.
 
-[![Latest Stable Version](http://poser.pugx.org/willy68/pg-eventdispacher/v)](https://packagist.org/packages/willy68/pg-eventdispacher)
-[![Total Downloads](http://poser.pugx.org/willy68/pg-eventdispacher/downloads)](https://packagist.org/packages/willy68/pg-eventdispacher)
-[![Latest Unstable Version](http://poser.pugx.org/willy68/pg-eventdispacher/v/unstable)](https://packagist.org/packages/willy68/pg-eventdispacher)
-[![License](http://poser.pugx.org/willy68/pg-eventdispacher/license)](https://packagist.org/packages/willy68/pg-eventdispacher)
-[![PHP Version Require](http://poser.pugx.org/willy68/pg-eventdispacher/require/php)](https://packagist.org/packages/willy68/pg-eventdispacher)
+[![Latest Stable Version](http://poser.pugx.org/willy68/pg-router/v)](https://packagist.org/packages/willy68/pg-router)
+[![Total Downloads](http://poser.pugx.org/willy68/pg-router/downloads)](https://packagist.org/packages/willy68/pg-router)
+[![Latest Unstable Version](http://poser.pugx.org/willy68/pg-router/v/unstable)](https://packagist.org/packages/willy68/pg-router)
+[![License](http://poser.pugx.org/willy68/pg-router/license)](https://packagist.org/packages/willy68/pg-router)
+[![PHP Version Require](http://poser.pugx.org/willy68/pg-router/require/php)](https://packagist.org/packages/willy68/pg-router)
 [![Coverage Status](https://coveralls.io/repos/github/willy68/pg-router/badge.svg?branch=main)](https://coveralls.io/github/willy68/pg-router?branch=main)
 
 ## Features
