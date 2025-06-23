@@ -42,7 +42,7 @@ class Router implements RouterInterface
     private ?RegexCollectorInterface $regexCollector;
 
     /**
-     * @code
+     * <code>
      * $router = new Router (
      *      null,
      *      null,
@@ -52,7 +52,7 @@ class Router implements RouterInterface
      *          Router::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...},
      *      ]
      * )
-     * @endcode
+     * </code>
      *
      * @param RegexCollectorInterface|null $regexCollector
      * @param callable|null $matcherFactory
