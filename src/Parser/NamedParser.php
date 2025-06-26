@@ -22,13 +22,13 @@ class NamedParser implements ParserInterface
     }
 
     /**
-     * Split in different pattern route with optionals parts.
+     * Split in different pattern route with optional parts.
      *
      * @return void
      */
     protected function parseOptionalParts(): void
     {
-        preg_match(Regex::OPT_REGEX, $this->regex, $matches);
+        preg_match('~' . Regex::OPT_REGEX . '~x', $this->regex, $matches);
         if ($matches) {
             $parts = explode(';', $matches[1]);
             $repl = $this->getRegexOptionalAttributesReplacement($parts);
@@ -88,7 +88,7 @@ class NamedParser implements ParserInterface
     {
         $vars = [];
 
-        preg_match_all(Regex::REGEX, $this->regex, $matches, PREG_SET_ORDER);
+        preg_match_all('~' . Regex::REGEX . '~x', $this->regex, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $name = $match[1];
             $token = $match[2] ?? null;
@@ -109,7 +109,7 @@ class NamedParser implements ParserInterface
     }
 
     /**
-     * Return the sub pattern for a token with the attribute name.
+     * Return the subpattern for a token with the attribute name.
      *
      * @param string $name
      * @param string|null $token

@@ -73,7 +73,7 @@ class MatcherForBenchmark
         $collector->addRoute(new Route('/admin/logout', 'callback', 'admin.logout', ['GET']));
         $collector->addRoute(new Route('/admin', 'callback', 'admin.index', ['GET']));
         $collector->addRoute(new Route('/admin/product', 'callback', 'admin.product.index', ['GET']));
-        $collector->addRoute(new Route('/admin/product)/create', 'callback', 'admin.product.create', ['GET']));
+        $collector->addRoute(new Route('/admin/product/create', 'callback', 'admin.product.create', ['GET']));
         $collector->addRoute(new Route('/admin/product', 'callback', 'admin.product.store', ['POST']));
         $collector->addRoute(new Route('/admin/product/{product_id:\d+}', 'callback', 'admin.product.show', ['GET']));
         $collector->addRoute(new Route(

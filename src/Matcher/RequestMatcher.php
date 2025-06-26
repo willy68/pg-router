@@ -67,7 +67,7 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Retourne les paramètres capturés depuis le chemin.
-     * Exemple : /users/42 return ['id' => '42']
+     * Exemple : /users/42 return ['id' → '42']
      */
     public function getPathParams(): array
     {
@@ -75,13 +75,13 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Convertit un chemin type /users/{id} en regex : #/users/(?P<id>[^/]+)#
-     * Convertit un chemin type /users/{id:\d+} en regex : #/users/(?P<id>\d+)#
+     * Convertit un chemin type /users/{id} en regex: #/users/(?P<id>[^/]+)#
+     * Convertit un chemin type /users/{id:\d+} en regex: #/users/(?P<id>\d+)#
      */
     private function convertPathToRegex(string $pattern): string
     {
         $regex = preg_replace_callback(
-            Regex::REGEX,
+            '~' . Regex::REGEX . '~x',
             fn($matches) => '(?P<' . $matches[1] . '>' . (isset($matches[2]) ? $matches[2] . ')' : '[^/]+)'),
             $pattern
         );
@@ -89,7 +89,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Set the value of path
+     * Set the value of a path
      *
      * @param string|null $path
      * @return  self
@@ -102,7 +102,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Set the value of method
+     * Set the value of a method
      *
      * @param $method
      * @return  self
@@ -115,7 +115,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Set the value of host
+     * Set the value of a host
      *
      * @param string|null $host
      * @return  self
@@ -128,7 +128,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * Set the value of scheme
+     * Set the value of a scheme
      *
      * @param $scheme
      * @return  self

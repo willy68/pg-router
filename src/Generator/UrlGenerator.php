@@ -66,14 +66,14 @@ class UrlGenerator implements GeneratorInterface
     protected function buildTokenReplacements(): void
     {
         // For new format
-        $matches = preg_split(Regex::OPT_REGEX, $this->url);
+        $matches = preg_split('~' . Regex::OPT_REGEX . '~x', $this->url);
 
         if (false === $matches  || $matches[0] === '/' || $matches[0] === '') {
             return;
         }
         $mainUrl = $matches[0];
 
-        if (preg_match_all(Regex::REGEX, $mainUrl, $matches, PREG_SET_ORDER) > 0) {
+        if (preg_match_all('~' . Regex::REGEX . '~x', $mainUrl, $matches, PREG_SET_ORDER) > 0) {
             $routeName = $this->route->getName();
 
             foreach ($matches as $match) {
@@ -112,7 +112,7 @@ class UrlGenerator implements GeneratorInterface
      */
     protected function buildOptionalReplacements(): void
     {
-        if (!preg_match(Regex::OPT_REGEX, $this->url, $matches)) {
+        if (!preg_match('~' . Regex::OPT_REGEX . '~x', $this->url, $matches)) {
             return;
         }
 
@@ -121,7 +121,7 @@ class UrlGenerator implements GeneratorInterface
         $replacements = [];
 
         foreach ($optionalParts as $part) {
-            if (preg_match_all(Regex::REGEX, $part, $exMatches, PREG_SET_ORDER) > 0) {
+            if (preg_match_all('~' . Regex::REGEX . '~x', $part, $exMatches, PREG_SET_ORDER) > 0) {
                 $tokenStr = [];
                 $names = [];
 

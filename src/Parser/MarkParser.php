@@ -29,7 +29,7 @@ class MarkParser implements ParserInterface
     protected function extractRouteVariants(): array
     {
         $base = $this->extractBasePath();
-        preg_match(Regex::OPT_REGEX, $this->regex, $matches);
+        preg_match('~' . Regex::OPT_REGEX . '~x', $this->regex, $matches);
 
         return $matches ? $this->expandOptionalSegments($base, $matches) : $base;
     }
@@ -39,7 +39,7 @@ class MarkParser implements ParserInterface
      */
     protected function extractBasePath(): array
     {
-        $parts = preg_split(Regex::OPT_REGEX, $this->regex);
+        $parts = preg_split('~' . Regex::OPT_REGEX . '~x', $this->regex);
         return [($parts[0] ?? '') ?: '/'];
     }
 
@@ -50,11 +50,15 @@ class MarkParser implements ParserInterface
     {
         $optionalParts = explode(';', $matches[1]);
         $variants = $base;
-        $current = '';
+        $current = $base[0];
+
+        if ($current === '/' && str_starts_with($optionalParts[0], '/')) {
+            $current = '';
+        }
 
         foreach ($optionalParts as $part) {
             $current .= trim($part);
-            $variants[] = str_replace($matches[0], $current, $this->regex);
+            $variants[] = $current;
         }
 
         return $variants;
@@ -70,7 +74,7 @@ class MarkParser implements ParserInterface
 
         foreach ($routes as $route) {
             $attributes = [];
-            preg_match_all(Regex::REGEX, $route, $matches, PREG_SET_ORDER);
+            preg_match_all('~' . Regex::REGEX . '~x', $route, $matches, PREG_SET_ORDER);
 
             foreach ($matches as $match) {
                 [$full, $name, $token] = array_pad($match, 3, null);

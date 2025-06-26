@@ -15,7 +15,8 @@
     }
   },
   "scripts": {
-    "coverage": ["php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-text --coverage-html=build/coverage"]
+    "coverage": ["php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-text --coverage-html=build/coverage"],
+    "bench": ["php ./vendor/bin/phpbench run --report=memory --report=benchmark_compare"]
   },
   "authors": [
     {
