@@ -46,7 +46,7 @@ class UrlGenerator implements GeneratorInterface
         $this->url = $this->route->getPath();
         $this->data = $attributes;
 
-        if (str_starts_with($this->url, '[/') && empty($this->data)) {
+        if (str_starts_with($this->url, '[') && empty($this->data)) {
             return '/';
         }
 

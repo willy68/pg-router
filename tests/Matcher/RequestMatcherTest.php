@@ -75,9 +75,9 @@ class RequestMatcherTest extends TestCase
         $this->assertSame(['userId' => '5', 'postId' => '42'], $matcher->getPathParams());
     }
 
-    public function testMatchesWithMultipleParametersAndAttributes()
+    public function testMatchesWithMultipleParametersAndAttributesWithSpaces()
     {
-        $matcher = new RequestMatcher('/users/{userId:\d+}/posts/{postId:\d+}', ['GET']);
+        $matcher = new RequestMatcher('/users/{ userId: \d+ }/posts/{ postId: \d+ }', ['GET']);
         $request = new ServerRequest('GET', '/users/5/posts/42');
 
         $this->assertTrue($matcher->match($request));

@@ -90,7 +90,7 @@ class NamedParserTest extends TestCase
 
     public function testOptionalStartPathWithToken()
     {
-        $data = $this->dataParser->parse('[/{bar:[a-z]+};/test/{test:\w+}]');
+        $data = $this->dataParser->parse('[/ {bar:[a-z]+};/test/{test:\w+}]');
         $expect = '/(?:(?P<bar>[a-z]+)(?:/test/(?P<test>\w+))?)?';
         $this->assertSame($expect, $data);
     }

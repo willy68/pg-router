@@ -71,7 +71,7 @@ class NamedParser implements ParserInterface
         // if the optional set is the first part of the path, make sure there
         // is a leading slash in the replacement before the optional attribute.
         $head = '';
-        if (str_starts_with($this->regex, '[/')) {
+        if (str_starts_with($this->regex, '[')) {
             $name = array_shift($parts);
             $name = ltrim($name, '/');
             $head = '/(?:' . trim($name);

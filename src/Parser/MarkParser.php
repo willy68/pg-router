@@ -28,10 +28,15 @@ class MarkParser implements ParserInterface
      */
     protected function extractRouteVariants(): array
     {
-        $base = $this->extractBasePath();
-        preg_match('~' . Regex::OPT_REGEX . '~x', $this->regex, $matches);
+        //$base = $this->extractBasePath();
+        //preg_match('~' . Regex::REGEX . '~x', $this->regex, $matches);
+        $route = rtrim($this->regex, ']');
+        // \[\!\s*(.*[^\s])\s*\]
+        $parts = preg_split('~(' . Regex::REGEX . ')(*SKIP)(?!)|\[~x', $route);
+        $base = [(trim($parts[0]) ?? '') ?: '/'];
+        $optionalParts = explode(';', $parts[1] ?? '');
 
-        return $matches ? $this->expandOptionalSegments($base, $matches) : $base;
+        return !empty($optionalParts[0]) ? $this->expandOptionalSegments($base, $optionalParts) : $base;
     }
 
     /**
@@ -46,17 +51,17 @@ class MarkParser implements ParserInterface
     /**
      * Expand a base route into variants using optional parts.
      */
-    protected function expandOptionalSegments(array $base, array $matches): array
+    protected function expandOptionalSegments(array $base, array $parts): array
     {
-        $optionalParts = explode(';', $matches[1]);
+        //$optionalParts = explode(';', $matches[1]);
         $variants = $base;
         $current = $base[0];
 
-        if ($current === '/' && str_starts_with($optionalParts[0], '/')) {
+        if ($current === '/' && str_starts_with($parts[0], '/')) {
             $current = '';
         }
 
-        foreach ($optionalParts as $part) {
+        foreach ($parts as $part) {
             $current .= trim($part);
             $variants[] = $current;
         }

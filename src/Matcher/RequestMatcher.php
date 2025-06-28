@@ -82,7 +82,8 @@ class RequestMatcher implements RequestMatcherInterface
     {
         $regex = preg_replace_callback(
             '~' . Regex::REGEX . '~x',
-            fn($matches) => '(?P<' . $matches[1] . '>' . (isset($matches[2]) ? $matches[2] . ')' : '[^/]+)'),
+            fn($matches) =>
+                '(?P<' . trim($matches[1]) . '>' . (isset($matches[2]) ? trim($matches[2]) . ')' : '[^/]+)'),
             $pattern
         );
         return '#' . $regex . '#';
