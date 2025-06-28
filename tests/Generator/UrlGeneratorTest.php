@@ -80,7 +80,7 @@ class UrlGeneratorTest extends TestCase
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('/archive/{category}[/{year};/{month};/{day}]', 'foo', 'test');
+        $collector->route('/archive/{category}[ / {year};/{month};/{day}]', 'foo', 'test');
 
         // some
         $url = $generator->generate('test', [

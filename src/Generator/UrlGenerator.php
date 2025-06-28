@@ -50,9 +50,22 @@ class UrlGenerator implements GeneratorInterface
             return '/';
         }
 
-        $this->buildTokenReplacements();
-        $this->buildOptionalReplacements();
+        $url = trim($this->url, ']');
+        $parts = preg_split('~(' . Regex::REGEX . ')(*SKIP)(?!)|\[~x', $url);
+        $base = (trim($parts[0]) ?? '') ?: '/';
+        $optionalParts = explode(';', $parts[1] ?? '');
+        $optionalSegments = isset($parts[1]) ? '[' . $parts[1] . ']' : '';
+
+        if ($base !== '/') {
+            $this->buildTokenReplacements($base);
+        }
+
+        if ($optionalSegments !== '') {
+            $this->buildOptionalReplacements($optionalSegments, $optionalParts);
+        }
+
         $this->url = strtr($this->url, $this->repl);
+        //dd($this->url, $this->repl, $optionalSegments, $optionalParts);
 
         return $this->url;
     }
@@ -61,18 +74,19 @@ class UrlGenerator implements GeneratorInterface
      *
      * Builds urlencoded data for token replacements.
      *
+     * @param string $mainUrl
      * @return void
      */
-    protected function buildTokenReplacements(): void
+    protected function buildTokenReplacements(string $mainUrl): void
     {
         // For new format
-        $matches = preg_split('~' . Regex::OPT_REGEX . '~x', $this->url);
+        /*$matches = preg_split('~' . Regex::OPT_REGEX . '~x', $this->url);
 
         if (false === $matches  || $matches[0] === '/' || $matches[0] === '') {
             return;
         }
         $mainUrl = $matches[0];
-
+        */
         if (preg_match_all('~' . Regex::REGEX . '~x', $mainUrl, $matches, PREG_SET_ORDER) > 0) {
             $routeName = $this->route->getName();
 
@@ -108,16 +122,18 @@ class UrlGenerator implements GeneratorInterface
      *
      * Builds replacements for attributes in the generated path.
      *
+     * @param string $optionalSegment
+     * @param array $optionalParts
      * @return void
      */
-    protected function buildOptionalReplacements(): void
+    protected function buildOptionalReplacements(string $optionalSegment = '', array $optionalParts = []): void
     {
-        if (!preg_match('~' . Regex::OPT_REGEX . '~x', $this->url, $matches)) {
+        /*if (!preg_match('~' . Regex::OPT_REGEX . '~x', $this->url, $matches)) {
             return;
         }
 
         $optionalSegment = $matches[0];
-        $optionalParts = explode(';', $matches[1]);
+        $optionalParts = explode(';', $matches[1]);*/
         $replacements = [];
 
         foreach ($optionalParts as $part) {
@@ -130,7 +146,7 @@ class UrlGenerator implements GeneratorInterface
                     $names[] = isset($match[2]) ? [$match[1], $match[2]] : $match[1];
                 }
 
-                $replacement = $this->buildOptionalReplacement($names, $tokenStr, $part);
+                $replacement = $this->buildOptionalReplacement($names, $tokenStr, trim($part));
                 if ($replacement !== '') {
                     $replacements[] = $replacement;
                 }
