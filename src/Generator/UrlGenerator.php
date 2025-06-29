@@ -12,10 +12,16 @@ use Pg\Router\Route;
 use Pg\Router\RouteCollectionInterface;
 use Pg\Router\RouterInterface;
 
+use function explode;
+use function implode;
 use function is_array;
 use function preg_match;
 use function preg_match_all;
+use function preg_split;
+use function rawurlencode;
 use function sprintf;
+use function str_replace;
+use function str_starts_with;
 use function strtr;
 
 class UrlGenerator implements GeneratorInterface
@@ -44,15 +50,15 @@ class UrlGenerator implements GeneratorInterface
         $this->route = $route;
         $url = $this->route->getPath();
         $this->data = $attributes;
+        $urlStartWithBracket = str_starts_with($url, '[');
 
-        if (str_starts_with($url, '[') && empty($this->data)) {
+        if ($urlStartWithBracket && empty($this->data)) {
             return '/';
         }
 
-        $urlWithoutEndBracket = rtrim($url, ']');
-        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(?!)|\[~x', $urlWithoutEndBracket);
+        $urlWithoutClosingBracket = rtrim($url, ']');
+        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(*F)|\[~x', $urlWithoutClosingBracket);
         $base = (trim($parts[0]) ?? '') ?: '/';
-        $optionalParts = explode(';', $parts[1] ?? '');
         $optionalSegments = isset($parts[1]) ? '[' . $parts[1] . ']' : '';
 
         if ($base !== '/') {
@@ -60,6 +66,10 @@ class UrlGenerator implements GeneratorInterface
         }
 
         if ($optionalSegments !== '') {
+            $optionalParts = explode(';', $parts[1]);
+            if ($urlStartWithBracket && !str_starts_with(ltrim($optionalParts[0]), '/')) {
+                $optionalParts[0] = '/' . $optionalParts[0];
+            }
             $this->buildOptionalReplacements($optionalSegments, $optionalParts);
         }
 

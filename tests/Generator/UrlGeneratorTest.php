@@ -135,6 +135,25 @@ class UrlGeneratorTest extends TestCase
     /**
      * @throws \Exception
      */
+    public function testOptionalStartPathWithoutFirstSlashAndSpace()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('[ { bar: [a-z]+ };/test/{ test: \w+ } ]', 'foo', 'test');
+
+        $url = $generator->generate('test', []);
+        $this->assertEquals('/', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo']);
+        $this->assertEquals('/foo', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo', 'test' => 'baz']);
+        $this->assertEquals('/foo/test/baz', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testGenerateOnFullUri()
     {
         $collector = $this->getCollector();
