@@ -28,8 +28,6 @@ class MarkParser implements ParserInterface
      */
     protected function extractRouteVariants(): array
     {
-        //$base = $this->extractBasePath();
-        //preg_match('~' . Regex::REGEX . '~x', $this->regex, $matches);
         $route = rtrim($this->regex, ']');
         // \[\!\s*(.*[^\s])\s*\]
         $parts = preg_split('~(' . Regex::REGEX . ')(*SKIP)(?!)|\[~x', $route);
@@ -53,7 +51,6 @@ class MarkParser implements ParserInterface
      */
     protected function expandOptionalSegments(array $base, array $parts): array
     {
-        //$optionalParts = explode(';', $matches[1]);
         $variants = $base;
         $current = $base[0];
 

@@ -38,6 +38,19 @@ class UrlGeneratorTest extends TestCase
     /**
      * @throws \Exception
      */
+    public function testGenerateStatic()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/edit', 'foo', 'test');
+
+        $url = $generator->generate('test', []);
+        $this->assertEquals('/blog/edit', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testGenerateWithInlineToken()
     {
         $collector = $this->getCollector();
@@ -76,11 +89,11 @@ class UrlGeneratorTest extends TestCase
     /**
      * @throws \Exception
      */
-    public function testGenerateWithOptional()
+    public function testGenerateWithOptionalAndSpace()
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('/archive/{category}[ / {year};/{month};/{day}]', 'foo', 'test');
+        $collector->route('/archive/{ category }[ / { year }; / { month } ;/{day}]', 'foo', 'test');
 
         // some
         $url = $generator->generate('test', [
@@ -98,6 +111,25 @@ class UrlGeneratorTest extends TestCase
             'day' => '07',
         ]);
         $this->assertEquals('/archive/foo/1979/11/07', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testOptionalStartPathWithToken()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('[/{bar:[a-z]+};/test/{test:\w+}]', 'foo', 'test');
+
+        $url = $generator->generate('test', []);
+        $this->assertEquals('/', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo']);
+        $this->assertEquals('/foo', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo', 'test' => 'baz']);
+        $this->assertEquals('/foo/test/baz', $url);
     }
 
     /**

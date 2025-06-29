@@ -21,7 +21,6 @@ use function strtr;
 class UrlGenerator implements GeneratorInterface
 {
     protected Route $route;
-    protected string $url;
     protected array $data = [];
     protected array $repl = [];
     protected RouterInterface|RouteCollectionInterface $router;
@@ -43,15 +42,15 @@ class UrlGenerator implements GeneratorInterface
         }
 
         $this->route = $route;
-        $this->url = $this->route->getPath();
+        $url = $this->route->getPath();
         $this->data = $attributes;
 
-        if (str_starts_with($this->url, '[') && empty($this->data)) {
+        if (str_starts_with($url, '[') && empty($this->data)) {
             return '/';
         }
 
-        $url = trim($this->url, ']');
-        $parts = preg_split('~(' . Regex::REGEX . ')(*SKIP)(?!)|\[~x', $url);
+        $urlWithoutEndBracket = rtrim($url, ']');
+        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(?!)|\[~x', $urlWithoutEndBracket);
         $base = (trim($parts[0]) ?? '') ?: '/';
         $optionalParts = explode(';', $parts[1] ?? '');
         $optionalSegments = isset($parts[1]) ? '[' . $parts[1] . ']' : '';
@@ -64,32 +63,19 @@ class UrlGenerator implements GeneratorInterface
             $this->buildOptionalReplacements($optionalSegments, $optionalParts);
         }
 
-        $this->url = strtr($this->url, $this->repl);
-        //dd($this->url, $this->repl, $optionalSegments, $optionalParts);
-
-        return $this->url;
+        return strtr($url, $this->repl);
     }
 
     /**
      *
      * Builds urlencoded data for token replacements.
      *
-     * @param string $mainUrl
+     * @param string $base
      * @return void
      */
-    protected function buildTokenReplacements(string $mainUrl): void
+    protected function buildTokenReplacements(string $base): void
     {
-        // For new format
-        /*$matches = preg_split('~' . Regex::OPT_REGEX . '~x', $this->url);
-
-        if (false === $matches  || $matches[0] === '/' || $matches[0] === '') {
-            return;
-        }
-        $mainUrl = $matches[0];
-        */
-        if (preg_match_all('~' . Regex::REGEX . '~x', $mainUrl, $matches, PREG_SET_ORDER) > 0) {
-            $routeName = $this->route->getName();
-
+        if (preg_match_all('~' . Regex::REGEX . '~x', $base, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $name = $match[1];
                 $token = $match[2] ?? "([^/]+)";
@@ -98,7 +84,7 @@ class UrlGenerator implements GeneratorInterface
                     throw new MissingAttributeException(sprintf(
                         'Parameter value for [%s] is missing for route [%s]',
                         $name,
-                        $routeName
+                        $this->route->getName()
                     ));
                 }
 
@@ -109,7 +95,7 @@ class UrlGenerator implements GeneratorInterface
                         'Parameter value for [%s] did not match the regex `%s` in route [%s]',
                         $name,
                         $token,
-                        $routeName
+                        $this->route->getName()
                     ));
                 }
 
@@ -128,12 +114,6 @@ class UrlGenerator implements GeneratorInterface
      */
     protected function buildOptionalReplacements(string $optionalSegment = '', array $optionalParts = []): void
     {
-        /*if (!preg_match('~' . Regex::OPT_REGEX . '~x', $this->url, $matches)) {
-            return;
-        }
-
-        $optionalSegment = $matches[0];
-        $optionalParts = explode(';', $matches[1]);*/
         $replacements = [];
 
         foreach ($optionalParts as $part) {
