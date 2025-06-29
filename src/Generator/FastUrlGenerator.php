@@ -245,7 +245,6 @@ class FastUrlGenerator implements GeneratorInterface
             if (!$canBuild) {
                 break;
             }
-            //dd($segment, $segments, $routeData);
 
             // Ajuster le préfixe pour le premier segment optionnel si nécessaire
             if ($index === 0 && $routeData['isOptionalStart'] && str_starts_with(ltrim($segment), '/')) {
