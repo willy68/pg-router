@@ -1,0 +1,212 @@
+<?php
+
+namespace PgTest\Router\Generator;
+
+use Pg\Router\Exception\RouteNotFoundException;
+use Pg\Router\Generator\FastUrlGenerator;
+use Pg\Router\RouteCollector;
+use Pg\Router\Router;
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+
+class FastUrlGeneratorTest extends TestCase
+{
+    protected Router|MockObject $router;
+
+    /**
+     * @throws Exception
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $router = $this->createMock(Router::class);
+        $this->router = $router;
+    }
+
+    protected function getCollector(): RouteCollector
+    {
+        return new RouteCollector($this->router);
+    }
+
+    protected function getGenerator(RouteCollector $collector): FastUrlGenerator
+    {
+        return new FastUrlGenerator($collector);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateStatic()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/edit', 'foo', 'test');
+
+        $url = $generator->generate('test', []);
+        $this->assertEquals('/blog/edit', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateWithInlineToken()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/{id:([0-9]+)}/edit', 'foo', 'test');
+
+        $url = $generator->generate('test', ['id' => 42, 'foo' => 'bar']);
+        $this->assertEquals('/blog/42/edit', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateMatchingException()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/{id:([0-9]+)}/edit', 'foo', 'test');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter value for [id] did not match the regex `([0-9]+)`');
+        $generator->generate('test', ['id' => '4 2', 'foo' => 'bar']);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateMissing()
+    {
+        $collector = $this->getCollector();
+        $this->expectException(RouteNotFoundException::class);
+        $this->expectExceptionMessage(sprintf('Route with name [%s] not found', 'no-such-route'));
+        $this->getGenerator($collector)->generate('no-such-route');
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateWithOptionalAndSpace()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/archive/{ category }[ / { year }; / { month } ;/{day}]', 'foo', 'test');
+
+        // some
+        $url = $generator->generate('test', [
+            'category' => 'foo',
+            'year' => '1979',
+            'month' => '11',
+        ]);
+        $this->assertEquals('/archive/foo/1979/11', $url);
+
+        // all
+        $url = $generator->generate('test', [
+            'category' => 'foo',
+            'year' => '1979',
+            'month' => '11',
+            'day' => '07',
+        ]);
+        $this->assertEquals('/archive/foo/1979/11/07', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testOptionalStartPathWithToken()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('[/{bar:[a-z]+};/test/{test:\w+}]', 'foo', 'test');
+
+        $url = $generator->generate('test', []);
+        $this->assertEquals('/', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo']);
+        $this->assertEquals('/foo', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo', 'test' => 'baz']);
+        $this->assertEquals('/foo/test/baz', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testOptionalStartPathWithoutFirstSlashAndSpace()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('[ { bar: [a-z]+ };/test/{ test: \w+ } ]', 'foo', 'test');
+
+        $url = $generator->generate('test', []);
+        $this->assertEquals('/', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo']);
+        $this->assertEquals('/foo', $url);
+
+        $url = $generator->generate('test', ['bar' => 'foo', 'test' => 'baz']);
+        $this->assertEquals('/foo/test/baz', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateOnFullUri()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('https://google.com/?q={q}', ['action', 'google-search'], 'test');
+
+        $actual = $generator->generate('test', ['q' => "what's up doc?"]);
+        $expect = "https://google.com/?q=what%27s%20up%20doc%3F";
+        $this->assertSame($expect, $actual);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateWithHost()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('//{host}.example.com/blog/{id}/edit', 'foo', 'test');
+
+        $url = $generator->generate('test', ['id' => 42, 'host' => 'bar']);
+        $this->assertEquals('//bar.example.com/blog/42/edit', $url);
+    }
+    public function testCachePerformance()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/{id:\d+}/edit', 'foo', 'test');
+
+        // Première génération - construit le cache
+        $url1 = $generator->generate('test', ['id' => 42]);
+
+        // Vérifier que le cache est créé
+        $cache = $generator->getRouteCache('test');
+        $this->assertNotNull($cache);
+
+        // Deuxième génération - utilise le cache
+        $url2 = $generator->generate('test', ['id' => 43]);
+
+        $this->assertEquals('/blog/42/edit', $url1);
+        $this->assertEquals('/blog/43/edit', $url2);
+    }
+
+    public function testClearCache()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/{id}/edit', 'foo', 'test');
+
+        $generator->generate('test', ['id' => 42]);
+        $this->assertNotNull($generator->getRouteCache('test'));
+
+        $generator->clearCache();
+        $this->assertNull($generator->getRouteCache('test'));
+    }
+}
