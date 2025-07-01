@@ -112,7 +112,6 @@ class FastUrlGenerator implements GeneratorInterface
                     'full' => $match[0],
                     'name' => $match[1],
                     'token' => $match[2] ?? '([^/]+)',
-                    'position' => strpos($segment, $match[0])
                 ];
             }
         }
