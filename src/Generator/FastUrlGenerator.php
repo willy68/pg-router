@@ -12,9 +12,54 @@ use Pg\Router\Route;
 use Pg\Router\RouteCollectionInterface;
 use Pg\Router\RouterInterface;
 
+use function preg_match;
+use function preg_match_all;
+use function preg_split;
+use function rawurlencode;
+use function sprintf;
+use function str_starts_with;
+use function strtr;
+use function trim;
+
 /**
- * Générateur d'URL optimisé suivant les concepts du projet
- * Supporte les segments optionnels, variables et validation des tokens
+ * FastUrlGenerator - High-performance URL generator with intelligent caching
+ *
+ * This generator provides an optimized implementation of URL generation with built-in
+ * route analysis caching to improve performance on repeated URL generation calls.
+ *
+ * Features:
+ * - Intelligent route parsing cache to avoid re-analysis
+ * - Support for static routes, variables with regex tokens, and optional segments
+ * - Comprehensive validation of route parameters against defined patterns
+ * - Sequential optional segment processing for complex route structures
+ * - Memory-efficient caching system for parsed route data
+ * - Full compatibility with existing GeneratorInterface
+ *
+ * Performance benefits:
+ * - First generation: Parses and caches route structure
+ * - Subsequent generations: Uses cached data for faster processing
+ * - Reduced regex operations and string parsing overhead
+ * - Optimized for high-traffic applications
+ *
+ * Usage example:
+ * ```php
+ * $generator = new FastUrlGenerator($router);
+ *
+ * // Static route
+ * $url = $generator->generate('home'); // Returns: '/'
+ *
+ * // Route with variables
+ * $url = $generator->generate('user_profile', ['id' => 123]); // Returns: '/user/123'
+ *
+ * // Route with optional segments
+ * $url = $generator->generate('archive', ['year' => '2024', 'month' => '12']);
+ * // Returns: '/archive/2024/12'
+ * ```
+ *
+ * @package Pg\Router\Generator
+ * @author William Lety
+ * @since 1.0.0
+ * @see GeneratorInterface
  */
 class FastUrlGenerator implements GeneratorInterface
 {
@@ -27,11 +72,11 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Génère une URL à partir du nom de route et des attributs
+     * Generates a URL from route name and attributes
      *
-     * @param string $name Nom de la route
-     * @param array $attributes Attributs pour remplacer les variables
-     * @return string URL générée
+     * @param string $name Route name
+     * @param array $attributes Attributes to replace variables
+     * @return string Generated URL
      * @throws RouteNotFoundException
      * @throws MissingAttributeException
      * @throws RuntimeException
@@ -41,7 +86,7 @@ class FastUrlGenerator implements GeneratorInterface
         $route = $this->getRoute($name);
         $path = $route->getPath();
 
-        // Cache des routes déjà analysées pour optimiser les performances
+        // Cache already analyzed routes to optimize performance
         if (!isset($this->routeCache[$name])) {
             $this->routeCache[$name] = $this->parseRoutePath($path);
         }
@@ -52,7 +97,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Récupère la route par son nom
+     * Retrieves route by name
      *
      * @param string $name
      * @return Route
@@ -72,7 +117,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Analyse le chemin de la route et extrait la structure
+     * Analyzes route path and extracts structure
      *
      * @param string $path
      * @return array
@@ -82,7 +127,7 @@ class FastUrlGenerator implements GeneratorInterface
         $isOptionalStart = str_starts_with($path, '[');
         $pathWithoutClosing = rtrim($path, ']');
 
-        // Séparer la partie statique des segments optionnels
+        // Separate static part from optional segments
         $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(*F)|\[~x', $pathWithoutClosing);
         $basePath = (trim($parts[0]) ?? '') ?: '/';
         $optionalSegments = $parts[1] ?? '';
@@ -97,7 +142,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Extrait les variables d'un segment de chemin
+     * Extracts variables from a path segment
      *
      * @param string $segment
      * @return array
@@ -120,7 +165,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Parse les segments optionnels
+     * Parses optional segments
      *
      * @param string $segments
      * @return array
@@ -142,7 +187,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Construit l'URL finale
+     * Builds the final URL
      *
      * @param array $routeData
      * @param array $attributes
@@ -151,19 +196,19 @@ class FastUrlGenerator implements GeneratorInterface
      */
     protected function buildUrl(array $routeData, array $attributes, string $routeName): string
     {
-        // Cas spécial : route optionnelle au début sans attributs
+        // Special case: optional route at start without attributes
         if ($routeData['isOptionalStart'] && empty($attributes)) {
             return '/';
         }
 
         $url = $routeData['basePath'];
 
-        // Remplacer les variables de la partie statique
+        // Replace variables in static part
         if ($routeData['basePath'] !== '/') {
             $url = $this->replaceVariables($url, $routeData['baseVariables'], $attributes, $routeName);
         }
 
-        // Traiter les segments optionnels
+        // Process optional segments
         if (!empty($routeData['optionalVariables'])) {
             $optionalUrl = $this->buildOptionalSegments($routeData, $attributes, $routeName);
             $url .= $optionalUrl;
@@ -173,7 +218,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Remplace les variables dans un segment
+     * Replaces variables in a segment
      *
      * @param string $segment
      * @param array $variables
@@ -199,7 +244,7 @@ class FastUrlGenerator implements GeneratorInterface
 
             $value = (string) $attributes[$name];
 
-            // Validation du token
+            // Token validation
             if (!preg_match('~^' . $token . '$~x', $value)) {
                 throw new RuntimeException(sprintf(
                     'Parameter value for [%s] did not match the regex `%s` in route [%s]',
@@ -216,7 +261,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Construit les segments optionnels
+     * Builds optional segments
      *
      * @param array $routeData
      * @param array $attributes
@@ -232,12 +277,12 @@ class FastUrlGenerator implements GeneratorInterface
             $segment = $segmentData['segment'];
             $variables = $segmentData['variables'];
 
-            // Vérifier si tous les paramètres requis sont présents
+            // Check if all required parameters are present
             $canBuild = true;
             foreach ($variables as $variable) {
                 if (!isset($attributes[$variable['name']])) {
                     $canBuild = false;
-                    break; // Les segments optionnels sont séquentiels.
+                    break; // Optional segments are sequential
                 }
             }
 
@@ -245,7 +290,7 @@ class FastUrlGenerator implements GeneratorInterface
                 break;
             }
 
-            // Ajuster le préfixe pour le premier segment optionnel si nécessaire
+            // Adjust prefix for first optional segment if necessary
             if ($index === 0 && $routeData['isOptionalStart'] && str_starts_with(ltrim($segment), '/')) {
                 $segment = ltrim($segment, '/');
             }
@@ -258,7 +303,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Vide le cache des routes (utile pour les tests ou le développement)
+     * Clears route cache (useful for tests or development)
      *
      * @return void
      */
@@ -268,7 +313,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Retourne les informations de cache pour une route (utile pour le debug)
+     * Returns cache information for a route (useful for debugging)
      *
      * @param string $name
      * @return array|null
