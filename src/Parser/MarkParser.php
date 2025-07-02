@@ -73,6 +73,8 @@ class MarkParser implements ParserInterface
     {
         $allAttributes = [];
         $compiledRoutes = [];
+        $searchPatterns = [];
+        $replacements = [];
 
         foreach ($routes as $route) {
             $attributes = [];
@@ -88,8 +90,14 @@ class MarkParser implements ParserInterface
                 }
 
                 $subPattern = $this->getSubpattern($name, $token);
-                $route = str_replace($full, $subPattern, $route);
+                $searchPatterns[] = $full;
+                $replacements[] = $subPattern;
                 $attributes[$name] = true;
+            }
+
+            // Single str_replace call with arrays for all replacements
+            if (!empty($searchPatterns)) {
+                $route = str_replace($searchPatterns, $replacements, $route);
             }
 
             $allAttributes += array_fill_keys(array_keys($attributes), true);

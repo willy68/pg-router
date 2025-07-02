@@ -43,10 +43,9 @@ class MarkRegexCollector implements RegexCollectorInterface
         $name = $route->getName();
 
         $data = $this->getParser()->parse($route->getPath());
-        [$regex, $vars] = $data;
 
         foreach ($methods as $method) {
-            $this->data[$method][$name] = [$regex, $vars];
+            $this->data[$method][$name] = $data;
         }
     }
 
