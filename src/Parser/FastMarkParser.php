@@ -129,7 +129,6 @@ class FastMarkParser implements ParserInterface
         $result = preg_match_all('~' . Regex::REGEX . '~x', $path, $matches, PREG_SET_ORDER);
 
         return [
-            'path' => $path,
             'basePath' => $basePath,
             'optionalSegments' => $optionalSegments,
             'isOptionalStart' => $isOptionalStart,
@@ -227,7 +226,6 @@ class FastMarkParser implements ParserInterface
             $subPattern = $this->buildSubpattern($token);
             $searchPatterns[] = $full;
             $replacements[] = $subPattern;
-
 
             $routeVariables[$name] = true;
         }
