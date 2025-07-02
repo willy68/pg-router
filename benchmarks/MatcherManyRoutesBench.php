@@ -20,8 +20,8 @@ final class MatcherManyRoutesBench
     public function registerMatchers(): void
     {
         $this->router = [
-            MarkDataMatcher::class => MatcherForBenchmark::manyRoutes(MarkDataMatcher::class),
-            NamedMatcher::class => MatcherForBenchmark::manyRoutes(NamedMatcher::class),
+            'mark_matcher' => MatcherForBenchmark::manyRoutes(MarkDataMatcher::class),
+            'named_matcher' => MatcherForBenchmark::manyRoutes(NamedMatcher::class),
         ];
     }
 
@@ -76,7 +76,7 @@ final class MatcherManyRoutesBench
     #[Bench\Groups(['dynamic', 'invalidMethod'])]
     public function dynamicInvalidMethod(array $params): void
     {
-        $this->router[$params['router']]->match('/abcbar/399', 'GET');
+        $this->router[$params['router']]->match('/abcbar/399', 'PUT');
     }
 
     /** @param array{router: string} $params
@@ -91,9 +91,7 @@ final class MatcherManyRoutesBench
     /** @return iterable<string, array<string, mixed>> */
     public function matchers(): iterable
     {
-        foreach (
-            [MarkDataMatcher::class, NamedMatcher::class] as $router
-        ) {
+        foreach (['mark_matcher', 'named_matcher'] as $router) {
             yield $router => ['router' => $router];
         }
     }
