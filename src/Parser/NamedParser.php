@@ -95,11 +95,12 @@ class NamedParser implements ParserInterface
     protected function parseVariableParts(): void
     {
         $vars = [];
+        $searchPatterns = [];
+        $replacements = [];
 
         preg_match_all('~' . Regex::REGEX . '\s*~x', $this->regex, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $name = $match[1];
-            $token = $match[2] ?? null;
+            [$full, $name, $token] = array_pad($match, 3, null);
 
             if (isset($vars[$name])) {
                 throw new DuplicateAttributeException(
@@ -110,9 +111,15 @@ class NamedParser implements ParserInterface
                 );
             }
 
-            $subpattern = $this->getSubpattern($name, $token);
-            $this->regex = str_replace($match[0], $subpattern, $this->regex);
+            $subPattern = $this->getSubpattern($name, $token);
+            $searchPatterns[] = $full;
+            $replacements[] = $subPattern;
             $vars[$name] = $name;
+        }
+
+        // Single str_replace call with arrays for all replacements
+        if (!empty($searchPatterns)) {
+            $this->regex = str_replace($searchPatterns, $replacements, $this->regex);
         }
     }
 
