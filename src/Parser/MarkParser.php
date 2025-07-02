@@ -38,15 +38,6 @@ class MarkParser implements ParserInterface
     }
 
     /**
-     * Extract static/variable prefix before optional segments.
-     */
-    protected function extractBasePath(): array
-    {
-        $parts = preg_split('~' . Regex::OPT_REGEX . '~x', $this->regex);
-        return [($parts[0] ?? '') ?: '/'];
-    }
-
-    /**
      * Expand a base route into variants using optional parts.
      */
     protected function expandOptionalSegments(array $base, array $parts): array

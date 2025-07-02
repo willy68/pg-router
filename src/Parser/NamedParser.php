@@ -28,12 +28,20 @@ class NamedParser implements ParserInterface
      */
     protected function parseOptionalParts(): void
     {
-        preg_match('~' . Regex::OPT_REGEX . '~x', $this->regex, $matches);
-        if ($matches) {
-            $parts = explode(';', $matches[1]);
+        $optionalParts = $this->extractOptionalParts();
+        if ($optionalParts) {
+            $partsWithoutBrackets = rtrim($optionalParts, ']');
+            $optionalParts = '[' . $optionalParts;
+            $parts = explode(';', $partsWithoutBrackets);
             $repl = $this->getRegexOptionalAttributesReplacement($parts);
-            $this->regex = str_replace($matches[0], $repl, $this->regex);
+            $this->regex = str_replace($optionalParts, $repl, $this->regex);
         }
+    }
+
+    protected function extractOptionalParts(): ?string
+    {
+        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(?!)|\[~x', $this->regex);
+        return $parts[1] ?? null;
     }
 
     /**
@@ -88,7 +96,7 @@ class NamedParser implements ParserInterface
     {
         $vars = [];
 
-        preg_match_all('~' . Regex::REGEX . '~x', $this->regex, $matches, PREG_SET_ORDER);
+        preg_match_all('~' . Regex::REGEX . '\s*~x', $this->regex, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $name = $match[1];
             $token = $match[2] ?? null;
