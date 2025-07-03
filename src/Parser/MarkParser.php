@@ -63,16 +63,22 @@ class MarkParser implements ParserInterface
     protected function compileRoutes(array $routes): void
     {
         $allAttributes = [];
-        $compiledRoutes = [];
         $searchPatterns = [];
         $replacements = [];
 
+        $result = preg_match_all('~' . Regex::REGEX . '~x', $this->regex, $matches, PREG_SET_ORDER);
+        $matches = ($result !== false && $result > 0) ? $matches : [];
+
         foreach ($routes as $route) {
             $attributes = [];
-            preg_match_all('~' . Regex::REGEX . '~x', $route, $matches, PREG_SET_ORDER);
 
             foreach ($matches as $match) {
                 [$full, $name, $token] = array_pad($match, 3, null);
+
+                // Skip if this variable doesn't exist in the current route variant
+                if (!str_contains($route, $full)) {
+                    break;
+                }
 
                 if (isset($attributes[$name])) {
                     throw new DuplicateAttributeException(
@@ -86,16 +92,15 @@ class MarkParser implements ParserInterface
                 $attributes[$name] = true;
             }
 
-            // Single str_replace call with arrays for all replacements
-            if (!empty($searchPatterns)) {
-                $route = str_replace($searchPatterns, $replacements, $route);
-            }
-
-            $allAttributes += array_fill_keys(array_keys($attributes), true);
-            $compiledRoutes[] = $route;
+            $allAttributes += $attributes;
         }
 
-        $this->routes = [$compiledRoutes, array_keys($allAttributes)];
+        // Single str_replace call with arrays for all replacements
+        if (!empty($searchPatterns)) {
+            $routes = str_replace($searchPatterns, $replacements, $routes);
+        }
+
+        $this->routes = [$routes, array_keys($allAttributes)];
     }
 
     /**
