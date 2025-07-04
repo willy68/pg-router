@@ -58,7 +58,8 @@ $router->group('/admin', function ($group) {
 
 ## Optional Segments
 
-You can define optional segments in your routes by enclosing them in square brackets with exclamation mark at the beginning `[!...;...]`. Optional segments should be separated by semicolon `;`.
+You can define optional segments in your routes by enclosing them in square brackets with exclamation mark at the beginning `[!...;...]`.  
+Optional segments should be separated by semicolon `;`.
 
 ```php
 // Example route with optional segments
