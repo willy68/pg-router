@@ -93,7 +93,7 @@ class FastUrlGeneratorTest extends TestCase
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('/archive/{ category }[ / { year }; / { month } ;/{day}]', 'foo', 'test');
+        $collector->route('/archive/{ category }[! / { year }; / { month } ;/{day}]', 'foo', 'test');
 
         // some
         $url = $generator->generate('test', [
@@ -120,7 +120,7 @@ class FastUrlGeneratorTest extends TestCase
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('[/{bar:[a-z]+};/test/{test:\w+}]', 'foo', 'test');
+        $collector->route('[!/{bar:[a-z]+};/test/{test:\w+}]', 'foo', 'test');
 
         $url = $generator->generate('test', []);
         $this->assertEquals('/', $url);
@@ -139,7 +139,7 @@ class FastUrlGeneratorTest extends TestCase
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('[ { bar: [a-z]+ };/test/{ test: \w+ } ]', 'foo', 'test');
+        $collector->route('[! { bar: [a-z]+ };/test/{ test: \w+ } ]', 'foo', 'test');
 
         $url = $generator->generate('test', []);
         $this->assertEquals('/', $url);

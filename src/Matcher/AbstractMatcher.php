@@ -24,7 +24,7 @@ abstract class AbstractMatcher implements MatcherInterface
     {
         $httpMethod = strtoupper($httpMethod);
 
-        // Try method given
+        // Try the method given
         if (isset($this->data[$httpMethod])) {
             $matches = $this->matchPath($uri, $this->data[$httpMethod]);
             if ($matches) {

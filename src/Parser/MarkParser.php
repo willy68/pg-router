@@ -30,7 +30,7 @@ class MarkParser implements ParserInterface
     {
         $route = rtrim($this->regex, ']');
         // \[\!\s*(.*[^\s])\s*\]
-        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(?!)|\[~x', $route);
+        $parts = preg_split('~' . Regex::OPT_REGEX . '~', $route);
         $base = [(trim($parts[0]) ?? '') ?: '/'];
         $optionalParts = explode(';', $parts[1] ?? '');
 

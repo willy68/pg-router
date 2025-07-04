@@ -85,35 +85,35 @@ class FastMarkParserTest extends TestCase
 
     public function testStaticAndOptionalWithDefaultToken()
     {
-        $data = $this->parser->parse('/foo/bar[/{baz}]');
+        $data = $this->parser->parse('/foo/bar[!/{baz}]');
         $expect = [['/foo/bar', '/foo/bar/([^/]+)'], ['baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testStaticAndOptionalWithToken()
     {
-        $data = $this->parser->parse('/foo/bar[/{baz:[a-z]+}]');
+        $data = $this->parser->parse('/foo/bar[!/{baz:[a-z]+}]');
         $expect = [['/foo/bar', '/foo/bar/([a-z]+)'], ['baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testStaticAndMultipleOptionalsWithToken()
     {
-        $data = $this->parser->parse('/foo[/bar/{bar:[a-z]+};/baz/{baz:\d+}]');
+        $data = $this->parser->parse('/foo[!/bar/{bar:[a-z]+};/baz/{baz:\d+}]');
         $expect = [['/foo', '/foo/bar/([a-z]+)', '/foo/bar/([a-z]+)/baz/(\d+)'], ['bar', 'baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableAndOptionalWithToken()
     {
-        $data = $this->parser->parse('/foo/{bar:\d+}[/{baz:[a-z]+}]');
+        $data = $this->parser->parse('/foo/{bar:\d+}[!/{baz:[a-z]+}]');
         $expect = [['/foo/(\d+)', '/foo/(\d+)/([a-z]+)'], ['bar', 'baz']];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableAndMultipleOptionalsWithToken()
     {
-        $data = $this->parser->parse('/foo/{slug:[a-z]+}[/{bar:[0-9]+};/baz/{baz:\d+}]');
+        $data = $this->parser->parse('/foo/{slug:[a-z]+}[!/{bar:[0-9]+};/baz/{baz:\d+}]');
         $expect = [
             ['/foo/([a-z]+)', '/foo/([a-z]+)/([0-9]+)', '/foo/([a-z]+)/([0-9]+)/baz/(\d+)'],
             ['slug', 'bar', 'baz']
@@ -123,14 +123,14 @@ class FastMarkParserTest extends TestCase
 
     public function testOptionalStartPathWithToken()
     {
-        $data = $this->parser->parse('[/{bar:[a-z]+};/test/{test:\w+}]');
+        $data = $this->parser->parse('[!/{bar:[a-z]+};/test/{test:\w+}]');
         $expect = [['/', '/([a-z]+)', '/([a-z]+)/test/(\w+)'], ['bar', 'test']];
         $this->assertSame($expect, $data);
     }
 
     public function testVariableAndMultipleOptionalsWithTokenAndSpace()
     {
-        $data = $this->parser->parse('/foo/ { slug : [a-z]+ } [ / { bar : [0-9]+ } ; / { baz : \d+ } ]');
+        $data = $this->parser->parse('/foo/ { slug : [a-z]+ } [! / { bar : [0-9]+ } ; / { baz : \d+ } ]');
         $expect = [
             ['/foo/([a-z]+)', '/foo/([a-z]+)/([0-9]+)', '/foo/([a-z]+)/([0-9]+)/(\d+)'],
             ['slug', 'bar', 'baz']
@@ -147,12 +147,12 @@ class FastMarkParserTest extends TestCase
                 'baz'
             )
         );
-        $this->parser->parse('/foo/{baz:[a-z]+}[/{bar:[0-9]+};{baz:\d+}]');
+        $this->parser->parse('/foo/{baz:[a-z]+}[!/{bar:[0-9]+};{baz:\d+}]');
     }
 
     public function testPerformanceWithComplexRoute()
     {
-        $complexRoute = '/api/v1/{version:\d+}/users/{user_id:\d+}[/profile[/{section:[a-z]+};/{subsection:[a-z]+}]]';
+        $complexRoute = '/api/v1/{version:\d+}/users/{user_id:\d+}[!/profile[/{section:[a-z]+};/{subsection:[a-z]+}]]';
 
         $result = $this->parser->parse($complexRoute);
 

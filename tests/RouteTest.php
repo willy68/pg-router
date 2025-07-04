@@ -9,6 +9,7 @@ use Pg\Router\Route;
 use Pg\Router\RouteCollector;
 use Pg\Router\RouteGroup;
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class RouteTest extends TestCase
@@ -26,7 +27,7 @@ class RouteTest extends TestCase
     /**
      * @throws Exception
      */
-    protected function getCollector()
+    protected function getCollector(): MockObject|RouteCollector
     {
         return $this->createMock(RouteCollector::class);
     }

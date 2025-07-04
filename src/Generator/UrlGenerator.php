@@ -50,16 +50,16 @@ class UrlGenerator implements GeneratorInterface
         $this->route = $route;
         $url = $this->route->getPath();
         $this->data = $attributes;
-        $urlStartWithBracket = str_starts_with($url, '[');
+        $urlStartWithBracket = str_starts_with($url, '[!');
 
         if ($urlStartWithBracket && empty($this->data)) {
             return '/';
         }
 
         $urlWithoutClosingBracket = rtrim($url, ']');
-        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(*F)|\[~x', $urlWithoutClosingBracket);
+        $parts = preg_split('~' . Regex::OPT_REGEX . '~x', $urlWithoutClosingBracket);
         $base = (trim($parts[0]) ?? '') ?: '/';
-        $optionalSegments = isset($parts[1]) ? '[' . $parts[1] . ']' : '';
+        $optionalSegments = isset($parts[1]) ? '[!' . $parts[1] . ']' : '';
 
         if ($base !== '/') {
             $this->buildTokenReplacements($base);

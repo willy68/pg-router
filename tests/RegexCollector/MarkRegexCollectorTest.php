@@ -106,7 +106,7 @@ class MarkRegexCollectorTest extends TestCase
 
     public function testPathWithVariableAndOptionalPartsWithMethodGet()
     {
-        $route = new Route('/foo/{bar:[a-z]+}[/{baz:\d+}]', $this->getCallback(), 'test', ['GET']);
+        $route = new Route('/foo/{bar:[a-z]+}[!/{baz:\d+}]', $this->getCallback(), 'test', ['GET']);
         $this->collector->addRoute($route);
 
         $expected = [
@@ -124,7 +124,7 @@ class MarkRegexCollectorTest extends TestCase
 
     public function testWithVariableAndOptionalPartsPathWithMethodAny()
     {
-        $route = new Route('/foo/{bar:[a-z]+}[/{baz:\d+}]', $this->getCallback(), 'test');
+        $route = new Route('/foo/{bar:[a-z]+}[!/{baz:\d+}]', $this->getCallback(), 'test');
         $this->collector->addRoute($route);
 
         $expected = [
@@ -143,7 +143,7 @@ class MarkRegexCollectorTest extends TestCase
     public function testWithVariableAndMultipleOptionalPartsPathWithMethodGet()
     {
         $route = new Route(
-            '/foo/{bar:[a-z]+}[/{baz:\d+};/{raz:[a-z]+}]',
+            '/foo/{bar:[a-z]+}[!/{baz:\d+};/{raz:[a-z]+}]',
             $this->getCallback(),
             'test',
             ['GET']
@@ -168,7 +168,7 @@ class MarkRegexCollectorTest extends TestCase
     public function testPathStartWithMultipleOptionalPartsWithMethodGet()
     {
         $route = new Route(
-            '[/{baz:\d+};/{raz:[a-z]+}]',
+            '[!/{baz:\d+};/{raz:[a-z]+}]',
             $this->getCallback(),
             'test',
             ['GET']
@@ -196,7 +196,7 @@ class MarkRegexCollectorTest extends TestCase
         for ($i = 0; $i <= 20; $i++) {
             $this->collector->addRoute(
                 new Route(
-                    "/foo$i/{bar:\d+}[/{baz:[a-z]+}]",
+                    "/foo$i/{bar:\d+}[!/{baz:[a-z]+}]",
                     $callback,
                     'test' . $i,
                     ['GET']

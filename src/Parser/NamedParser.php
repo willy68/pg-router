@@ -31,7 +31,7 @@ class NamedParser implements ParserInterface
         $optionalParts = $this->extractOptionalParts();
         if ($optionalParts) {
             $partsWithoutBrackets = rtrim($optionalParts, ']');
-            $optionalParts = '[' . $optionalParts;
+            $optionalParts = '[!' . $optionalParts;
             $parts = explode(';', $partsWithoutBrackets);
             $repl = $this->getRegexOptionalAttributesReplacement($parts);
             $this->regex = str_replace($optionalParts, $repl, $this->regex);
@@ -40,7 +40,7 @@ class NamedParser implements ParserInterface
 
     protected function extractOptionalParts(): ?string
     {
-        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(?!)|\[~x', $this->regex);
+        $parts = preg_split('~' . Regex::OPT_REGEX . '~x', $this->regex);
         return $parts[1] ?? null;
     }
 
@@ -79,7 +79,7 @@ class NamedParser implements ParserInterface
         // if the optional set is the first part of the path, make sure there
         // is a leading slash in the replacement before the optional attribute.
         $head = '';
-        if (str_starts_with($this->regex, '[')) {
+        if (str_starts_with($this->regex, '[!')) {
             $name = array_shift($parts);
             $name = ltrim($name, '/');
             $head = '/(?:' . trim($name);

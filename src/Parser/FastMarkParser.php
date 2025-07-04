@@ -107,7 +107,7 @@ class FastMarkParser implements ParserInterface
      */
     protected function containsOptionalSegments(string $path): bool
     {
-        return str_contains($path, '[');
+        return str_contains($path, '[!');
     }
 
     /**
@@ -119,10 +119,10 @@ class FastMarkParser implements ParserInterface
     protected function analyzeRoute(string $path): array
     {
         $pathWithoutClosing = rtrim($path, ']');
-        $isOptionalStart = str_starts_with($path, '[');
+        $isOptionalStart = str_starts_with($path, '[!');
 
         // Split into a base path and optional segments
-        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(*F)|\[~x', $pathWithoutClosing);
+        $parts = preg_split('~' . Regex::OPT_REGEX . '~x', $pathWithoutClosing);
         $basePath = (trim($parts[0]) ?? '') ?: '/';
         $optionalSegments = $parts[1] ?? '';
 

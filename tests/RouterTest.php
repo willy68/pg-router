@@ -78,7 +78,7 @@ class RouterTest extends TestCase
         ));
         $router->generateUri('test.uri');
 
-        // test with bad attribute
+        // test with a bad attribute
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
             'Parameter value for [%s] did not match the regex `%s`',
@@ -261,7 +261,7 @@ class RouterTest extends TestCase
 
         $router->route('/cache-test/{id:\d+}', 'TestController::cache', 'cache.route', ['GET']);
 
-        // First match to populate cache
+        // First match to populate the cache
         $request = new ServerRequest('GET', '/cache-test/123');
         $result = $router->match($request);
 
@@ -269,7 +269,7 @@ class RouterTest extends TestCase
         $this->assertSame('cache.route', $result->getMatchedRouteName());
         $this->assertSame(['id' => '123'], $result->getMatchedAttributes());
 
-        // Simulate a new Router instance with same cache config
+        // Simulate a new Router instance with the same cache config
         $router2 = new Router(
             null,
             null,

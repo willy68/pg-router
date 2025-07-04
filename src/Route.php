@@ -164,7 +164,7 @@ class Route
     }
 
     /**
-     * Get schemes array available for this route
+     * Get all schemes array available for this route
      *
      * @return null|string[] Returns HTTP_SCHEME_ANY or string of allowed schemes.
      */
@@ -199,7 +199,7 @@ class Route
     }
 
     /**
-     * Indicate whether any schemes is allowed by the route.
+     * Indicate whether any schemes are allowed by the route.
      */
     public function allowsAnyScheme(): bool
     {

@@ -68,7 +68,7 @@ class NamedRegexCollectorTest extends TestCase
 
     public function testWithVariableAndOptionalPartsPathWithMethodGet()
     {
-        $route = new Route('/foo/{bar:[a-z]+}[/{baz:\d+}]', $this->getCallback(), 'test', ['GET']);
+        $route = new Route('/foo/{bar:[a-z]+}[!/{baz:\d+}]', $this->getCallback(), 'test', ['GET']);
         $this->collector->addRoute($route);
 
         $expected = ['GET' => ['test' => ['regex' => '/foo/(?P<bar>[a-z]+)(?:/(?P<baz>\d+))?']]];
@@ -79,7 +79,7 @@ class NamedRegexCollectorTest extends TestCase
 
     public function testWithVariableAndOptionalPartsPathWithMethodAny()
     {
-        $route = new Route('/foo/{bar:[a-z]+}[/{baz:\d+}]', $this->getCallback(), 'test');
+        $route = new Route('/foo/{bar:[a-z]+}[!/{baz:\d+}]', $this->getCallback(), 'test');
         $this->collector->addRoute($route);
 
         $expected = ['ANY' => ['test' => ['regex' => '/foo/(?P<bar>[a-z]+)(?:/(?P<baz>\d+))?']]];
@@ -91,7 +91,7 @@ class NamedRegexCollectorTest extends TestCase
     public function testWithVariableAndMultipleOptionalPartsPathWithMethodGet()
     {
         $route = new Route(
-            '/foo/{bar:[a-z]+}[/{baz:\d+};/{raz:[a-z]+}]',
+            '/foo/{bar:[a-z]+}[!/{baz:\d+};/{raz:[a-z]+}]',
             $this->getCallback(),
             'test',
             ['GET']
@@ -107,7 +107,7 @@ class NamedRegexCollectorTest extends TestCase
     public function testPathStartWithMultipleOptionalPartsWithMethodGet()
     {
         $route = new Route(
-            '[/{baz:\d+};/{raz:[a-z]+}]',
+            '[!/{baz:\d+};/{raz:[a-z]+}]',
             $this->getCallback(),
             'test',
             ['GET']

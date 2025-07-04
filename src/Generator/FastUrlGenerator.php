@@ -124,11 +124,11 @@ class FastUrlGenerator implements GeneratorInterface
      */
     protected function parseRoutePath(string $path): array
     {
-        $isOptionalStart = str_starts_with($path, '[');
+        $isOptionalStart = str_starts_with($path, '[!');
         $pathWithoutClosing = rtrim($path, ']');
 
         // Separate static part from optional segments
-        $parts = preg_split('~' . Regex::REGEX . '(*SKIP)(*F)|\[~x', $pathWithoutClosing);
+        $parts = preg_split('~' . Regex::OPT_REGEX . '~x', $pathWithoutClosing);
         $basePath = (trim($parts[0]) ?? '') ?: '/';
         $optionalSegments = $parts[1] ?? '';
 
@@ -290,7 +290,7 @@ class FastUrlGenerator implements GeneratorInterface
                 break;
             }
 
-            // Adjust prefix for first optional segment if necessary
+            // Adjust prefix for the first optional segment if necessary
             if ($index === 0 && $routeData['isOptionalStart'] && str_starts_with(ltrim($segment), '/')) {
                 $segment = ltrim($segment, '/');
             }

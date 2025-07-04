@@ -60,7 +60,7 @@ class MarkDataMatcherTest extends TestCase
     public function testMethodNotAllowed(): void
     {
         $matcher = $this->getMatcher();
-        $result = $matcher->match('/submit/form/xyz', 'GET'); // GET not allowed for /submit
+        $result = $matcher->match('/submit/form/xyz', 'GET'); // Method GET not allowed for /submit
 
         $this->assertFalse($result);
         $this->assertEquals(['form'], $matcher->getFailedRoutesMethod());

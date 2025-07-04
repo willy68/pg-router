@@ -7,7 +7,7 @@ namespace Pg\Router\Parser;
 interface ParserInterface
 {
     /**
-     * Parse the path in multiple routes or one route depending on parser system.
+     * Parse the path in multiple routes or one route depending on a parser system.
      *
      * @param string $path
      * @return string|array
