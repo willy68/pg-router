@@ -29,7 +29,7 @@ namespace Pg\Router;
  * A general `addRoute()` method with created Route add route on the router.
  *
  * Internally, the class performs some checks for duplicate routes when
- * attaching via one of the exposed methods, and will raise an exception when a
+ * attaching via one of the exposed methods and will raise an exception when a
  * collision occurs.
  */
 class RouteCollector implements RouteCollectionInterface
@@ -47,7 +47,7 @@ class RouteCollector implements RouteCollectionInterface
     /**
      * Add a route to match.
      *
-     * Accepts a combination of a path and callback, and optionally the HTTP methods allowed.
+     * Accepts a combination of a path and callback, and optionally the allowed HTTP methods.
      *
      * @param string $path
      * @param callable|array|string $callback
@@ -63,12 +63,11 @@ class RouteCollector implements RouteCollectionInterface
     ): Route {
         $route = new Route($path, $callback, $name, $methods);
         $this->routes[$route->getName()] = $route;
-        $this->router->addRoute($route);
-        return $route;
+        return $this->router->addRoute($route);
     }
 
     /**
-     * Create multiple routes with same prefix
+     * Create multiple routes with the same prefix
      *
      * Ex:
      * ```
@@ -83,7 +82,7 @@ class RouteCollector implements RouteCollectionInterface
     public function group(string $prefix, callable $callable): RouteGroup
     {
         $group = new RouteGroup($prefix, $callable, $this);
-        /* run group to inject routes on router*/
+        /* run the group to inject routes on router*/
         $group();
 
         return $group;

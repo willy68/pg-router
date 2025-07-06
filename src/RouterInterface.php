@@ -19,7 +19,7 @@ interface RouterInterface
      * This method adds a route against which the underlying implementation may
      * match. Implementations 'MUST' aggregate route instances.
      */
-    public function addRoute(Route $route): void;
+    public function addRoute(Route $route): Route;
 
     /**
      * Add a route.

@@ -138,10 +138,11 @@ class Router implements RouterInterface
         return $route;
     }
 
-    public function addRoute(Route $route): void
+    public function addRoute(Route $route): Route
     {
         $this->duplicateRoute($route);
         $this->routes[$route->getName()] = $route;
+        return $route;
     }
 
     protected function duplicateRoute(Route $route): void
