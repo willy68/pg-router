@@ -63,7 +63,8 @@ class RouteCollector implements RouteCollectionInterface
     ): Route {
         $route = new Route($path, $callback, $name, $methods);
         $this->routes[$route->getName()] = $route;
-        return $this->router->addRoute($route);
+        $this->router->addRoute($route);
+        return $route;
     }
 
     /**
