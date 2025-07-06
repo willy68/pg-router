@@ -62,7 +62,7 @@ interface RouterInterface
      *
      * @throws Exception|RouteNotFoundException If unable to generate the given URI.
      */
-    public function generateUri(string $name, array $substitutions = [], array $options = []): string;
+    public function generateUri(string $name, array $substitutions = [], array $queryParams = []): string;
 
     /**
      * Retrieve all directly registered routes with the application.
@@ -75,4 +75,15 @@ interface RouterInterface
      * Retrieve Route by name
      */
     public function getRouteName(string $name): ?Route;
+
+    /**
+     * Clears the internal cache of the router.
+     *
+     * This method resets or removes any cache used to speed up route resolution.
+     *
+     * In development, disable caching or clear cache when routes change
+     *
+     * @return void
+     */
+    public function clearCache(): void;
 }

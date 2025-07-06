@@ -27,7 +27,7 @@ class Router implements RouterInterface
     public const CONFIG_CACHE_DIR = 'cache_dir';
     public const CONFIG_CACHE_POOL_FACTORY = 'cache_pool_factory';
 
-    private string $cacheDir = '/tmp/cache/router';
+    private string $cacheDir = '/tmp/cache';
     private string $cacheKey = 'router_parsed_data';
     /** @var callable: CachePoolInterface */
     private $cachePoolFactory = null;
@@ -43,15 +43,15 @@ class Router implements RouterInterface
 
     /**
      * <code>
-     * $router = new Router (
-     *      null,
-     *      null,
-     *      [
-     *          Router::CONFIG_CACHE_ENABLED => ($env === 'prod'),
-     *          Router::CONFIG_CACHE_DIR => '/tmp/cache/router',
-     *          Router::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...},
-     *      ]
-     * )
+      $router = new Router (
+           null,
+           null,
+           [
+               Router::CONFIG_CACHE_ENABLED => ($env === 'prod'),
+               Router::CONFIG_CACHE_DIR => '/tmp/cache',
+               Router::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...},
+           ]
+      )
      * </code>
      *
      * @param RegexCollectorInterface|null $regexCollector
@@ -249,9 +249,13 @@ class Router implements RouterInterface
         return $this->regexCollector ??= new MarkRegexCollector();
     }
 
-    public function generateUri(string $name, array $substitutions = [], array $options = []): string
+    public function generateUri(string $name, array $substitutions = [], array $queryParams = []): string
     {
-        return (new UrlGenerator($this))->generate($name, $substitutions);
+        $uri = (new UrlGenerator($this))->generate($name, $substitutions);
+        if (!empty($queryParams)) {
+            return $uri . '?' . http_build_query($queryParams);
+        }
+        return $uri;
     }
 
     /**
@@ -296,5 +300,12 @@ class Router implements RouterInterface
     public function getRouteName(string $name): ?Route
     {
         return $this->routes[$name] ?? null;
+    }
+
+    public function clearCache(): void
+    {
+        $this->cachePool?->clear();
+        $this->parsedData = null;
+        $this->hasParsedData = false;
     }
 }

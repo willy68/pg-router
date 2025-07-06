@@ -337,4 +337,34 @@ class RouterTest extends TestCase
         $this->assertTrue($result2->isSuccess());
         $this->assertSame('about', $result2->getMatchedRoute()->getName());
     }
+
+    /**
+     * @throws CacheException
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    public function testClearCacheEmptiesCacheAndResetsParsedData(): void
+    {
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cachePool->expects($this->once())->method('clear');
+
+        $router = new Router(null, null, [
+            Router::CONFIG_CACHE_ENABLED => true,
+            Router::CONFIG_CACHE_DIR => '/tmp/cache_dir'
+        ]);
+
+        // Injection of the mocked cache
+        $reflection = new ReflectionClass($router);
+        $property = $reflection->getProperty('cachePool');
+        $property->setAccessible(true);
+        $property->setValue($router, $cachePool);
+
+        // Simulate cached data
+        $reflection->getProperty('parsedData')->setValue($router, ['foo' => 'bar']);
+        $reflection->getProperty('hasParsedData')->setValue($router, true);
+
+        $router->clearCache();
+
+        $this->assertNull($reflection->getProperty('parsedData')->getValue($router));
+        $this->assertFalse($reflection->getProperty('hasParsedData')->getValue($router));
+    }
 }

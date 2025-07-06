@@ -21,7 +21,7 @@ A fast, flexible, and PSR-7 compatible router for PHP.
 ## Installation
 
 ```bash
-composer require pg/router
+composer require willy68/pg-router
 ```
 
 ## Basic Usage
@@ -58,8 +58,9 @@ $router->group('/admin', function ($group) {
 
 ## Optional Segments
 
-You can define optional segments in your routes by enclosing them in square brackets with exclamation mark at the beginning `[!...;...]`.  
-Optional segments should be separated by semicolon `;`.
+BC breaking change:  
+Optional segments in routes can be defined by enclosing them in square brackets with an exclamation mark at the start `[!...;...]`.  
+Optional segments must be separated by a semicolon `;`.
 
 ```php
 // Example route with optional segments

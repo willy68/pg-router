@@ -55,12 +55,12 @@ class RouteGroup
     /**
      * Add a route to match.
      *
-     * Accepts a combination of a path and callback, and optionally the HTTP methods allowed.
+     * Accepts a combination of a path and a callback, and optionally the HTTP methods allowed.
      *
-     * @param string $path
-     * @param callable|array|string $callback
-     * @param null|string $name The name of the route.
-     * @param null|array $methods HTTP method to accept; null indicates any.
+     * @param string $path The URI path to match
+     * @param callable|array|string $callback The handler for the route
+     * @param null|string $name The name of the route
+     * @param null|string[] $methods HTTP methods to accept (null for any)
      * @return Route
      */
     public function route(
@@ -94,7 +94,7 @@ class RouteGroup
     }
 
     /**
-     * Get the value of prefix
+     * Get the value of the prefix
      */
     public function getPrefix(): string
     {
