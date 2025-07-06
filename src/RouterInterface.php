@@ -54,7 +54,7 @@ interface RouterInterface
      * Generate a URI from the named route.
      *
      * Takes the named route and any substitutions and attempts to generate a
-     * URI from it. Additional router-dependent options may be passed.
+     * URI from it. Additional query params may be passed.
      *
      * The URI generated MUST NOT be escaped. If you wish to escape any part of
      * the URI, this should be performed afterward; consider passing the URI
