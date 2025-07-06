@@ -27,7 +27,7 @@ class Router implements RouterInterface
     public const CONFIG_CACHE_DIR = 'cache_dir';
     public const CONFIG_CACHE_POOL_FACTORY = 'cache_pool_factory';
 
-    private string $cacheDir = '/tmp/cache';
+    private string $cacheDir = 'tmp/cache';
     private string $cacheKey = 'router_parsed_data';
     /** @var callable: CachePoolInterface */
     private $cachePoolFactory = null;
