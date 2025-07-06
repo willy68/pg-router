@@ -63,6 +63,9 @@ class RouterTest extends TestCase
         $uri = $router->generateUri('test.uri', ['id' => 42]);
         $this->assertSame('/test/42', $uri);
 
+        $uri = $router->generateUri('test.uri', ['id' => 42], ['bar' => 'baz']);
+        $this->assertSame('/test/42?bar=baz', $uri);
+
         // test with bad route name
         $this->expectException(RouteNotFoundException::class);
         $this->expectExceptionMessage(

@@ -88,13 +88,13 @@ $response = $callback($request);
 ### Route Parameters
 
 ```php
-// Simple parameter 
+// Simple parameter, id matches any alphanumeric string
 $router->route('/user/{id}','handler', 'user.show', ['GET']);
 
 //Define route parameters with custom patterns:
-
 // Parameter with regex constraint 
 $router->route('/user/{id:\d+}','handler', 'user.show', ['GET']);
+
 // Multiple parameters 
 $router->route('/blog/{year:\d{4}}/{month:\d{2}}/{slug}','handler', 'blog.post', ['GET']);
 ```
@@ -105,7 +105,7 @@ $router->route('/blog/{year:\d{4}}/{month:\d{2}}/{slug}','handler', 'blog.post',
 
 ```php
 // Example route with optional segments
-$router->route('/article[!/{id};/{slug}]', function ($request) {
+$router->route('/article[!/{id: \d+};/{slug: \w+}]', function ($request) {
     $id = $request->getAttribute('id', null);
     $slug = $request->getAttribute('slug', null);
     // ...
@@ -144,7 +144,7 @@ $router->route('/admin/dashboard','handler', 'admin.dashboard', ['GET'])
 $router->group('/admin', function ($group) { 
     $group->route('/users', 'AdminController::users', 'admin.users', ['GET']);
     $group->route('/settings', 'AdminController::settings', 'admin.settings', ['GET']);
-})->middleware([AuthMiddleware::class, AdminMiddleware::class]);
+})->middlewares([AuthMiddleware::class, AdminMiddleware::class]);
 
 ```
 
@@ -154,6 +154,7 @@ Generate URLs using named routes:
 ```php
 // Define a named route
 $router->route('/user/{id:\d+}','handler', 'user.profile', ['GET']);
+
 // Generate URL
 $url = $router->generateUri('user.profile', ['id' => 123]); 
 // Result: /user/123
