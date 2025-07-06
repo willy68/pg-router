@@ -105,7 +105,7 @@ $router->route('/blog/{year:\d{4}}/{month:\d{2}}/{slug}','handler', 'blog.post',
 
 ```php
 // Example route with optional segments
-$router->route('/article[!/{id: \d+};/{slug: \w+}]', function ($request) {
+$router->route('/article[!/{id: \d+};/{slug: [\w-]+}]', function ($request) {
     $id = $request->getAttribute('id', null);
     $slug = $request->getAttribute('slug', null);
     // ...
