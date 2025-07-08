@@ -51,4 +51,13 @@ interface FileCacheInterface
      * @return void
      */
     public function delete(string $key): void;
+
+    /**
+     * Fetch data from cache or compute it if not cached
+     *
+     * @param string $key Cache key
+     * @param callable $dataFetcher Data fetcher function
+     * @return mixed Cached data or result of data fetcher
+     */
+    public function fetch(string $key, callable $dataFetcher): mixed;
 }

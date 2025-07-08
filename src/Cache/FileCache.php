@@ -11,17 +11,14 @@ class FileCache implements FileCacheInterface
 
     private string $cacheDir;
     private bool $useCache;
-    private $dataFetcher;
 
     public function __construct(
         ?string $cacheDir = null,
-        bool $useCache = false,
-        ?callable $dataFetcher = null
+        bool $useCache = false
     ) {
         self::$error_handler = function (): void {};
         $this->cacheDir = $cacheDir ?? 'tmp' . DIRECTORY_SEPARATOR . 'pg-router-cache';
         $this->useCache = $useCache;
-        $this->dataFetcher = $dataFetcher;
         $this->init();
     }
 
@@ -114,19 +111,15 @@ class FileCache implements FileCacheInterface
         return $this->cacheDir . DIRECTORY_SEPARATOR . md5($key) . '.php';
     }
 
-    public function fetch(string $key): mixed
+    public function fetch(string $key, callable $dataFetcher): mixed
     {
-        if ($this->dataFetcher === null) {
-            throw new RuntimeException('No data fetcher provided');
-        }
-
         $cachedData = $this->get($key);
 
         if ($cachedData !== null) {
             return $cachedData;
         }
 
-        $result = ($this->dataFetcher)();
+        $result = $dataFetcher();
         $this->set($key, $result);
 
         return $result;

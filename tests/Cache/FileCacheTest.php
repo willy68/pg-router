@@ -94,16 +94,18 @@ class FileCacheTest extends TestCase
         $key = 'test-key';
         $value = ['test' => 'value'];
         
-        $fileCache = new FileCache($this->cacheDir, true, function () use ($value) {
-            return $value;
-        });
+        $fileCache = new FileCache($this->cacheDir, true);
 
         // First fetch should call the data fetcher
-        $result = $fileCache->fetch($key);
+        $result = $fileCache->fetch($key,function () use ($value) {
+            return $value;
+        });
         $this->assertEquals($value, $result);
         
         // Second fetch should use cache
-        $result = $fileCache->fetch($key);
+        $result = $fileCache->fetch($key,function () use ($value) {
+            return $value;
+        });
         $this->assertEquals($value, $result);
     }
 }
