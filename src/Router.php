@@ -205,10 +205,7 @@ class Router implements RouterInterface
             return $this->parsedData;
         }
 
-        foreach ($this->routes as $route) {
-            $this->getRegexCollector()->addRoute($route);
-        }
-
+        $this->getRegexCollector()->addRoutes($this->routes);
         $data = $this->getRegexCollector()->getData();
 
         if ($this->cachePool) {

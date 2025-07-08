@@ -2,12 +2,12 @@
 
 namespace Pg\Router\Cache;
 
+use Closure;
 use RuntimeException;
-use Exception;
 
 class FileCache implements FileCacheInterface
 {
-    private static $error_handler;
+    private static array|string|Closure $error_handler;
 
     private string $cacheDir;
     private bool $useCache;
@@ -16,7 +16,8 @@ class FileCache implements FileCacheInterface
         ?string $cacheDir = null,
         bool $useCache = false
     ) {
-        self::$error_handler = function (): void {};
+        self::$error_handler = function (): void {
+        };
         $this->cacheDir = $cacheDir ?? 'tmp' . DIRECTORY_SEPARATOR . 'pg-router-cache';
         $this->useCache = $useCache;
         $this->init();
@@ -49,7 +50,7 @@ class FileCache implements FileCacheInterface
         $result = include $cachePath;
         restore_error_handler();
 
-        if (!is_array($result)) {
+        if ($result === false) {
             return null;
         }
 
@@ -106,11 +107,6 @@ class FileCache implements FileCacheInterface
         }
     }
 
-    private function getCachePath(string $key): string
-    {
-        return $this->cacheDir . DIRECTORY_SEPARATOR . md5($key) . '.php';
-    }
-
     public function fetch(string $key, callable $dataFetcher): mixed
     {
         $cachedData = $this->get($key);
@@ -123,5 +119,10 @@ class FileCache implements FileCacheInterface
         $this->set($key, $result);
 
         return $result;
+    }
+
+    private function getCachePath(string $key): string
+    {
+        return $this->cacheDir . DIRECTORY_SEPARATOR . md5($key) . '.php';
     }
 }

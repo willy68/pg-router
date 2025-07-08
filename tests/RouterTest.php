@@ -154,7 +154,6 @@ class RouterTest extends TestCase
 
         $reflection = new ReflectionClass($router);
         $property = $reflection->getProperty('cachePool');
-        $property->setAccessible(true);
         $property->setValue($router, $cachePool);
 
         $data = $this->invokeLoadParsedData($router);
@@ -170,7 +169,6 @@ class RouterTest extends TestCase
     {
         $reflection = new ReflectionClass($router);
         $method = $reflection->getMethod('loadParsedData');
-        $method->setAccessible(true);
         return $method->invoke($router);
     }
 
@@ -181,7 +179,6 @@ class RouterTest extends TestCase
     {
         $reflection = new ReflectionClass($router);
         $method = $reflection->getMethod('getParsedData');
-        $method->setAccessible(true);
         return $method->invoke($router);
     }
 
@@ -195,7 +192,7 @@ class RouterTest extends TestCase
         $route = new Route('/test', 'callback', 'test');
 
         $regexCollector = $this->createMock(RegexCollectorInterface::class);
-        $regexCollector->expects($this->once())->method('addRoute');
+        $regexCollector->expects($this->once())->method('addRoutes');
         $regexCollector->method('getData')->willReturn(['parsed' => 'data']);
 
         $cacheItem = $this->createMock(CacheItemInterface::class);
@@ -214,7 +211,6 @@ class RouterTest extends TestCase
 
         $reflection = new ReflectionClass($router);
         $property = $reflection->getProperty('cachePool');
-        $property->setAccessible(true);
         $property->setValue($router, $cachePool);
 
         $this->invokeParsedData($router);
@@ -358,7 +354,6 @@ class RouterTest extends TestCase
         // Injection of the mocked cache
         $reflection = new ReflectionClass($router);
         $property = $reflection->getProperty('cachePool');
-        $property->setAccessible(true);
         $property->setValue($router, $cachePool);
 
         // Simulate cached data

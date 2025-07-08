@@ -37,10 +37,10 @@ interface FileCacheInterface
     public function clear(): void;
 
     /**
-     * Check if cache exists for key
+     * Check if a cache exists for the key
      *
      * @param string $key Cache key
-     * @return bool True if cache exists
+     * @return bool True if a cache exists
      */
     public function has(string $key): bool;
 
@@ -53,7 +53,7 @@ interface FileCacheInterface
     public function delete(string $key): void;
 
     /**
-     * Fetch data from cache or compute it if not cached
+     * Fetch data from a cache or compute it if not cached
      *
      * @param string $key Cache key
      * @param callable $dataFetcher Data fetcher function

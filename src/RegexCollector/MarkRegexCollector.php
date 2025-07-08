@@ -13,6 +13,7 @@ use Pg\Router\Route;
  */
 class MarkRegexCollector implements RegexCollectorInterface
 {
+    protected array $routes = [];
     protected ?array $data = null;
     private ?ParserInterface $parser;
     private int $chunk;
@@ -39,19 +40,32 @@ class MarkRegexCollector implements RegexCollectorInterface
      */
     public function addRoute(Route $route): void
     {
-        $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
-        $name = $route->getName();
+        $this->routes[] = $route;
+    }
 
-        $data = $this->getParser()->parse($route->getPath());
+    public function addRoutes(array $routes): void
+    {
+        $this->routes = array_merge($this->routes, $routes);
+    }
 
-        foreach ($methods as $method) {
-            $this->data[$method][$name] = $data;
+    protected function parseRoutes(array $routes): void
+    {
+        foreach ($routes as $route) {
+            $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
+            $name = $route->getName();
+
+            $data = $this->getParser()->parse($route->getPath());
+
+            foreach ($methods as $method) {
+                $this->data[$method][$name] = $data;
+            }
         }
     }
 
     public function getData(): array
     {
         // Good place to cache data
+        $this->parseRoutes($this->routes);
         return $this->computeRegex();
     }
 
