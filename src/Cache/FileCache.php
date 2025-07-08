@@ -1,0 +1,134 @@
+<?php
+
+namespace Pg\Router\Cache;
+
+use RuntimeException;
+use Exception;
+
+class FileCache implements FileCacheInterface
+{
+    private static $error_handler;
+
+    private string $cacheDir;
+    private bool $useCache;
+    private $dataFetcher;
+
+    public function __construct(
+        ?string $cacheDir = null,
+        bool $useCache = false,
+        ?callable $dataFetcher = null
+    ) {
+        self::$error_handler = function (): void {};
+        $this->cacheDir = $cacheDir ?? 'tmp' . DIRECTORY_SEPARATOR . 'pg-router-cache';
+        $this->useCache = $useCache;
+        $this->dataFetcher = $dataFetcher;
+        $this->init();
+    }
+
+    public function init(): void
+    {
+        if (!$this->useCache || is_dir($this->cacheDir)) {
+            return;
+        }
+
+        set_error_handler(self::$error_handler);
+        $created = mkdir($this->cacheDir, 0755, true);
+        restore_error_handler();
+
+        if ($created === false) {
+            throw new RuntimeException('Impossible to create Cache directory: ' . $this->cacheDir);
+        }
+    }
+
+    public function get(string $key): mixed
+    {
+        if (!$this->useCache) {
+            return null;
+        }
+
+        $cachePath = $this->getCachePath($key);
+
+        set_error_handler(self::$error_handler);
+        $result = include $cachePath;
+        restore_error_handler();
+
+        if (!is_array($result)) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    public function set(string $key, mixed $value): void
+    {
+        if (!$this->useCache) {
+            return;
+        }
+
+        $cachePath = $this->getCachePath($key);
+        set_error_handler(self::$error_handler);
+        file_put_contents(
+            $cachePath,
+            '<?php return ' . var_export($value, true) . ';',
+            LOCK_EX
+        );
+        restore_error_handler();
+    }
+
+    public function clear(): void
+    {
+        if (!$this->useCache) {
+            return;
+        }
+
+        $files = glob($this->cacheDir . '/*.php');
+        foreach ($files as $file) {
+            unlink($file);
+        }
+    }
+
+    public function has(string $key): bool
+    {
+        if (!$this->useCache) {
+            return false;
+        }
+
+        $cachePath = $this->getCachePath($key);
+        return file_exists($cachePath);
+    }
+
+    public function delete(string $key): void
+    {
+        if (!$this->useCache) {
+            return;
+        }
+
+        $cachePath = $this->getCachePath($key);
+        if (file_exists($cachePath)) {
+            unlink($cachePath);
+        }
+    }
+
+    private function getCachePath(string $key): string
+    {
+        return $this->cacheDir . DIRECTORY_SEPARATOR . md5($key) . '.php';
+    }
+
+    public function fetch(string $key): mixed
+    {
+        if ($this->dataFetcher === null) {
+            throw new RuntimeException('No data fetcher provided');
+        }
+
+        $cachedData = $this->get($key);
+
+        if ($cachedData !== null) {
+            return $cachedData;
+        }
+
+        $result = ($this->dataFetcher)();
+        $this->set($key, $result);
+
+        return $result;
+    }
+}
