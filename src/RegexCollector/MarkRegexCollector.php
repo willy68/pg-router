@@ -48,9 +48,9 @@ class MarkRegexCollector implements RegexCollectorInterface
         $this->routes = array_merge($this->routes, $routes);
     }
 
-    protected function parseRoutes(array $routes): void
+    protected function parseRoutes(): void
     {
-        foreach ($routes as $route) {
+        foreach ($this->routes as $index => $route) {
             $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
             $name = $route->getName();
 
@@ -59,13 +59,15 @@ class MarkRegexCollector implements RegexCollectorInterface
             foreach ($methods as $method) {
                 $this->data[$method][$name] = $data;
             }
+            // Consume Routes set
+            unset($this->routes[$index]);
         }
     }
 
     public function getData(): array
     {
         // Good place to cache data
-        $this->parseRoutes($this->routes);
+        $this->parseRoutes();
         return $this->computeRegex();
     }
 

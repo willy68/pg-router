@@ -37,13 +37,13 @@ class NamedRegexCollector implements RegexCollectorInterface
      */
     public function getData(): array
     {
-        $this->parseRoutes($this->routes);
+        $this->parseRoutes();
         return $this->data;
     }
 
-    protected function parseRoutes(array $routes): void
+    protected function parseRoutes(): void
     {
-        foreach ($routes as $route) {
+        foreach ($this->routes as $index => $route) {
             $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
             $name = $route->getName();
 
@@ -52,6 +52,8 @@ class NamedRegexCollector implements RegexCollectorInterface
             foreach ($methods as $method) {
                 $this->data[$method][$name] = ['regex' => $regex];
             }
+            // Consume Routes set
+            unset($this->routes[$index]);
         }
     }
 

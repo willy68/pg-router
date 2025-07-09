@@ -209,4 +209,22 @@ class MarkRegexCollectorTest extends TestCase
         $this->assertCount(15, $data['GET'][0]['attributes']);
         $this->assertCount(6, $data['GET'][1]['attributes']);
     }
+
+    public function testRoutesCollectionEmpty()
+    {
+        $route = new Route(
+            '/foo/{bar:[a-z]+}[!/{baz:\d+};/{raz:[a-z]+}]',
+            $this->getCallback(),
+            'test',
+            ['GET']
+        );
+        $this->collector->addRoute($route);
+
+        $reflection = new \ReflectionClass($this->collector);
+        $property = $reflection->getProperty('routes');
+        $this->assertNotEmpty($property->getValue($this->collector));
+
+        $this->collector->getData();
+        $this->assertEmpty($property->getValue($this->collector));
+    }
 }

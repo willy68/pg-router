@@ -123,7 +123,7 @@ class Route
     }
 
     /**
-     * Indicate whether the specified method is allowed by the route.
+     * Indicate whether the route allows the specified method.
      *
      * @param string $method HTTP method to test.
      */
@@ -134,7 +134,7 @@ class Route
     }
 
     /**
-     * Indicate whether any method is allowed by the route.
+     * Indicates whether the route allows any HTTP method.
      */
     public function allowsAnyMethod(): bool
     {
@@ -187,7 +187,7 @@ class Route
     }
 
     /**
-     * Indicate whether the specified scheme is allowed by the route.
+     * Check if the route allows the specified scheme.
      *
      * @param string $scheme
      * @return bool
@@ -199,7 +199,7 @@ class Route
     }
 
     /**
-     * Indicate whether any schemes are allowed by the route.
+     * Checks if the route allows any scheme.
      */
     public function allowsAnyScheme(): bool
     {
