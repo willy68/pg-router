@@ -271,7 +271,7 @@ class RouterTest extends TestCase
      */
     public function testCacheStoresAndRestoresParsedData(): void
     {
-        $tmpDir = sys_get_temp_dir() . '/router_cache_' . uniqid();
+        $tmpDir = 'tmp/router_cache';
 
         $router = new Router(
             null,
