@@ -101,7 +101,7 @@ $router->route('/blog/{year:\d{4}}/{month:\d{2}}/{slug}','handler', 'blog.post',
 It is possible to define default tokens for parameters:
 ```php
 // The id matches a numeric string for this route
-$router->route('/user/{id}','handler', 'user.show', ['GET'])
+$route = $router->route('/user/{id}','handler', 'user.show', ['GET'])
     ->setTokens(['id' => '\d+']);
 
 // Default token for all routes
