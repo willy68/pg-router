@@ -98,6 +98,19 @@ $router->route('/user/{id:\d+}','handler', 'user.show', ['GET']);
 // Multiple parameters 
 $router->route('/blog/{year:\d{4}}/{month:\d{2}}/{slug}','handler', 'blog.post', ['GET']);
 ```
+It is possible to define default tokens for parameters:
+```php
+// The id matches a numeric string for this route
+$router->route('/user/{id}','handler', 'user.show', ['GET'])
+    ->setTokens(['id' => '\d+']);
+
+// Default token for all routes
+$router->setTokens(['id' => '\d+']);
+
+// Update and/or add tokens given by the Router
+$route->updateTokens(['id' => '[0-9]', 'slug' => '[a-zA-Z0-9_-]+']);
+
+```
 
 ### Optional Segments
 
