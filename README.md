@@ -108,7 +108,7 @@ $route = $router->route('/user/{id}','handler', 'user.show', ['GET'])
 $router->setTokens(['id' => '\d+']);
 
 // Update and/or add tokens given by the Router
-$route->updateTokens(['id' => '[0-9]', 'slug' => '[a-zA-Z0-9_-]+']);
+$route->updateTokens(['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9_-]+']);
 
 ```
 
