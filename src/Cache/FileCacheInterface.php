@@ -25,9 +25,9 @@ interface FileCacheInterface
      *
      * @param string $key Cache key
      * @param mixed $value Value to cache
-     * @return void
+     * @return int|bool
      */
-    public function set(string $key, mixed $value): void;
+    public function set(string $key, mixed $value): int|bool;
 
     /**
      * Clear all cache data
