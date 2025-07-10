@@ -15,6 +15,19 @@ class NamedParser implements ParserInterface
 
     public function parse(string $path, array $tokens = []): string|array
     {
+        if (empty($path)) {
+            return '/';
+        }
+
+        if ($path === '/') {
+            return '/';
+        }
+
+        // Quick check for simple static routes
+        if (!$this->containsVariables($path) && !$this->containsOptionalSegments($path)) {
+            return $path;
+        }
+
         $this->regex = $path;
         $this->tokens = $tokens;
 
@@ -22,6 +35,28 @@ class NamedParser implements ParserInterface
         $this->parseVariableParts();
 
         return $this->regex;
+    }
+
+    /**
+     * Check if a path contains variable patterns
+     *
+     * @param string $path
+     * @return bool
+     */
+    protected function containsVariables(string $path): bool
+    {
+        return str_contains($path, '{');
+    }
+
+    /**
+     * Check if a path contains optional segments
+     *
+     * @param string $path
+     * @return bool
+     */
+    protected function containsOptionalSegments(string $path): bool
+    {
+        return str_contains($path, '[!');
     }
 
     /**

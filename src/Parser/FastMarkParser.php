@@ -50,7 +50,7 @@ use function trim;
  * $result = $parser->parse('/user/{id:\d+}'); // Returns: [['/user/(\d+)'], ['id']]
  *
  * // Route with optional segments
- * $result = $parser->parse('/archive[/{year:\d+};/{month:\d+}]');
+ * $result = $parser->parse('/archive[!/{year:\d+};/{month:\d+}]');
  * // Returns: [['/archive', '/archive/(\d+)', '/archive/(\d+)/(\d+)'], ['year', 'month']]
  * ```
  *
