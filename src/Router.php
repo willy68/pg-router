@@ -26,6 +26,7 @@ class Router implements RouterInterface
     public const CONFIG_CACHE_ENABLED = 'cache_enabled';
     public const CONFIG_CACHE_DIR = 'cache_dir';
     public const CONFIG_CACHE_POOL_FACTORY = 'cache_pool_factory';
+    public const CONFIG_DEFAULT_TOKENS = 'default_tokens';
 
     private string $cacheDir = 'tmp/cache';
     private string $cacheKey = 'router_parsed_data';
@@ -52,8 +53,9 @@ class Router implements RouterInterface
                Router::CONFIG_CACHE_ENABLED => ($env === 'prod'),
                Router::CONFIG_CACHE_DIR => '/tmp/cache',
                Router::CONFIG_CACHE_POOL_FACTORY => function (): CacheItemPoolInterface {...},
+     *         Router::CONFIG_DEFAULT_TOKENS => ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'],
            ]
-      )
+      );
      * </code>
      *
      * @param RegexCollectorInterface|null $regexCollector
@@ -86,6 +88,7 @@ class Router implements RouterInterface
         $cacheEnabled = (bool)($config[self::CONFIG_CACHE_ENABLED] ?? false);
         $this->cacheDir = (string)($config[self::CONFIG_CACHE_DIR] ?? $this->cacheDir);
         $this->cachePoolFactory = $config[self::CONFIG_CACHE_POOL_FACTORY] ?? $this->getCachePoolFactory();
+        $this->tokens = $config[self::CONFIG_DEFAULT_TOKENS] ?? [];
 
         if ($cacheEnabled) {
             $this->loadCachePool();
@@ -165,7 +168,7 @@ class Router implements RouterInterface
      */
     public function match(Request $request): RouteResult
     {
-        $uri = $request->getUri()->getPath();
+        $uri = rawurldecode($request->getUri()->getPath());
         $method = $request->getMethod();
         $matcher = $this->getMatcher();
 

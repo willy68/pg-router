@@ -104,8 +104,14 @@ It is possible to define default tokens for parameters:
 $route = $router->route('/user/{id}','handler', 'user.show', ['GET'])
     ->setTokens(['id' => '\d+']);
 
-// Default token for all routes
+// Default token for all routes before adding a new one
 $router->setTokens(['id' => '\d+']);
+// Or with The Configuration in the constructor
+$router = new Router(
+    null,
+    null,
+    [Router::CONFIG_DEFAULT_TOKENS => ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+']]
+);
 
 // Update and/or add tokens given by the Router
 $route->updateTokens(['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9_-]+']);

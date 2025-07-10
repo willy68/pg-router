@@ -24,26 +24,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class RouterTest extends TestCase
 {
-    public function delTree(string $dir): bool
-    {
-        if (!is_dir($dir)) {
-            return false;
-        }
-
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($files as $fileInfo) {
-            $todo = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
-            $todo($fileInfo->getRealPath());
-        }
-
-        rmdir($dir);
-        return true;
-    }
-
     public function testAddAndGetRoute(): void
     {
         $router = new Router();
@@ -74,6 +54,21 @@ class RouterTest extends TestCase
 
         $router->setTokens(['id' => '\d+']);
         $this->assertSame(['id' => '\d+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'], $router->getTokens());
+    }
+
+    /**
+     * @throws CacheException
+     */
+    public function testTokensByConfig(): void
+    {
+        $router = new Router(
+            null,
+            null,
+            [
+                Router::CONFIG_DEFAULT_TOKENS => ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'],
+            ]
+        );
+        $this->assertSame(['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'], $router->getTokens());
     }
 
     /**
@@ -196,14 +191,24 @@ class RouterTest extends TestCase
         return $method->invoke($router);
     }
 
-    /**
-     * @throws ReflectionException
-     */
-    private function invokeParsedData(Router $router): array
+    public function delTree(string $dir): bool
     {
-        $reflection = new ReflectionClass($router);
-        $method = $reflection->getMethod('getParsedData');
-        return $method->invoke($router);
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileInfo) {
+            $todo = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
+            $todo($fileInfo->getRealPath());
+        }
+
+        rmdir($dir);
+        return true;
     }
 
     /**
@@ -241,6 +246,16 @@ class RouterTest extends TestCase
 
         // Clean up
         $this->delTree('/tmp/cache_dir');
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function invokeParsedData(Router $router): array
+    {
+        $reflection = new ReflectionClass($router);
+        $method = $reflection->getMethod('getParsedData');
+        return $method->invoke($router);
     }
 
     /**
