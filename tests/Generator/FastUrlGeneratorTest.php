@@ -2,6 +2,7 @@
 
 namespace PgTest\Router\Generator;
 
+use Pg\Router\Exception\MissingAttributeException;
 use Pg\Router\Exception\RouteNotFoundException;
 use Pg\Router\Generator\FastUrlGenerator;
 use Pg\Router\RouteCollector;
@@ -73,6 +74,20 @@ class FastUrlGeneratorTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Parameter value for [id] did not match the regex `([0-9]+)`');
         $generator->generate('test', ['id' => '4 2', 'foo' => 'bar']);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGenerateMissingAttribute()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/{id:([0-9]+)}/edit', 'foo', 'test');
+
+        $this->expectException(MissingAttributeException::class);
+        $this->expectExceptionMessage('Parameter value for [id] is missing for route [test]');
+        $generator->generate('test');
     }
 
     /**
