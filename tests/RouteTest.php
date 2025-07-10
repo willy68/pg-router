@@ -73,6 +73,9 @@ class RouteTest extends TestCase
 
         $route->setTokens(['id' => '\d+']);
         $this->assertSame($tokens, $route->getTokens());
+
+        $route->updateTokens(['id' => '\d+', 'slug' => '[a-zA-Z0-9_-]+']);
+        $this->assertSame(['id' => '\d+', 'slug' => '[a-zA-Z0-9_-]+'], $route->getTokens());
     }
 
     public function testRouteWithNullNameMatchPathMethodGet(): void

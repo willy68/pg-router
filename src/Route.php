@@ -209,7 +209,7 @@ class Route
     }
 
     /**
-     * Add new tokens, but priority is given to existing tokens
+     * Add new tokens, but preserve existing tokens
      * Through this method you can set tokens in an array ["id" => "[0-9]+", "slug" => "[a-zA-Z-]+[a-zA-Z0-9_-]+"]
      * @param array $tokens
      * @return $this
@@ -217,6 +217,18 @@ class Route
     public function setTokens(array $tokens): self
     {
         $this->tokens = $this->tokens + $tokens;
+        return $this;
+    }
+
+    /**
+     * Override existing tokens and/or add new
+     * Through this method you can set tokens in an array ["id" => "[0-9]+", "slug" => "[a-zA-Z0-9_-]+"]
+     * @param array $tokens
+     * @return $this
+     */
+    public function updateTokens(array $tokens): self
+    {
+        $this->tokens = $tokens + $this->tokens;
         return $this;
     }
 
