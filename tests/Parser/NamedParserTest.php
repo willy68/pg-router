@@ -32,6 +32,13 @@ class NamedParserTest extends TestCase
         $this->assertSame($expect, $data);
     }
 
+    public function testVariableWithDefaultTokenFromRoute()
+    {
+        $data = $this->dataParser->parse('/foo/{bar}', ['bar' => '[a-zA-Z_-]+']);
+        $expect = '/foo/(?P<bar>[a-zA-Z_-]+)';
+        $this->assertSame($expect, $data);
+    }
+
     public function testVariableWithToken()
     {
         $data = $this->dataParser->parse('/foo/{bar:[a-z]+}');

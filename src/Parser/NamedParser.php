@@ -10,10 +10,13 @@ use Pg\Router\Regex\Regex;
 class NamedParser implements ParserInterface
 {
     protected string $regex;
+    /** @var array  Default tokens ["tokenName" => "regex"]*/
+    protected array $tokens = [];
 
-    public function parse(string $path): string|array
+    public function parse(string $path, array $tokens = []): string|array
     {
         $this->regex = $path;
+        $this->tokens = $tokens;
 
         $this->parseOptionalParts();
         $this->parseVariableParts();
@@ -132,6 +135,12 @@ class NamedParser implements ParserInterface
      */
     protected function getSubpattern(string $name, ?string $token = null): string
     {
+        // is there a custom subpattern for the name?
+        if (isset($this->tokens[$name]) && is_string($this->tokens[$name])) {
+            // if $token is null use route token
+            $token = $token ?: $this->tokens[$name];
+        }
+
         // is there a custom subpattern for the name?
         if ($token) {
             return '(?P<' . $name . '>' . trim($token) . ')';

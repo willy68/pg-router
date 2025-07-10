@@ -36,6 +36,8 @@ class Route
     protected ?RouteGroup $group = null;
     protected ?string $name = null;
     protected ?array $methods = null;
+    /** @var array  Default tokens ["tokenName" => "regex"]*/
+    protected array $tokens = [];
 
 
     public function __construct(
@@ -204,6 +206,28 @@ class Route
     public function allowsAnyScheme(): bool
     {
         return $this->schemes === self::HTTP_SCHEME_ANY;
+    }
+
+    /**
+     * Add new tokens, but priority is given to existing tokens
+     * Through this method you can set tokens in an array ["id" => "[0-9]+", "slug" => "[a-zA-Z-]+[a-zA-Z0-9_-]+"]
+     * @param array $tokens
+     * @return $this
+     */
+    public function setTokens(array $tokens): self
+    {
+        $this->tokens = $this->tokens + $tokens;
+        return $this;
+    }
+
+    /**
+     * Get tokens
+     *
+     * @return array
+     */
+    public function getTokens(): array
+    {
+        return $this->tokens;
     }
 
     protected function validateHttpMethods(array $methods): array

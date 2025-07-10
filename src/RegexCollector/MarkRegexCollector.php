@@ -54,7 +54,7 @@ class MarkRegexCollector implements RegexCollectorInterface
             $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
             $name = $route->getName();
 
-            $data = $this->getParser()->parse($route->getPath());
+            $data = $this->getParser()->parse($route->getPath(), $route->getTokens());
 
             foreach ($methods as $method) {
                 $this->data[$method][$name] = $data;

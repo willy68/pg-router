@@ -47,7 +47,7 @@ class NamedRegexCollector implements RegexCollectorInterface
             $methods = $route->getAllowedMethods() ?? [self::ANY_METHODS];
             $name = $route->getName();
 
-            $regex = $this->getParser()->parse($route->getPath());
+            $regex = $this->getParser()->parse($route->getPath(), $route->getTokens());
 
             foreach ($methods as $method) {
                 $this->data[$method][$name] = ['regex' => $regex];

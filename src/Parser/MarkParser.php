@@ -11,16 +11,54 @@ class MarkParser implements ParserInterface
 {
     protected string $regex;
     protected array $routes;
+    /** @var array  Default tokens ["tokenName" => "regex"]*/
+    protected array $tokens = [];
 
-    public function parse(string $path): string|array
+    public function parse(string $path, array $tokens = []): string|array
     {
+        if (empty($path)) {
+            return [['/'], []];
+        }
+
+        if ($path === '/') {
+            return [['/'], []];
+        }
+
+        // Quick check for simple static routes
+        if (!$this->containsVariables($path) && !$this->containsOptionalSegments($path)) {
+            return [[$path], []];
+        }
+
         $this->regex = $path;
         $this->routes = [];
+        $this->tokens = $tokens;
 
         $routes = $this->extractRouteVariants();
         $this->compileRoutes($routes);
 
         return $this->routes;
+    }
+
+    /**
+     * Check if a path contains variable patterns
+     *
+     * @param string $path
+     * @return bool
+     */
+    protected function containsVariables(string $path): bool
+    {
+        return str_contains($path, '{');
+    }
+
+    /**
+     * Check if a path contains optional segments
+     *
+     * @param string $path
+     * @return bool
+     */
+    protected function containsOptionalSegments(string $path): bool
+    {
+        return str_contains($path, '[!');
     }
 
     /**
@@ -108,6 +146,12 @@ class MarkParser implements ParserInterface
      */
     protected function getSubpattern(string $name, ?string $token = null): string
     {
+        // is there a custom subpattern for the name?
+        if (isset($this->tokens[$name])) {
+            // if $token is null use route token
+            $token = $token ?: $this->tokens[$name];
+        }
+
         return $token ? '(' . trim($token) . ')' : '([^/]+)';
     }
 }

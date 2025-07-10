@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<ruleset name="PgRouter">
+<ruleset name="Pg-Router">
   <description>Formattage</description>
 
   <arg name="colors"/>
@@ -9,6 +9,5 @@
   <file>src</file>
 
   <rule ref="PSR12">
-    <exclude/>
   </rule>
 </ruleset>

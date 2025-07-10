@@ -37,6 +37,8 @@ class Router implements RouterInterface
     protected ?DuplicateDetectorInterface $detector = null;
     /** @var Route[] */
     protected array $routes = [];
+    /** @var array  Default tokens ["tokenName" => "regex"]*/
+    protected array $tokens = [];
     /** @var callable(array|object): MatcherInterface|null */
     protected $matcherFactory = null;
     private ?RegexCollectorInterface $regexCollector;
@@ -142,6 +144,9 @@ class Router implements RouterInterface
     {
         $this->duplicateRoute($route);
         $this->routes[$route->getName()] = $route;
+        if (!empty($this->tokens)) {
+            $route->setTokens($this->tokens);
+        }
         return $route;
     }
 
@@ -298,6 +303,24 @@ class Router implements RouterInterface
     public function getRouteName(string $name): ?Route
     {
         return $this->routes[$name] ?? null;
+    }
+
+    /**
+     * Add new tokens, but priority is given to existing tokens
+     * Through this method you can set tokens in an array ["id" => "[0-9]+", "slug" => "[a-zA-Z-]+[a-zA-Z0-9_-]+"]
+     *
+     * @param array $tokens
+     * @return $this
+     */
+    public function setTokens(array $tokens): self
+    {
+        $this->tokens = $this->tokens + $tokens;
+        return $this;
+    }
+
+    public function getTokens(): array
+    {
+        return $this->tokens;
     }
 
     public function clearCache(): void

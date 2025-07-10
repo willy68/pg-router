@@ -61,14 +61,10 @@ use function trim;
  */
 class FastMarkParser implements ParserInterface
 {
-    /**
-     * Parse route path into regex patterns and variable names
-     *
-     * @param string $path Route path to parse
-     * @return array Array containing [patterns, variables]
-     * @throws DuplicateAttributeException
-     */
-    public function parse(string $path): array
+    /** @var array  Default tokens ["tokenName" => "regex"]*/
+    protected array $tokens = [];
+
+    public function parse(string $path, array $tokens = []): array
     {
         if (empty($path)) {
             return [['/'], []];
@@ -82,6 +78,8 @@ class FastMarkParser implements ParserInterface
         if (!$this->containsVariables($path) && !$this->containsOptionalSegments($path)) {
             return [[$path], []];
         }
+
+        $this->tokens = $tokens;
 
         $routeData = $this->analyzeRoute($path);
         $variants = $this->buildRouteVariants($routeData);
@@ -223,7 +221,7 @@ class FastMarkParser implements ParserInterface
                 );
             }
 
-            $subPattern = $this->buildSubpattern($token);
+            $subPattern = $this->buildSubpattern($name, $token);
             $searchPatterns[] = $full;
             $replacements[] = $subPattern;
 
@@ -241,11 +239,18 @@ class FastMarkParser implements ParserInterface
     /**
      * Build regex subpattern for a variable
      *
+     * @param string $name
      * @param string|null $token
      * @return string
      */
-    protected function buildSubpattern(?string $token = null): string
+    protected function buildSubpattern(string $name, ?string $token = null): string
     {
+        // is there a custom subpattern for the name?
+        if (isset($this->tokens[$name])) {
+            // if $token is null use route token
+            $token = $token ?: $this->tokens[$name];
+        }
+
         return $token ? '(' . trim($token) . ')' : '([^/]+)';
     }
 }

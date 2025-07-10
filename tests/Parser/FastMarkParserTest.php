@@ -62,6 +62,13 @@ class FastMarkParserTest extends TestCase
         $this->assertSame($expect, $data);
     }
 
+    public function testVariableWithDefaultTokenFromRoute()
+    {
+        $data = $this->parser->parse('/foo/{bar}', ['bar' => '[a-zA-Z_-]+']);
+        $expect = [['/foo/([a-zA-Z_-]+)'], ['bar']];
+        $this->assertSame($expect, $data);
+    }
+
     public function testVariableWithToken()
     {
         $data = $this->parser->parse('/foo/{bar:[a-z]+}');
