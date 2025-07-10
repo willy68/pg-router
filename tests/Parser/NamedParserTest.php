@@ -17,6 +17,19 @@ class NamedParserTest extends TestCase
         parent::setUp();
         $this->dataParser = new NamedParser();
     }
+    public function testEmptyPath()
+    {
+        $data = $this->dataParser->parse('');
+        $expect = '/';
+        $this->assertSame($expect, $data);
+    }
+
+    public function testRootPath()
+    {
+        $data = $this->dataParser->parse('/');
+        $expect = '/';
+        $this->assertSame($expect, $data);
+    }
 
     public function testStaticPath()
     {
