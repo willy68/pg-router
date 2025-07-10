@@ -114,7 +114,24 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException;
+     */
+    public function testMatchFailureMethodNotAllowed(): void
+    {
+        $router = new Router();
+        $router->route('/hello', 'HelloController::sayHello', 'hello', ['GET']);
+
+        $request = new ServerRequest('POST', '/hello');
+
+        $result = $router->match($request);
+
+        $this->assertFalse($result->isSuccess());
+        $this->assertTrue($result->isMethodFailure());
+        $this->assertEquals(['GET'], $result->getAllowedMethods());
+    }
+
+    /**
+     * @throws InvalidArgumentException;
      */
     public function testMatchSuccess(): void
     {
@@ -127,22 +144,6 @@ class RouterTest extends TestCase
         $this->assertTrue($result->isSuccess());
         $this->assertSame('hello', $result->getMatchedRouteName());
         $this->assertSame(['name' => 'john'], $result->getMatchedAttributes());
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function testMatchFailureMethodNotAllowed(): void
-    {
-        $router = new Router();
-        $router->route('/hello', 'HelloController::sayHello', 'hello', ['GET']);
-
-        $request = new ServerRequest('POST', '/hello');
-        $result = $router->match($request);
-
-        $this->assertFalse($result->isSuccess());
-        $this->assertTrue($result->isMethodFailure());
-        $this->assertEquals(['GET'], $result->getAllowedMethods());
     }
 
     public function testCrudRoutes(): void
@@ -285,7 +286,6 @@ class RouterTest extends TestCase
 
     /**
      * @throws CacheException
-     * @throws InvalidArgumentException
      */
     public function testCacheStoresAndRestoresParsedData(): void
     {
@@ -335,7 +335,6 @@ class RouterTest extends TestCase
 
     /**
      * @throws CacheException
-     * @throws InvalidArgumentException
      */
     public function testMatchRouteWithCache(): void
     {
@@ -377,6 +376,43 @@ class RouterTest extends TestCase
 
         $this->assertTrue($result2->isSuccess());
         $this->assertSame('about', $result2->getMatchedRoute()->getName());
+    }
+
+    /**
+     * @throws CacheException
+     */
+    public function testCachePoolFactoryFails(): void
+    {
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cache pool factory must return an instance of CacheItemPoolInterface.'
+        );
+        $this->expectExceptionMessage('Cache pool factory must return an instance of CacheItemPoolInterface');
+        new Router(
+            null,
+            null,
+            [
+                Router::CONFIG_CACHE_ENABLED => true,
+                Router::CONFIG_CACHE_POOL_FACTORY => fn() => 'foo'
+            ]
+        );
+    }
+
+    /**
+     * @throws CacheException
+     */
+    public function testGetCachePoolFactoryMustBeCallable(): void
+    {
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cache pool factory must be a callable.');
+        new Router(
+            null,
+            null,
+            [
+                Router::CONFIG_CACHE_ENABLED => true,
+                Router::CONFIG_CACHE_POOL_FACTORY => 'foo'
+            ]
+        );
     }
 
     /**

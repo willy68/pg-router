@@ -108,12 +108,13 @@ class Router implements RouterInterface
                     'Cache pool factory must be a callable.'
                 );
             }
-            $this->cachePool = $cachePoolFactory();
-            if (!$this->cachePool instanceof CacheItemPoolInterface) {
+            $cachePool = $cachePoolFactory();
+            if (!$cachePool instanceof CacheItemPoolInterface) {
                 throw new \Symfony\Component\Cache\Exception\InvalidArgumentException(
                     'Cache pool factory must return an instance of CacheItemPoolInterface.'
                 );
             }
+            $this->cachePool = $cachePool;
         }
     }
 
