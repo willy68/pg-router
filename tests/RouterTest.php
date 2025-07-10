@@ -46,13 +46,16 @@ class RouterTest extends TestCase
 
     public function testPriorityTokens(): void
     {
-        $tokens = ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'];
+        $tokens = ['id' => '[0-9]+'];
         $router = new Router();
         $router->setTokens($tokens);
 
         $this->assertSame($tokens, $router->getTokens());
 
-        $router->setTokens(['id' => '\d+']);
+        $router->setTokens(['id' => '\d+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+']);
+        $this->assertSame(['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'], $router->getTokens());
+
+        $router->updateTokens(['id' => '\d+']);
         $this->assertSame(['id' => '\d+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'], $router->getTokens());
     }
 
