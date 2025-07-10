@@ -54,6 +54,27 @@ class RouteTest extends TestCase
         $route->setName('/bar');
     }
 
+    public function testAddAndGetTokens(): void
+    {
+        $tokens = ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'];
+        $route = new Route('/test', 'TestController::index', 'test.route', ['GET']);
+        $route->setTokens($tokens);
+
+        $this->assertSame($tokens, $route->getTokens());
+    }
+
+    public function testPriorityTokens(): void
+    {
+        $tokens = ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'];
+        $route = new Route('/test', 'TestController::index', 'test.route', ['GET']);
+        $route->setTokens($tokens);
+
+        $this->assertSame($tokens, $route->getTokens());
+
+        $route->setTokens(['id' => '\d+']);
+        $this->assertSame($tokens, $route->getTokens());
+    }
+
     public function testRouteWithNullNameMatchPathMethodGet(): void
     {
         $route = new Route('/foo', $this->callback, null, [RequestMethod::METHOD_GET]);

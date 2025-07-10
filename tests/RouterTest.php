@@ -52,6 +52,30 @@ class RouterTest extends TestCase
         $this->assertSame($route, $router->getRouteName('test.route'));
     }
 
+    public function testAddAndGetTokens(): void
+    {
+        $tokens = ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'];
+        $router = new Router();
+        $router->setTokens($tokens);
+        $route = $router->route('/test', 'TestController::index', 'test.route', ['GET']);
+
+        $this->assertSame($tokens, $router->getTokens());
+        $this->assertSame($tokens, $route->getTokens());
+        $this->assertSame($route, $router->getRouteName('test.route'));
+    }
+
+    public function testPriorityTokens(): void
+    {
+        $tokens = ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'];
+        $router = new Router();
+        $router->setTokens($tokens);
+
+        $this->assertSame($tokens, $router->getTokens());
+
+        $router->setTokens(['id' => '\d+']);
+        $this->assertSame(['id' => '\d+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'], $router->getTokens());
+    }
+
     /**
      * @throws Exception
      */

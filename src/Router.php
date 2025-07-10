@@ -306,7 +306,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Add new tokens, but priority is given to existing tokens
+     * Add new tokens, but priority is given to new tokens
      * Through this method you can set tokens in an array ["id" => "[0-9]+", "slug" => "[a-zA-Z-]+[a-zA-Z0-9_-]+"]
      *
      * @param array $tokens
@@ -314,7 +314,7 @@ class Router implements RouterInterface
      */
     public function setTokens(array $tokens): self
     {
-        $this->tokens = $this->tokens + $tokens;
+        $this->tokens = $tokens + $this->tokens;
         return $this;
     }
 
