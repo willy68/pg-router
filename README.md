@@ -6,6 +6,7 @@
 [![License](http://poser.pugx.org/willy68/pg-router/license)](https://packagist.org/packages/willy68/pg-router)
 [![PHP Version Require](http://poser.pugx.org/willy68/pg-router/require/php)](https://packagist.org/packages/willy68/pg-router)
 [![Coverage Status](https://coveralls.io/repos/github/willy68/pg-router/badge.svg?branch=main)](https://coveralls.io/github/willy68/pg-router?branch=main)
+[![Continuous Integration](https://github.com/willy68/pg-router/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/willy68/pg-router/actions/workflows/ci.yml)
 
 A fast, flexible, and PSR-7 compatible HTTP router for PHP applications. Built for performance with support for advanced routing patterns, middleware stacking, and route caching.
 
