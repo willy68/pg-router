@@ -17,9 +17,9 @@ class RequestMatcher implements RequestMatcherInterface
     public function __construct(
         ?string $path = null,
         array $methods = [],
-        string $host = null,
+        ?string $host = null,
         array $schemes = [],
-        string $port = null
+        ?string $port = null
     ) {
         $this->setPath($path);
         $this->setMethod($methods);
@@ -95,7 +95,7 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|null $path
      * @return  self
      */
-    public function setPath(?string $path): static
+    public function setPath(?string $path): self
     {
         $this->path = $path;
 
@@ -105,12 +105,12 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Set the value of a method
      *
-     * @param $method
+     * @param array $method
      * @return  self
      */
-    public function setMethod($method): static
+    public function setMethod(array $method): self
     {
-        $this->methods = !empty($method) ? array_map('strtoupper', (array) $method) : [];
+        $this->methods = !empty($method) ? array_map('strtoupper', $method) : [];
 
         return $this;
     }
@@ -121,7 +121,7 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|null $host
      * @return  self
      */
-    public function setHost(?string $host): static
+    public function setHost(?string $host): self
     {
         $this->host = $host;
 
@@ -131,12 +131,12 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Set the value of a scheme
      *
-     * @param $scheme
+     * @param array $scheme
      * @return  self
      */
-    public function setSchemes($scheme): static
+    public function setSchemes(array $scheme): self
     {
-        $this->schemes = !empty($scheme) ? array_map('strtolower', (array) $scheme) : [];
+        $this->schemes = !empty($scheme) ? array_map('strtolower', $scheme) : [];
 
         return $this;
     }
@@ -147,7 +147,7 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|null $port
      * @return  self
      */
-    public function setPort(?string $port): static
+    public function setPort(?string $port): self
     {
         $this->port = $port;
 
