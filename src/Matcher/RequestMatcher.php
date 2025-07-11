@@ -15,10 +15,10 @@ class RequestMatcher implements RequestMatcherInterface
     private ?array $matchedParams = null;
 
     public function __construct(
-        string $path = null,
-        array $methods = null,
+        ?string $path = null,
+        array $methods = [],
         string $host = null,
-        array $schemes = null,
+        array $schemes = [],
         string $port = null
     ) {
         $this->setPath($path);
@@ -110,7 +110,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function setMethod($method): static
     {
-        $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : [];
+        $this->methods = !empty($method) ? array_map('strtoupper', (array) $method) : [];
 
         return $this;
     }
@@ -136,7 +136,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function setSchemes($scheme): static
     {
-        $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : [];
+        $this->schemes = !empty($scheme) ? array_map('strtolower', (array) $scheme) : [];
 
         return $this;
     }

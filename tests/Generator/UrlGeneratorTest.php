@@ -79,6 +79,20 @@ class UrlGeneratorTest extends TestCase
     /**
      * @throws \Exception
      */
+    public function testGenerateMatchingExceptionForOptional()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog[!/{id:([0-9]+)}]', 'foo', 'test');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter value for [id] did not match the regex `([0-9]+)`');
+        $generator->generate('test', ['id' => '4 2', 'foo' => 'bar']);
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testGenerateMissingAttribute()
     {
         $collector = $this->getCollector();
