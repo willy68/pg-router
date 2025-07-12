@@ -110,7 +110,7 @@ class RequestMatcherTest extends TestCase
         $request = $request->withUri(
             $request->getUri()
                 ->withScheme('https')
-                ->withHost('example.org')
+                ->withHost('example.com')
                 ->withPort(443)
         );
 
