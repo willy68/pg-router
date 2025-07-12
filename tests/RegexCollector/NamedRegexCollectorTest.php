@@ -137,4 +137,30 @@ class NamedRegexCollectorTest extends TestCase
         $this->collector->getData();
         $this->assertEmpty($property->getValue($this->collector));
     }
+
+    public function testRoutesCollectionAddRoutes()
+    {
+        $route = new Route(
+            '/foo/{bar:[a-z]+}[!/{baz:\d+};/{raz:[a-z]+}]',
+            $this->getCallback(),
+            'test',
+            ['GET']
+        );
+        $route2 = new Route(
+            '/baz/{bar:[a-z]+}',
+            $this->getCallback(),
+            'test2',
+            ['GET']
+        );
+        $routes = [$route, $route2];
+        $this->collector->addRoutes($routes);
+
+        $reflection = new \ReflectionClass($this->collector);
+        $property = $reflection->getProperty('routes');
+        $this->assertNotEmpty($property->getValue($this->collector));
+        $this->assertCount(2, $property->getValue($this->collector));
+
+        $this->collector->getData();
+        $this->assertEmpty($property->getValue($this->collector));
+    }
 }
