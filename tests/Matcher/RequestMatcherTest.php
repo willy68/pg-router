@@ -3,9 +3,9 @@
 namespace PgTest\Router\Matcher;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use GuzzleHttp\Psr7\Uri;
 use Pg\Router\Matcher\RequestMatcher;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ServerRequestInterface;
 
 class RequestMatcherTest extends TestCase
 {
@@ -87,32 +87,54 @@ class RequestMatcherTest extends TestCase
 
     public function testDoesNotMatchWrongScheme()
     {
-        $matcher = new RequestMatcher('/users/{id}', ['GET'], null, ['https']);
-        $request = new ServerRequest('GET', '/profile/123');
-        $request = $request->withUri($request->getUri()->withScheme('http'));
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], null, ['http']);
+        $uri = new Uri('https://example.com/users/123');
+        $request = new ServerRequest('GET', $uri);
 
         $this->assertFalse($matcher->match($request));
+    }
+
+    public function testDoesMatchScheme()
+    {
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], null, ['https']);
+        $uri = new Uri('https://example.com/users/123');
+        $request = new ServerRequest('GET', $uri);
+
+        $this->assertTrue($matcher->match($request));
     }
 
     public function testDoesNotMatchWrongHost()
     {
         $matcher = new RequestMatcher('/users/{id}', ['GET'], 'example.com', ['https']);
-        $request = new ServerRequest('GET', '/profile/123');
-        $request = $request->withUri($request->getUri()->withScheme('https')->withHost('example.org'));
+        $uri = new Uri('https://example.org/users/123');
+        $request = new ServerRequest('GET', $uri);
 
         $this->assertFalse($matcher->match($request));
+    }
+
+    public function testDoesMatchHost()
+    {
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], 'example.com', ['https']);
+        $uri = new Uri('https://example.com/users/123');
+        $request = new ServerRequest('GET', $uri);
+
+        $this->assertTrue($matcher->match($request));
     }
 
     public function testDoesNotMatchWrongPort()
     {
         $matcher = new RequestMatcher('/users/{id}', ['GET'], 'example.com', ['https'], '80');
-        $request = new ServerRequest('GET', '/profile/123');
-        $request = $request->withUri(
-            $request->getUri()
-                ->withScheme('https')
-                ->withHost('example.com')
-                ->withPort(443)
-        );
+        $uri = new Uri('https://example.com:81/users/123');
+        $request = new ServerRequest('GET', $uri);
+
+        $this->assertFalse($matcher->match($request));
+    }
+
+    public function testDoesMatchPort()
+    {
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], 'example.com', ['https'], '80');
+        $uri = new Uri('https://example.com:80/users/123');
+        $request = new ServerRequest('GET', $uri);
 
         $this->assertFalse($matcher->match($request));
     }
