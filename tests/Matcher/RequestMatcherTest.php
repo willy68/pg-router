@@ -5,6 +5,7 @@ namespace PgTest\Router\Matcher;
 use GuzzleHttp\Psr7\ServerRequest;
 use Pg\Router\Matcher\RequestMatcher;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RequestMatcherTest extends TestCase
 {
@@ -82,5 +83,37 @@ class RequestMatcherTest extends TestCase
 
         $this->assertTrue($matcher->match($request));
         $this->assertSame(['userId' => '5', 'postId' => '42'], $matcher->getPathParams());
+    }
+
+    public function testDoesNotMatchWrongScheme()
+    {
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], null, ['https']);
+        $request = new ServerRequest('GET', '/profile/123');
+        $request = $request->withUri($request->getUri()->withScheme('http'));
+
+        $this->assertFalse($matcher->match($request));
+    }
+
+    public function testDoesNotMatchWrongHost()
+    {
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], 'example.com', ['https']);
+        $request = new ServerRequest('GET', '/profile/123');
+        $request = $request->withUri($request->getUri()->withScheme('https')->withHost('example.org'));
+
+        $this->assertFalse($matcher->match($request));
+    }
+
+    public function testDoesNotMatchWrongPort()
+    {
+        $matcher = new RequestMatcher('/users/{id}', ['GET'], 'example.com', ['https'], '80');
+        $request = new ServerRequest('GET', '/profile/123');
+        $request = $request->withUri(
+            $request->getUri()
+                ->withScheme('https')
+                ->withHost('example.org')
+                ->withPort(443)
+        );
+
+        $this->assertFalse($matcher->match($request));
     }
 }
