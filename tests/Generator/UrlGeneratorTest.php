@@ -65,6 +65,19 @@ class UrlGeneratorTest extends TestCase
     /**
      * @throws \Exception
      */
+    public function testGenerateWithInlineParamWithoutToken()
+    {
+        $collector = $this->getCollector();
+        $generator = $this->getGenerator($collector);
+        $collector->route('/blog/{id}/edit', 'foo', 'test');
+
+        $url = $generator->generate('test', ['id' => 'id', 'foo' => 'bar']);
+        $this->assertEquals('/blog/id/edit', $url);
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testGenerateMatchingException()
     {
         $collector = $this->getCollector();
@@ -122,7 +135,8 @@ class UrlGeneratorTest extends TestCase
     {
         $collector = $this->getCollector();
         $generator = $this->getGenerator($collector);
-        $collector->route('/archive/{ category }[! / { year }; / { month } ;/{day}]', 'foo', 'test');
+        $collector->route('/archive/{ category }[! / { year }; / { month } ;/{day}]', 'foo', 'test')
+            ->setTokens(['year' => '[0-9]{4}', 'month' => '[0-9]{2}', 'day' => '[0-9]{2}']);
 
         // some
         $url = $generator->generate('test', [

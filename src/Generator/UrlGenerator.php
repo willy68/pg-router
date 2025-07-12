@@ -29,6 +29,7 @@ class UrlGenerator implements GeneratorInterface
     protected Route $route;
     protected array $data = [];
     protected array $repl = [];
+    protected array $tokens = [];
     protected RouterInterface|RouteCollectionInterface $router;
 
 
@@ -49,6 +50,7 @@ class UrlGenerator implements GeneratorInterface
 
         $this->route = $route;
         $url = $this->route->getPath();
+        $this->tokens = $route->getTokens();
         $this->data = $attributes;
         $urlStartWithBracket = str_starts_with($url, '[!');
 
@@ -88,7 +90,7 @@ class UrlGenerator implements GeneratorInterface
         if (preg_match_all('~' . Regex::REGEX . '~x', $base, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $name = $match[1];
-                $token = $match[2] ?? "([^/]+)";
+                $token = $match[2] ?? ($this->tokens[$name] ?? '([^/]+)');
 
                 if (!isset($this->data[$name])) {
                     throw new MissingAttributeException(sprintf(
@@ -162,8 +164,8 @@ class UrlGenerator implements GeneratorInterface
         $replacements = [];
 
         foreach ($names as $name) {
-            $token = is_array($name) ? $name[1] : '([^/]+)';
             $paramName = is_array($name) ? $name[0] : $name;
+            $token = is_array($name) ? $name[1] : ($this->tokens[$paramName] ?? '([^/]+)');
 
             if (!isset($this->data[$paramName])) {
                 return ''; // Options are sequentially optional

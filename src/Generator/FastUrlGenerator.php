@@ -36,7 +36,7 @@ use function trim;
  * - Full compatibility with existing GeneratorInterface
  *
  * Performance benefits:
- * - First generation: Parses and caches route structure
+ * - First generation: Parses and caches the route's structure
  * - Subsequent generations: Uses cached data for faster processing
  * - Reduced regex operations and string parsing overhead
  * - Optimized for high-traffic applications
@@ -65,6 +65,7 @@ class FastUrlGenerator implements GeneratorInterface
 {
     protected RouteCollectionInterface|RouterInterface $router;
     protected array $routeCache = [];
+    protected array $tokens = [];
 
     public function __construct(RouteCollectionInterface|RouterInterface $router)
     {
@@ -85,6 +86,7 @@ class FastUrlGenerator implements GeneratorInterface
     {
         $route = $this->getRoute($name);
         $path = $route->getPath();
+        $this->tokens = $route->getTokens();
 
         // Cache already analyzed routes to optimize performance
         if (!isset($this->routeCache[$name])) {
@@ -117,7 +119,7 @@ class FastUrlGenerator implements GeneratorInterface
     }
 
     /**
-     * Analyzes route path and extracts structure
+     * Analyzes the route path and extracts structure
      *
      * @param string $path
      * @return array
@@ -156,7 +158,7 @@ class FastUrlGenerator implements GeneratorInterface
                 $variables[] = [
                     'full' => $match[0],
                     'name' => $match[1],
-                    'token' => $match[2] ?? '([^/]+)',
+                    'token' => $match[2] ?? ($this->tokens[$match[1]] ?? '([^/]+)'),
                 ];
             }
         }
@@ -242,7 +244,7 @@ class FastUrlGenerator implements GeneratorInterface
                 ));
             }
 
-            $value = (string) $attributes[$name];
+            $value = (string)$attributes[$name];
 
             // Token validation
             if (!preg_match('~^' . $token . '$~x', $value)) {
@@ -290,7 +292,7 @@ class FastUrlGenerator implements GeneratorInterface
                 break;
             }
 
-            // Adjust prefix for the first optional segment if necessary
+            // Adjust the prefix for the first optional segment if necessary
             if ($index === 0 && $routeData['isOptionalStart'] && str_starts_with(ltrim($segment), '/')) {
                 $segment = ltrim($segment, '/');
             }
