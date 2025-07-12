@@ -32,9 +32,9 @@ interface FileCacheInterface
     /**
      * Clear all cache data
      *
-     * @return void
+     * @return bool
      */
-    public function clear(): void;
+    public function clear(): bool;
 
     /**
      * Check if a cache exists for the key
@@ -48,9 +48,9 @@ interface FileCacheInterface
      * Delete cache data by key
      *
      * @param string $key Cache key
-     * @return void
+     * @return bool
      */
-    public function delete(string $key): void;
+    public function delete(string $key): bool;
 
     /**
      * Fetch data from a cache or compute it if not cached

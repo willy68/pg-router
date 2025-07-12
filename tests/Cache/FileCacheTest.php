@@ -60,6 +60,22 @@ class FileCacheTest extends TestCase
         $this->assertFalse($this->fileCache->has($key2));
     }
 
+    public function testWhenCacheDisabled(): void
+    {
+        $key1 = 'test-key1';
+        $value = ['test' => 'value'];
+
+        $cache = new FileCache($this->cacheDir, false);
+
+        $this->assertFalse($cache->set($key1, $value));
+
+        $this->assertFalse($cache->has($key1));
+
+        $this->assertFalse($cache->delete($key1));
+
+        $this->assertFalse($cache->clear());
+    }
+
     public function testCacheDisabled(): void
     {
         $fileCache = new FileCache($this->cacheDir, false);

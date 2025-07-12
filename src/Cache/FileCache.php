@@ -38,16 +38,17 @@ class FileCache implements FileCacheInterface
         }
     }
 
-    public function clear(): void
+    public function clear(): bool
     {
         if (!$this->useCache) {
-            return;
+            return false;
         }
 
         $files = glob($this->cacheDir . '/*.php');
         foreach ($files as $file) {
             unlink($file);
         }
+        return true;
     }
 
     public function has(string $key): bool
@@ -65,16 +66,17 @@ class FileCache implements FileCacheInterface
         return $this->cacheDir . DIRECTORY_SEPARATOR . md5($key) . '.php';
     }
 
-    public function delete(string $key): void
+    public function delete(string $key): bool
     {
         if (!$this->useCache) {
-            return;
+            return false;
         }
 
         $cachePath = $this->getCachePath($key);
         if (file_exists($cachePath)) {
             unlink($cachePath);
         }
+        return true;
     }
 
     public function fetch(string $key, callable $dataFetcher): mixed
