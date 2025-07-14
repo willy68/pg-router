@@ -241,9 +241,9 @@ $router->clearCache();
 `Router::CONFIG_CACHE_POOL_FACTORY` allows you to use a custom PSR-6 compatible cache pool implementation,  
 but this parameter is optional.
 
-### Using FileCache with MarkRegexCollector
+### Using FileCache with Regex Collector
 
-The router uses `MarkRegexCollector` by default to compile and cache route patterns. The `FileCache` class provides a simple file-based caching solution that works well with the `MarkRegexCollector`.
+The `FileCache` class provides a simple file-based caching solution that works well with all regex collectors.
 
 Here's a practical example of using `FileCache` with route collectors:
 
@@ -298,7 +298,7 @@ foreach ($collectors as $name => $collector) {
 
 In this example:
 1. We create a `FileCache` instance pointing to a cache directory
-2. We set up a `MarkRegexCollector` and other Collectors for route collection
+2. We set up all available Collectors for route collection
 3. We use `fetch()` which will return cached data if available, or execute the callback to generate and cache the data
 4. We measure and display the execution time to demonstrate the performance benefit of caching
 
