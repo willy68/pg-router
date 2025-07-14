@@ -135,32 +135,19 @@ class Psr16FileCacheTest extends TestCase
     public function testExpiredItem(): void
     {
         $key = 'test-key';
+        $key2 = 'test-key2';
         $value = 'test-value';
 
         $this->cache->set($key, $value, 1);
+        $this->cache->set($key2, $value, new DateInterval('PT1S'));
         $this->assertEquals($value, $this->cache->get($key));
+        $this->assertEquals($value, $this->cache->get($key2));
 
         // Sleep for just over 1 second to ensure the item expires
         usleep(2100000); // 2.1 seconds
 
         $this->assertNull($this->cache->get($key));
-    }
-
-    /**
-     * @throws PsrInvalidArgumentException
-     */
-    public function testExpiredItemWithDateInterval(): void
-    {
-        $key = 'test-key';
-        $value = 'test-value';
-
-        $this->cache->set($key, $value, new DateInterval('PT1S'));
-        $this->assertEquals($value, $this->cache->get($key));
-
-        // Sleep for just over 1 second to ensure the item expires
-        usleep(2100000); // 2.1 seconds
-
-        $this->assertNull($this->cache->get($key));
+        $this->assertNull($this->cache->get($key2));
     }
 
     /**
