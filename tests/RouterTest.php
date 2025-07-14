@@ -146,6 +146,18 @@ class RouterTest extends TestCase
         $this->assertSame(['name' => 'john'], $result->getMatchedAttributes());
     }
 
+    public function testGroupRoutes(): void
+    {
+        $router = new Router();
+        $group = $router->group('/users', function ($group) {
+            $group->route('/admin-test', 'controller', 'admin-test', ['GET']);
+            $group->route('post/{id}', 'postController', 'post-show', ['GET']);
+        });
+
+        $this->assertNotEmpty($router->getRoutes());
+        $this->assertEquals($group, $router->getRouteName('admin-test')->getParentGroup());
+    }
+
     public function testCrudRoutes(): void
     {
         $router = new Router();
