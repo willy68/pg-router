@@ -23,7 +23,7 @@ class FileCache implements FileCacheInterface
         $this->init();
     }
 
-    public function init(): void
+    protected function init(): void
     {
         if (!$this->useCache || is_dir($this->cacheDir)) {
             return;

@@ -232,6 +232,76 @@ $router->clearCache();
 `Router::CONFIG_CACHE_POOL_FACTORY` allows you to use a custom PSR-6 compatible cache pool implementation,  
 but this parameter is optional.
 
+### Using FileCache with MarkRegexCollector
+
+The router uses `MarkRegexCollector` by default to compile and cache route patterns. The `FileCache` class provides a simple file-based caching solution that works well with the `MarkRegexCollector`.
+
+Here's a practical example of using `FileCache` with route collectors:
+
+```php
+use Pg\Router\Cache\FileCache;
+use Pg\Router\RegexCollector\MarkRegexCollector;
+use Pg\Router\RegexCollector\NamedRegexCollector;
+use Pg\Router\RegexParser\FastMarkParser;
+
+// Initialize the cache with a custom directory
+$fileCache = new FileCache(
+    cacheDir: __DIR__ . '../tmp/cache/router',  // Directory to store cache files
+    useCache: true                                // Enable caching
+);
+
+// Example of using the cache with a route collection
+$collectors = [
+    'MarkRegexCollector' => new MarkRegexCollector(),
+    'NamedCollector' => new NamedRegexCollector(),
+    'FastMarkCollector' => new MarkRegexCollector(new FastMarkParser()),
+    // Add other collectors if needed
+];
+
+// Sample routes
+$allRoutes = [
+    // Your route definitions here
+];
+
+foreach ($collectors as $name => $collector) {
+    $collector->addRoutes($allRoutes);
+    $hasCache = $fileCache->has($name);
+    
+    // Fetch data with caching
+    // The callback will only execute if the cache is empty
+    $startTime = microtime(true);
+    $routesData = $fileCache->fetch($name, [$collector, 'getData']);
+    $duration = microtime(true) - $startTime;
+
+    echo "<h2>Collector: $name</h2>";
+    echo "<div style='color:green;'>";
+    echo "Execution time: " . number_format($duration * 1000, 4) . " ms<br>";
+    echo "Cached: " . ($hasCache ? 'Yes' : 'No') . "<br>";
+    echo "</div>";
+}
+
+// Clear specific cache if needed
+// $fileCache->delete('MarkRegexCollector');
+
+// Or clear all caches
+// $fileCache->clear();
+```
+
+In this example:
+1. We create a `FileCache` instance pointing to a cache directory
+2. We set up a `MarkRegexCollector` and other Collectors for route collection
+3. We use `fetch()` which will return cached data if available, or execute the callback to generate and cache the data
+4. We measure and display the execution time to demonstrate the performance benefit of caching
+
+The `fetch()` method is particularly useful as it handles both the cache check and the callback execution in one call, making your code cleaner and more efficient.
+
+Using the returned data directly in a Matcher like:
+```php
+$data = $fileCache->fetch($name, [$collector, 'getData']);
+$matcher = new \Pg\Router\Matcher\MarkDataMatcher($data);
+$matches = $matcher->match('/post/{id: \d+}', 'GET');
+```
+
 ## Performance
 pg-router is designed for high performance:
 - **Optimized Route Matching**: Uses efficient algorithms for route compilation and matching

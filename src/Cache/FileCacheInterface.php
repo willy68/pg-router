@@ -8,11 +8,6 @@ namespace Pg\Router\Cache;
 interface FileCacheInterface
 {
     /**
-     * Initialize the cache
-     */
-    public function init(): void;
-
-    /**
      * Get cache data by key
      *
      * @param string $key Cache key
