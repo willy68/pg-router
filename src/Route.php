@@ -103,22 +103,6 @@ class Route
         return $this->name;
     }
 
-    /**
-     * Set the route name if null.
-     *
-     * @param non-empty-string $name
-     * @return Route
-     */
-    public function setName(string $name): self
-    {
-        if (null !== $this->name) {
-            $message = static::class . ' ::$name is immutable once set';
-            throw new ImmutableProperty($message);
-        }
-        $this->name = $name;
-        return $this;
-    }
-
     public function getAllowedMethods(): ?array
     {
         return $this->methods;

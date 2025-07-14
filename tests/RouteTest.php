@@ -46,14 +46,6 @@ class RouteTest extends TestCase
         self::assertSame('test', $route->getName());
     }
 
-    public function testImmutableName()
-    {
-        $route = new Route('/foo', $this->callback, 'test');
-        self::expectException(ImmutableProperty::class);
-        self::expectExceptionMessage(Route::class . ' ::$name is immutable once set');
-        $route->setName('/bar');
-    }
-
     public function testAddAndGetTokens(): void
     {
         $tokens = ['id' => '[0-9]+', 'slug' => '[a-zA-Z-]+[a-zA-Z0-9_-]+'];
