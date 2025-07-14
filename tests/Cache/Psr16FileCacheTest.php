@@ -6,10 +6,8 @@ namespace PgTest\Router\Cache;
 
 use DateInterval;
 use PHPUnit\Framework\TestCase;
-use Pg\Router\Cache\FileCache;
 use Pg\Router\Cache\Psr16FileCache;
 use Pg\Router\Cache\Exception\InvalidArgumentException;
-use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as PsrInvalidArgumentException;
 
 class Psr16FileCacheTest extends TestCase
@@ -19,7 +17,7 @@ class Psr16FileCacheTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheDir = sys_get_temp_dir() . '/pg-router-cache-test' . uniqid();
+        $this->cacheDir = sys_get_temp_dir() . '/pg-router-cache-test';
         $this->cache = new Psr16FileCache($this->cacheDir, true, 'test');
     }
 
@@ -111,7 +109,7 @@ class Psr16FileCacheTest extends TestCase
         $this->assertTrue($this->cache->setMultiple($items));
         $result = $this->cache->getMultiple(array_keys($items));
 
-        $this->assertEquals($items, iterator_to_array($result));
+        $this->assertEquals($items, $result);
     }
 
     /**
@@ -128,7 +126,7 @@ class Psr16FileCacheTest extends TestCase
         $this->assertTrue($this->cache->deleteMultiple(['key1', 'key2']));
 
         $result = $this->cache->getMultiple(['key1', 'key2'], 'default');
-        $this->assertEquals(['key1' => 'default', 'key2' => 'default'], iterator_to_array($result));
+        $this->assertEquals(['key1' => 'default', 'key2' => 'default'], $result);
     }
 
     /**
@@ -151,10 +149,36 @@ class Psr16FileCacheTest extends TestCase
     /**
      * @throws PsrInvalidArgumentException
      */
+    public function testExpiredItemWithDateInterval(): void
+    {
+        $key = 'test-key';
+        $value = 'test-value';
+
+        $this->cache->set($key, $value, new DateInterval('PT1S'));
+        $this->assertEquals($value, $this->cache->get($key));
+
+        // Sleep for just over 1 second to ensure the item expires
+        usleep(2100000); // 2.1 seconds
+
+        $this->assertNull($this->cache->get($key));
+    }
+
+    /**
+     * @throws PsrInvalidArgumentException
+     */
     public function testInvalidKeyThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->get('invalid/key');
+    }
+
+    /**
+     * @throws PsrInvalidArgumentException
+     */
+    public function testEmptyKeyThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->get('');
     }
 
     /**
