@@ -13,6 +13,7 @@ A fast, flexible, and PSR-7 compatible HTTP router for PHP applications. Built f
 ## Table of Contents
 
 - [Features](#features)
+- [Credits](#credits)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
@@ -41,6 +42,14 @@ A fast, flexible, and PSR-7 compatible HTTP router for PHP applications. Built f
 - ⚡ **CRUD Helpers**: Quick REST resource route generation
 - 🔀 **Optional Segments**: Advanced optional route segment support
 - 🏗️ **Extensible**: Custom matchers and collectors for advanced use cases
+
+## Credits
+
+The regex pattern implementation and benchmarking are inspired by [nikic/Fast-Route](https://github.com/nikic/FastRoute).  
+For a detailed explanation of how this approach works and why it is fast, please read [nikic's blog post](http://nikic.github.io/2014/02/18/Fast-request-routing-using-regular-expressions.html).
+
+This router's implementation is original and may differ in speed or structure compared to Fast-Route.  
+Some parts do not strictly follow the same patterns as nikic/Fast-Route.
 
 ## Requirements
 
