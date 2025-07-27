@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Pg\Router;
 
-use Pg\Router\Exception\ImmutableProperty;
+use Pg\Middleware\Stack\MiddlewareAwareStackTrait;
 use Pg\Router\Exception\InvalidArgumentException;
-use Pg\Router\Middlewares\MiddlewareAwareStackTrait;
 
 use function array_map;
 use function implode;

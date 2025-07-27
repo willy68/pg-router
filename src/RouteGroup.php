@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pg\Router;
 
-use Pg\Router\Middlewares\MiddlewareAwareStackTrait;
+use Pg\Middleware\Stack\MiddlewareAwareStackTrait;
 
 use function ltrim;
 use function sprintf;

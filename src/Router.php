@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Pg\Router;
 
+use Pg\Middleware\Stack\MiddlewareAwareStackTrait;
 use Pg\Router\DuplicateDetector\DuplicateDetectorInterface;
 use Pg\Router\DuplicateDetector\DuplicateMethodMapDetector;
 use Pg\Router\Generator\UrlGenerator;
 use Pg\Router\Matcher\MarkDataMatcher;
 use Pg\Router\Matcher\MatcherInterface;
-use Pg\Router\Middlewares\MiddlewareAwareStackTrait;
 use Pg\Router\RegexCollector\MarkRegexCollector;
 use Pg\Router\RegexCollector\RegexCollectorInterface;
 use Psr\Cache\CacheException;
