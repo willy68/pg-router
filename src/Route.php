@@ -131,7 +131,7 @@ class Route
         return $this->host;
     }
 
-    public function setHost(string $host): self
+    public function setHost(string $host = null): self
     {
         $this->host = $host;
         return $this;
@@ -142,7 +142,7 @@ class Route
         return $this->port;
     }
 
-    public function setPort(int $port): self
+    public function setPort(int $port = null): self
     {
         $this->port = $port;
         return $this;
